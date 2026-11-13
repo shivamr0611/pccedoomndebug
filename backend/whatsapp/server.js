@@ -1,3 +1,11 @@
+const path = require('path');
+try {
+  process.loadEnvFile(path.join(__dirname, '.env'));
+} catch (e) {
+  console.warn('No .env loaded:', e.message);
+}
+if (!process.env.GROQ_API_KEY) console.warn('WARNING: GROQ_API_KEY is not set - auto-replies will fail');
+
 const http = require('http');
 const qrcode = require('qrcode-terminal');
 const { Client, LocalAuth } = require('whatsapp-web.js');
@@ -22,49 +30,41 @@ client.on('ready', () => {
 client.on('disconnected', () => {
   ready = false;
 });
-const GEMINI_MODELS = ['gemini-3.8-flash', 'gemini-3.1-flash-lite', 'gemini-3.5-flash', 'gemini-flash-latest'];
+const GEMINI_MODEL = 'gemini-2.5-flash';
 
 // Asks Gemini to say "hi" in the same language (and script) as the guest's message.
 async function greetInLanguageOf(text) {
   const key = process.env.GEMINI_API_KEY;
   if (!key) throw new Error('GEMINI_API_KEY is not set');
-
-  let lastError = null;
-  for (const model of GEMINI_MODELS) {
-    try {
-      const r = await fetch(
-        'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
-          body: JSON.stringify({
-            systemInstruction: {
-              parts: [{ text: 'Detect the language and script of the user message and reply with only a short friendly "hi" greeting in that same language and script. Output only the greeting.' }],
-            },
-            contents: [{ role: 'user', parts: [{ text: text }] }],
-            generationConfig: { thinkingConfig: { thinkingBudget: 0 } },
-          }),
-        }
-      );
-      const d = await r.json();
-      if (!r.ok) {
-        lastError = new Error((d.error && d.error.message) || 'Gemini HTTP ' + r.status);
-        continue;
-      }
-      const out = d.candidates && d.candidates[0] && d.candidates[0].content && d.candidates[0].content.parts.map((p) => p.text).join('').trim();
-      if (out) return out;
-    } catch (err) {
-      lastError = err;
+  const r = await fetch(
+    'https://generativelanguage.googleapis.com/v1beta/models/' + GEMINI_MODEL + ':generateContent',
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
+      body: JSON.stringify({
+        systemInstruction: {
+          parts: [{ text: 'Detect the language and script of the user message and reply with only a short friendly "hi" greeting in that same language and script. Output only the greeting.' }],
+        },
+        contents: [{ role: 'user', parts: [{ text: text }] }],
+        generationConfig: { thinkingConfig: { thinkingBudget: 0 } },
+      }),
     }
-  }
-  if (lastError) throw lastError;
-  return 'hi';
+  );
+  const d = await r.json();
+  if (!r.ok) throw new Error((d.error && d.error.message) || 'Gemini HTTP ' + r.status);
+  const out = d.candidates && d.candidates[0] && d.candidates[0].content.parts.map((p) => p.text).join('').trim();
+  return out || 'hi';
 }
 
-client.on('message', async (msg) => {
-  if (msg.fromMe || msg.isStatus || msg.from.endsWith('@g.us') || !msg.body) return;
+client.on('message_create', async (msg) => {
+  if (msg.isStatus || msg.from.endsWith('@g.us') || msg.to.endsWith('@g.us') || !msg.body) return;
+  if (msg.body.startsWith(BOT_MARK)) return;
+  if (msg.fromMe && msg.to !== msg.from) return; // ignore messages we send to other people (e.g. the Message tab)
+  if (msg.fromMe && recentBotTexts.has(norm(msg.body))) return; // our own reply echoing back
+  const chat = msg.fromMe ? msg.to : msg.from;
+  console.log('<- message from ' + (msg.fromMe ? 'self' : msg.from) + ': ' + msg.body);
   try {
-    await msg.reply(await greetInLanguageOf(msg.body));
+    await sendBot(chat, await translateWithEnglish(msg.body));
   } catch (e) {
     console.error('Auto-reply failed:', e.message);
   }
