@@ -250,15 +250,16 @@ async function resolveSender(msg, chat) {
   return { phone, name };
 }
 
-const BOOKING_INTENT_RE = /\b(?:book(?:\s+the|\s+a)?\s+room|book\s+it|confirm\s+booking|booking\s+kar(?:na|o|do)?|room\s+book)\b/i;
+const BOOKING_INTENT_RE = /\b(?:book(?:ing)?(?:\s+(?:for|a|the|it|room|me))?|confirm\s+booking|booking\s+kar(?:na|o|do)?|room\s+book)\b/i;
 
 function extractDateFromText(text) {
-  const m = String(text || '').match(/(\d{1,2})\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{4})/i);
+  const m = String(text || '').match(/(\d{1,2})\s+(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s*(?:(\d{2,4}))?/i);
   if (m) {
-    const months = { january: '01', february: '02', march: '03', april: '04', may: '05', june: '06', july: '07', august: '08', september: '09', october: '10', november: '11', december: '12' };
-    const month = months[m[2].toLowerCase()];
+    const months = { jan: '01', feb: '02', mar: '03', apr: '04', may: '05', jun: '06', jul: '07', aug: '08', sep: '09', oct: '10', nov: '11', dec: '12' };
+    const month = months[m[2].toLowerCase().slice(0, 3)];
     const day = m[1].padStart(2, '0');
-    return m[3] + '-' + month + '-' + day;
+    let year = m[3] ? (m[3].length === 2 ? '20' + m[3] : m[3]) : '2026';
+    return year + '-' + month + '-' + day;
   }
   const iso = String(text || '').match(/\b(\d{4}-\d{2}-\d{2})\b/);
   return iso ? iso[1] : null;
