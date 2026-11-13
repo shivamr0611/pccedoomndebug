@@ -1,584 +1,847 @@
 <!DOCTYPE html>
 
-<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "error-container": "#ffdad6", "tertiary-fixed-dim": "#7dd0ff", "on-primary-fixed-variant": "#394761", "secondary-container": "#fd6e5c", "inverse-primary": "#b9c7e6", "tertiary": "#000000", "on-tertiary-container": "#008dc0", "surface": "#fbf8fb", "primary-fixed-dim": "#b9c7e6", "on-secondary-fixed": "#410000", "outline": "#75777e", "surface-container": "#efedf0", "on-tertiary-fixed-variant": "#004c69", "secondary-fixed": "#ffdad5", "surface-tint": "#515f7a", "on-surface-variant": "#44474d", "surface-container-highest": "#e4e2e4", "on-error": "#ffffff", "background": "#fbf8fb", "outline-variant": "#c5c6ce", "on-primary": "#ffffff", "on-error-container": "#93000a", "on-background": "#1b1b1d", "surface-container-lowest": "#ffffff", "surface-container-low": "#f5f3f5", "on-secondary-container": "#6d0102", "primary": "#000000", "tertiary-container": "#001e2c", "surface-container-high": "#eae7ea", "on-tertiary": "#ffffff", "inverse-on-surface": "#f2f0f2", "primary-fixed": "#d7e3ff", "on-secondary": "#ffffff", "on-primary-container": "#7684a1", "on-tertiary-fixed": "#001e2c", "surface-variant": "#e4e2e4", "on-surface": "#1b1b1d", "primary-container": "#0c1b33", "tertiary-fixed": "#c4e7ff", "secondary-fixed-dim": "#ffb4a9", "on-secondary-fixed-variant": "#8a1a12", "on-primary-fixed": "#0c1b33", "inverse-surface": "#303032", "surface-bright": "#fbf8fb", "secondary": "#ac3327", "error": "#ba1a1a", "surface-dim": "#dbd9dc" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-md": "1rem", "gutter": "1.5rem", "space-xs": "0.25rem", "space-sm": "0.5rem", "space-xl": "2rem", "margin": "2rem", "space-lg": "1.5rem", "space-xxl": "3rem" }, "fontFamily": { "label-sm": ["Inter"], "body-lg": ["Inter"], "label-md": ["Inter"], "headline-md": ["Inter"], "headline-lg": ["Inter"], "body-sm": ["Inter"], "headline-sm": ["Inter"], "body-md": ["Inter"], "headline-xl": ["Inter"] }, "fontSize": { "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }], "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "500" }], "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }], "headline-sm": ["16px", { "lineHeight": "24px", "fontWeight": "500" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "headline-xl": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }] } } } }</script><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/></head><body class="bg-[#F6F3F3] font-body text-on-surface"><aside class="fixed left-0 top-0 h-full w-[240px] bg-primary-container z-50 flex flex-col justify-between py-6"><div class="flex flex-col"><div class="px-6 mb-8 flex items-center gap-3"><img alt="Sunset Bay Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1j_jF9ff_6jXVnqNdvU5ltkA_QIkvWFi78OfLJGK9_v5-YAf13XXncOr3hzRwt0LHDEh1K1KAWPN68lYM2w2ZfnnQIh14pVKCElihl-cA49sBuTV8wgTcW7EYpVkVkDMSrQD886a4YkWbYWG4yoIChFEEMe2EaODmVkr22xUzQ8Ulfmhx5_HCtusI1JOh9DuxaLqIYcuDAPYbVBF2Zm3YGXOA9Nm0XMv1zwbZmg"/><div class="flex flex-col"><span class="text-headline-sm font-bold text-on-primary">Sunset Bay</span><span class="text-label-sm text-on-primary-container">Calangute, Goa</span></div></div><div class="px-4 mb-6"><div class="bg-primary p-3 rounded-xl flex items-center justify-between text-on-primary cursor-pointer"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-sm">apartment</span><span class="text-body-sm font-medium">Sunset Bay Resort</span></div><span class="material-symbols-outlined text-sm">unfold_more</span></div></div><nav class="flex-1 px-4 space-y-1" data-active-classes="bg-secondary text-on-secondary font-bold rounded-xl"><a class="flex items-center justify-between px-4 py-3 transition-all rounded-xl text-primary-fixed-dim hover:bg-surface-container-high hover:text-on-surface" data-path="dashboard" href="#"><span class="material-symbols-outlined mr-3">dashboard</span>Dashboard</a><a class="flex items-center justify-between px-4 py-3 rounded-xl transition-all text-primary-fixed-dim hover:bg-surface-container-high hover:text-on-surface" data-path="conversations" href="#"><div class="flex items-center"><span class="material-symbols-outlined mr-3">chat</span>Conversations</div><span class="bg-secondary-container text-on-secondary-container text-label-sm px-2 py-0.5 rounded-full">7</span></a><a class="flex items-center px-4 py-3 rounded-xl transition-all text-primary-fixed-dim hover:bg-surface-container-high hover:text-on-surface" data-path="tickets" href="#"><span class="material-symbols-outlined mr-3">confirmation_number</span>Tickets</a><a aria-current="page" class="flex items-center px-4 py-3 rounded-xl transition-all bg-secondary text-on-secondary font-bold" data-path="guests" href="#"><span class="material-symbols-outlined mr-3">group</span>Guests</a><a class="flex items-center px-4 py-3 rounded-xl transition-all text-primary-fixed-dim hover:bg-surface-container-high hover:text-on-surface" data-path="knowledge-base" href="#"><span class="material-symbols-outlined mr-3">menu_book</span>Knowledge Base</a><a class="flex items-center px-4 py-3 rounded-xl transition-all text-primary-fixed-dim hover:bg-surface-container-high hover:text-on-surface" data-path="analytics" href="#"><span class="material-symbols-outlined mr-3">analytics</span>Analytics</a><a class="flex items-center px-4 py-3 rounded-xl transition-all text-primary-fixed-dim hover:bg-surface-container-high hover:text-on-surface" data-path="triggers-and-alerts" href="#"><span class="material-symbols-outlined mr-3">bolt</span>Triggers &amp; Alerts</a><a class="flex items-center px-4 py-3 rounded-xl transition-all text-primary-fixed-dim hover:bg-surface-container-high hover:text-on-surface" data-path="settings" href="#"><span class="material-symbols-outlined mr-3">settings</span>Settings</a></nav></div><div class="px-4 pt-4 border-t border-outline-variant/20"><div class="flex items-center gap-3 px-2"><img alt="Profile" class="w-9 h-9 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYuf5ThWCtj7pbiidRxX44c7_Zei1tdmHaXFscoH85EO_oX0TcvB5pJbqVTUvGeO5ZgbeYYgwB-jT9koZGXCkQNuY1MZIlXVEWmzl2-OJ5Q6KlTrY5jx15t9hhh2Oqb5E2zi16JJ6YM6kkNJ8JvdiqUeG4NKjnVPtSjijOsnLgYv0Reap--37RcVehblDBl9jYB8kD5nnt3clD1NvfIKdll89Qt_QhFzJlcb-faA"/><div class="flex flex-col overflow-hidden"><span class="text-body-sm font-medium text-on-primary truncate">Meera Prabhu</span><span class="text-label-sm text-on-primary-container truncate">Manager</span></div></div></div></aside><div class="pl-[240px]"><header class="fixed top-0 left-[240px] right-0 h-16 bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-gutter"><div class="flex items-center gap-4 text-on-surface-variant text-body-sm"><span class="hover:text-on-surface cursor-pointer">Home</span><span class="material-symbols-outlined text-xs">chevron_right</span><span class="text-on-surface font-medium">Dashboard</span></div><div class="flex items-center gap-4"><div class="flex items-center bg-surface-container px-3 py-1.5 rounded-lg border border-outline-variant/30 text-on-surface-variant"><span class="material-symbols-outlined text-sm mr-2">search</span><input class="bg-transparent border-none outline-none text-body-sm text-on-surface w-64" placeholder="Search guests, rooms, tickets..." type="text"/></div><div class="flex items-center gap-2 bg-surface-container px-3 py-1.5 rounded-lg border border-outline-variant/30 text-body-sm text-on-surface-variant cursor-pointer"><span class="material-symbols-outlined text-sm">language</span><span>EN</span></div><div class="flex items-center gap-2 bg-surface-container px-3 py-1.5 rounded-lg border border-outline-variant/30 text-body-sm text-on-surface"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span><span class="text-label-md font-medium">AI Online</span></div><div class="relative cursor-pointer"><span class="material-symbols-outlined text-on-surface-variant hover:text-on-surface">notifications</span><span class="absolute top-0 right-0 w-2 h-2 rounded-full bg-secondary"></span></div><img alt="Profile" class="w-8 h-8 rounded-full object-cover cursor-pointer" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYuf5ThWCtj7pbiidRxX44c7_Zei1tdmHaXFscoH85EO_oX0TcvB5pJbqVTUvGeO5ZgbeYYgwB-jT9koZGXCkQNuY1MZIlXVEWmzl2-OJ5Q6KlTrY5jx15t9hhh2Oqb5E2zi16JJ6YM6kkNJ8JvdiqUeG4NKjnVPtSjijOsnLgYv0Reap--37RcVehblDBl9jYB8kD5nnt3clD1NvfIKdll89Qt_QhFzJlcb-faA"/></div></header><main class="relative pt-16 bg-[#F6F3F3] min-h-screen p-gutter"><div class="flex flex-col w-full pb-16">
-<!-- Top Stats & Header Action Row -->
-<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-<div>
-<div class="flex items-center gap-2 text-label-md text-on-surface-variant uppercase tracking-wider mb-1">
-<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
-        Directory &amp; CRM
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <meta content="web_dashboard" name="shell-type" />
+  <style>
+    @layer base {
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        overscroll-behavior: none;
+      }
+
+      main>:first-child {
+        margin-top: 0 !important;
+      }
+
+      main>:last-child {
+        margin-bottom: 0 !important;
+      }
+    }
+
+    ::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script
+    id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "error-container": "#ffdad6", "tertiary-fixed-dim": "#7dd0ff", "on-primary-fixed-variant": "#394761", "secondary-container": "#fd6e5c", "inverse-primary": "#b9c7e6", "tertiary": "#000000", "on-tertiary-container": "#008dc0", "surface": "#fbf8fb", "primary-fixed-dim": "#b9c7e6", "on-secondary-fixed": "#410000", "outline": "#75777e", "surface-container": "#efedf0", "on-tertiary-fixed-variant": "#004c69", "secondary-fixed": "#ffdad5", "surface-tint": "#515f7a", "on-surface-variant": "#44474d", "surface-container-highest": "#e4e2e4", "on-error": "#ffffff", "background": "#fbf8fb", "outline-variant": "#c5c6ce", "on-primary": "#ffffff", "on-error-container": "#93000a", "on-background": "#1b1b1d", "surface-container-lowest": "#ffffff", "surface-container-low": "#f5f3f5", "on-secondary-container": "#6d0102", "primary": "#000000", "tertiary-container": "#001e2c", "surface-container-high": "#eae7ea", "on-tertiary": "#ffffff", "inverse-on-surface": "#f2f0f2", "primary-fixed": "#d7e3ff", "on-secondary": "#ffffff", "on-primary-container": "#7684a1", "on-tertiary-fixed": "#001e2c", "surface-variant": "#e4e2e4", "on-surface": "#1b1b1d", "primary-container": "#0c1b33", "tertiary-fixed": "#c4e7ff", "secondary-fixed-dim": "#ffb4a9", "on-secondary-fixed-variant": "#8a1a12", "on-primary-fixed": "#0c1b33", "inverse-surface": "#303032", "surface-bright": "#fbf8fb", "secondary": "#ac3327", "error": "#ba1a1a", "surface-dim": "#dbd9dc" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-md": "1rem", "gutter": "1.5rem", "space-xs": "0.25rem", "space-sm": "0.5rem", "space-xl": "2rem", "margin": "2rem", "space-lg": "1.5rem", "space-xxl": "3rem" }, "fontFamily": { "label-sm": ["Inter"], "body-lg": ["Inter"], "label-md": ["Inter"], "headline-md": ["Inter"], "headline-lg": ["Inter"], "body-sm": ["Inter"], "headline-sm": ["Inter"], "body-md": ["Inter"], "headline-xl": ["Inter"] }, "fontSize": { "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }], "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "500" }], "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }], "headline-sm": ["16px", { "lineHeight": "24px", "fontWeight": "500" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "headline-xl": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }] } } } }</script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+    rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
+</head>
+
+<body class="bg-[#F6F3F3] font-body text-on-surface">
+  <aside class="fixed left-0 top-0 h-full w-[240px] bg-primary-container z-50 flex flex-col justify-between py-6">
+    <div class="flex flex-col">
+      <div class="px-6 mb-8 flex items-center gap-3"><img alt="Sunset Bay Logo" class="h-8 w-auto object-contain"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1j_jF9ff_6jXVnqNdvU5ltkA_QIkvWFi78OfLJGK9_v5-YAf13XXncOr3hzRwt0LHDEh1K1KAWPN68lYM2w2ZfnnQIh14pVKCElihl-cA49sBuTV8wgTcW7EYpVkVkDMSrQD886a4YkWbYWG4yoIChFEEMe2EaODmVkr22xUzQ8Ulfmhx5_HCtusI1JOh9DuxaLqIYcuDAPYbVBF2Zm3YGXOA9Nm0XMv1zwbZmg" />
+        <div class="flex flex-col"><span class="text-headline-sm font-bold text-on-primary">Sunset Bay</span><span
+            class="text-label-sm text-on-primary-container">Calangute, Goa</span></div>
       </div>
-<h1 class="text-headline-xl font-headline-xl text-on-surface">Guest Management</h1>
-</div>
-<div class="flex items-center gap-3">
-<button class="flex items-center gap-2 bg-surface-container hover:bg-surface-container-high text-on-surface px-4 py-2.5 rounded-lg text-body-sm font-medium transition-all shadow-sm" onclick="openExportModal()">
-<span class="material-symbols-outlined text-base">download</span>
-        Export CSV
-      </button>
-<button class="flex items-center gap-2 bg-secondary text-on-secondary px-4 py-2.5 rounded-lg text-body-sm font-medium transition-all shadow-sm hover:opacity-90" onclick="openAddGuestModal()">
-<span class="material-symbols-outlined text-base">person_add</span>
-        Add New Guest
-      </button>
-</div>
-</div>
-<!-- Metric Overview Cards -->
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter mb-8">
-<div class="bg-surface-container-low p-5 rounded-xl shadow-sm flex items-center justify-between">
-<div>
-<p class="text-label-md text-on-surface-variant mb-1">Total Registered</p>
-<h3 class="text-headline-lg font-headline-lg text-on-surface">1,482</h3>
-<span class="text-label-sm text-emerald-600 font-medium mt-1 inline-block">+12% this month</span>
-</div>
-<div class="w-12 h-12 rounded-xl bg-primary-container text-on-primary flex items-center justify-center shadow-sm">
-<span class="material-symbols-outlined text-2xl">group</span>
-</div>
-</div>
-<div class="bg-surface-container-low p-5 rounded-xl shadow-sm flex items-center justify-between">
-<div>
-<p class="text-label-md text-on-surface-variant mb-1">In-House Now</p>
-<h3 class="text-headline-lg font-headline-lg text-on-surface">128</h3>
-<span class="text-label-sm text-on-surface-variant font-medium mt-1 inline-block">42 rooms occupied</span>
-</div>
-<div class="w-12 h-12 rounded-xl bg-secondary-container text-on-secondary-container flex items-center justify-center shadow-sm">
-<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">hotel</span>
-</div>
-</div>
-<div class="bg-surface-container-low p-5 rounded-xl shadow-sm flex items-center justify-between">
-<div>
-<p class="text-label-md text-on-surface-variant mb-1">VIP &amp; Returning</p>
-<h3 class="text-headline-lg font-headline-lg text-on-surface">346</h3>
-<span class="text-label-sm text-emerald-600 font-medium mt-1 inline-block">23% retention rate</span>
-</div>
-<div class="w-12 h-12 rounded-xl bg-tertiary-container text-on-tertiary flex items-center justify-center shadow-sm">
-<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">star</span>
-</div>
-</div>
-<div class="bg-surface-container-low p-5 rounded-xl shadow-sm flex items-center justify-between">
-<div>
-<p class="text-label-md text-on-surface-variant mb-1">AI Profiles Built</p>
-<h3 class="text-headline-lg font-headline-lg text-on-surface">1,420</h3>
-<span class="text-label-sm text-on-surface-variant font-medium mt-1 inline-block">95.8% sync rate</span>
-</div>
-<div class="w-12 h-12 rounded-xl bg-primary text-on-primary flex items-center justify-center shadow-sm">
-<span class="material-symbols-outlined text-2xl">neurology</span>
-</div>
-</div>
-</div>
-<!-- Search, Filter & Table Area -->
-<div class="bg-surface-container-low rounded-xl shadow-sm overflow-hidden flex flex-col">
-<!-- Toolbar -->
-<div class="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
-<div class="flex items-center gap-3 flex-1">
-<div class="flex items-center bg-surface px-3 py-2 rounded-lg shadow-sm w-full md:w-80">
-<span class="material-symbols-outlined text-on-surface-variant text-base mr-2">search</span>
-<input class="bg-transparent border-none outline-none text-body-sm text-on-surface w-full" id="guestSearch" oninput="filterGuests()" placeholder="Search by name, phone or tag..." type="text"/>
-</div>
-<div class="hidden sm:flex items-center gap-2">
-<select class="bg-surface text-on-surface text-body-sm px-3 py-2 rounded-lg shadow-sm outline-none cursor-pointer" id="tagFilter" onchange="filterGuests()">
-<option value="">All Tags</option>
-<option value="VIP">VIP</option>
-<option value="Returning">Returning</option>
-<option value="Corporate">Corporate</option>
-<option value="Family">Family</option>
-<option value="Spa Lover">Spa Lover</option>
-</select>
-<select class="bg-surface text-on-surface text-body-sm px-3 py-2 rounded-lg shadow-sm outline-none cursor-pointer" id="langFilter" onchange="filterGuests()">
-<option value="">All Languages</option>
-<option value="English">English</option>
-<option value="Russian">Russian</option>
-<option value="German">German</option>
-<option value="Hindi">Hindi</option>
-</select>
-</div>
-</div>
-<div class="flex items-center gap-2 text-body-sm text-on-surface-variant">
-<span>Showing <strong class="text-on-surface" id="visibleCount">6</strong> of 6 guests</span>
-</div>
-</div>
-<!-- Table Container -->
-<div class="overflow-x-auto">
-<table class="w-full text-left border-collapse">
-<thead>
-<tr class="bg-surface-container text-on-surface-variant text-label-md uppercase tracking-wider">
-<th class="py-3 px-6 cursor-pointer hover:text-on-surface" onclick="sortTable(0)">Guest <span class="material-symbols-outlined text-xs align-middle">unfold_more</span></th>
-<th class="py-3 px-4">Phone</th>
-<th class="py-3 px-4 cursor-pointer hover:text-on-surface text-center" onclick="sortTable(2)">Stays <span class="material-symbols-outlined text-xs align-middle">unfold_more</span></th>
-<th class="py-3 px-4 cursor-pointer hover:text-on-surface" onclick="sortTable(3)">Last Visit <span class="material-symbols-outlined text-xs align-middle">unfold_more</span></th>
-<th class="py-3 px-4">Preferred Language</th>
-<th class="py-3 px-4">Tags</th>
-<th class="py-3 px-6 text-right">Action</th>
-</tr>
-</thead>
-<tbody class="text-body-sm text-on-surface" id="guestTableBody">
-<!-- Row 1 -->
-<tr class="hover:bg-surface-container transition-colors cursor-pointer group" onclick="openDrawer('Aarav Sharma', '+91 98231 45678', '4 Stays', 'Oct 14, 2023', 'English', ['VIP', 'Spa Lover'])">
-<td class="py-4 px-6 flex items-center gap-3">
-<img class="w-10 h-10 rounded-full object-cover shadow-sm" data-alt="Portrait of an Indian man in his late 30s with a neat beard and professional smile, wearing a casual linen shirt, warm ambient lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJ2IYwqsZ1yKFIhO23HwUnyvmMXjDfpbNixVV2nRdZU3il84Hd0_0_vqjjE7b-kbKnqDsv2vTq7PO6auJc0lzHHBo8jfc6MqS43aKxI-CNpQ4Lzm_hThbwyg-dPxCHqjCfc2f_uh_j3LYkfN5zVMY5W4iRilhnqyL-bzIzY9_l4Y4v8p-bXM9JMnmQP9fB5r1UvE2fmKOIybPH5dZoahgbtf1yEpwntwS3QeOhrQ"/>
-<div>
-<div class="font-medium text-on-surface group-hover:text-secondary transition-colors">Aarav Sharma</div>
-<div class="text-label-sm text-on-surface-variant">Room 304 (Deluxe Suite)</div>
-</div>
-</td>
-<td class="py-4 px-4 text-on-surface-variant">+91 98231 45678</td>
-<td class="py-4 px-4 text-center"><span class="bg-primary-fixed text-on-primary-fixed font-semibold px-2.5 py-1 rounded-full text-label-sm">4</span></td>
-<td class="py-4 px-4 text-on-surface-variant">Oct 14, 2023</td>
-<td class="py-4 px-4"><span class="bg-surface-container-high text-on-surface px-2.5 py-1 rounded-full text-label-sm font-medium">English</span></td>
-<td class="py-4 px-4">
-<div class="flex items-center gap-1.5 flex-wrap">
-<span class="bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded text-label-sm font-medium">VIP</span>
-<span class="bg-tertiary-fixed text-on-tertiary-fixed px-2 py-0.5 rounded text-label-sm font-medium">Spa Lover</span>
-</div>
-</td>
-<td class="py-4 px-6 text-right">
-<button class="text-secondary hover:underline font-medium inline-flex items-center gap-1" onclick="event.stopPropagation(); openDrawer('Aarav Sharma', '+91 98231 45678', '4 Stays', 'Oct 14, 2023', 'English', ['VIP', 'Spa Lover'])">
-                View <span class="material-symbols-outlined text-sm">arrow_forward</span>
-</button>
-</td>
-</tr>
-<!-- Row 2 -->
-<tr class="hover:bg-surface-container transition-colors cursor-pointer group" onclick="openDrawer('Elena Rostova', '+7 916 456 7890', '2 Stays', 'Jan 05, 2024', 'Russian', ['Returning'])">
-<td class="py-4 px-6 flex items-center gap-3">
-<img class="w-10 h-10 rounded-full object-cover shadow-sm" data-alt="Portrait of a Russian woman in her early 30s with blonde hair tied back, wearing sunglasses resting on her head, bright tropical resort background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBg4z22A594CZaliuIvzD5SfLs8Aaeq1tXFnjPuOQgci18lnVVJfe5JEPtRDYBYOh2H95FsIIFslQ8RZuXYA9f1JSg9_0ELfgY7eESh95VBLdY0CVuZtETJlyMDvI-4ocCIPVRw2PIsUAkfszFWeioSZY3JU4kHHH777lb7H4SENWeg-mTtXiib3cJ4AT5gYycUKTqxDNblg0_26TJ-wnU1SnQFOT4-N8aXsGFWEA"/>
-<div>
-<div class="font-medium text-on-surface group-hover:text-secondary transition-colors">Elena Rostova</div>
-<div class="text-label-sm text-on-surface-variant">Room 112 (Sea View)</div>
-</div>
-</td>
-<td class="py-4 px-4 text-on-surface-variant">+7 916 456 7890</td>
-<td class="py-4 px-4 text-center"><span class="bg-primary-fixed text-on-primary-fixed font-semibold px-2.5 py-1 rounded-full text-label-sm">2</span></td>
-<td class="py-4 px-4 text-on-surface-variant">Jan 05, 2024</td>
-<td class="py-4 px-4"><span class="bg-surface-container-high text-on-surface px-2.5 py-1 rounded-full text-label-sm font-medium">Russian</span></td>
-<td class="py-4 px-4">
-<div class="flex items-center gap-1.5 flex-wrap">
-<span class="bg-surface-container text-on-surface-variant px-2 py-0.5 rounded text-label-sm font-medium">Returning</span>
-</div>
-</td>
-<td class="py-4 px-6 text-right">
-<button class="text-secondary hover:underline font-medium inline-flex items-center gap-1" onclick="event.stopPropagation(); openDrawer('Elena Rostova', '+7 916 456 7890', '2 Stays', 'Jan 05, 2024', 'Russian', ['Returning'])">
-                View <span class="material-symbols-outlined text-sm">arrow_forward</span>
-</button>
-</td>
-</tr>
-<!-- Row 3 -->
-<tr class="hover:bg-surface-container transition-colors cursor-pointer group" onclick="openDrawer('Marcus Schmidt', '+49 151 23456789', '1 Stay', 'Nov 20, 2023', 'German', ['Corporate'])">
-<td class="py-4 px-6 flex items-center gap-3">
-<img class="w-10 h-10 rounded-full object-cover shadow-sm" data-alt="Portrait of a German businessman in his 40s with short silver hair and glasses, wearing a crisp collarless shirt." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCkX3U9TJTTz6qoGSWFfu876gnVo0dosLjX34qk4GCBoiJ4x1eyRe6_nyIDmrMwGfMCdMqxwfqW1WO0nYeM1U1nAdXRGZwzECk7q-VTWrjLRNexNcMqXFRFmwG9_tbFAZt2pNp-rLGtatWH6m9CJi5SZ7pHsMRKIjAu9Cia9zUC1PLUsxQG9tnGjckxqUwsTIDikB8dWVku5McdF3VUZG0USJMHbdbvj2tL2fSfQw"/>
-<div>
-<div class="font-medium text-on-surface group-hover:text-secondary transition-colors">Marcus Schmidt</div>
-<div class="text-label-sm text-on-surface-variant">Checked Out</div>
-</div>
-</td>
-<td class="py-4 px-4 text-on-surface-variant">+49 151 23456789</td>
-<td class="py-4 px-4 text-center"><span class="bg-primary-fixed text-on-primary-fixed font-semibold px-2.5 py-1 rounded-full text-label-sm">1</span></td>
-<td class="py-4 px-4 text-on-surface-variant">Nov 20, 2023</td>
-<td class="py-4 px-4"><span class="bg-surface-container-high text-on-surface px-2.5 py-1 rounded-full text-label-sm font-medium">German</span></td>
-<td class="py-4 px-4">
-<div class="flex items-center gap-1.5 flex-wrap">
-<span class="bg-primary-container text-on-primary px-2 py-0.5 rounded text-label-sm font-medium">Corporate</span>
-</div>
-</td>
-<td class="py-4 px-6 text-right">
-<button class="text-secondary hover:underline font-medium inline-flex items-center gap-1" onclick="event.stopPropagation(); openDrawer('Marcus Schmidt', '+49 151 23456789', '1 Stay', 'Nov 20, 2023', 'German', ['Corporate'])">
-                View <span class="material-symbols-outlined text-sm">arrow_forward</span>
-</button>
-</td>
-</tr>
-<!-- Row 4 -->
-<tr class="hover:bg-surface-container transition-colors cursor-pointer group" onclick="openDrawer('Priya Nair', '+91 97412 88990', '6 Stays', 'Feb 12, 2024', 'English', ['VIP', 'Family'])">
-<td class="py-4 px-6 flex items-center gap-3">
-<img class="w-10 h-10 rounded-full object-cover shadow-sm" data-alt="Portrait of an Indian woman in her late 20s with long dark hair, wearing traditional elegant attire with warm resort lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAqSJmiKxM5PfQYLl_Hv8G7aatzxgwrXu_fwv7gujlQ0jDqE1Y4IJ8la2pdJBVmD-QO_F1e-zNYyHtjsRFsSeLZFcrtg4wXp7pZe0hkGLbHdTDH3oAN1YYMnsdRCTwqM_eG6LeUUaKBzQG8JRBPeKxe-JiRvPSDHSZVfZi-9PJIzUVzyyqvd2zo7qS0stCVK7czQc5TYvmapawUKd4slQv9-lzdXsFENk_IAqfAZw"/>
-<div>
-<div class="font-medium text-on-surface group-hover:text-secondary transition-colors">Priya Nair</div>
-<div class="text-label-sm text-on-surface-variant">Room 205 (Family Villa)</div>
-</div>
-</td>
-<td class="py-4 px-4 text-on-surface-variant">+91 97412 88990</td>
-<td class="py-4 px-4 text-center"><span class="bg-primary-fixed text-on-primary-fixed font-semibold px-2.5 py-1 rounded-full text-label-sm">6</span></td>
-<td class="py-4 px-4 text-on-surface-variant">Feb 12, 2024</td>
-<td class="py-4 px-4"><span class="bg-surface-container-high text-on-surface px-2.5 py-1 rounded-full text-label-sm font-medium">English</span></td>
-<td class="py-4 px-4">
-<div class="flex items-center gap-1.5 flex-wrap">
-<span class="bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded text-label-sm font-medium">VIP</span>
-<span class="bg-error-container text-on-error-container px-2 py-0.5 rounded text-label-sm font-medium">Family</span>
-</div>
-</td>
-<td class="py-4 px-6 text-right">
-<button class="text-secondary hover:underline font-medium inline-flex items-center gap-1" onclick="event.stopPropagation(); openDrawer('Priya Nair', '+91 97412 88990', '6 Stays', 'Feb 12, 2024', 'English', ['VIP', 'Family'])">
-                View <span class="material-symbols-outlined text-sm">arrow_forward</span>
-</button>
-</td>
-</tr>
-<!-- Row 5 -->
-<tr class="hover:bg-surface-container transition-colors cursor-pointer group" onclick="openDrawer('Liam O’Connor', '+353 87 123 4567', '3 Stays', 'Dec 31, 2023', 'English', ['Returning', 'Spa Lover'])">
-<td class="py-4 px-6 flex items-center gap-3">
-<img class="w-10 h-10 rounded-full object-cover shadow-sm" data-alt="Portrait of an Irish man in his 30s with reddish beard, smiling warmly outdoors." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1t3TgUzpX6HYhtcp-B0dLPi4JBI1ZuOu-2gp9jDGB6WKwE2Mops0ZXvEwYFw55jU2syW1WvaHGoV7Fo3vOLaoh1claKulVk_x4IIAcjePlXUSMcVwMTQwP0CNrfRksV5rlOTWSW-YqDuaO3MI2hc_61EPLn_F6n6XmGqoGX4zU_tQ9m3rfutTz5p7Ty9ngFXJuNnLAxG-kg9yvt-pgkqGf5ZWqYJkUjdZEXfg8g"/>
-<div>
-<div class="font-medium text-on-surface group-hover:text-secondary transition-colors">Liam O’Connor</div>
-<div class="text-label-sm text-on-surface-variant">Checked Out</div>
-</div>
-</td>
-<td class="py-4 px-4 text-on-surface-variant">+353 87 123 4567</td>
-<td class="py-4 px-4 text-center"><span class="bg-primary-fixed text-on-primary-fixed font-semibold px-2.5 py-1 rounded-full text-label-sm">3</span></td>
-<td class="py-4 px-4 text-on-surface-variant">Dec 31, 2023</td>
-<td class="py-4 px-4"><span class="bg-surface-container-high text-on-surface px-2.5 py-1 rounded-full text-label-sm font-medium">English</span></td>
-<td class="py-4 px-4">
-<div class="flex items-center gap-1.5 flex-wrap">
-<span class="bg-surface-container text-on-surface-variant px-2 py-0.5 rounded text-label-sm font-medium">Returning</span>
-<span class="bg-tertiary-fixed text-on-tertiary-fixed px-2 py-0.5 rounded text-label-sm font-medium">Spa Lover</span>
-</div>
-</td>
-<td class="py-4 px-6 text-right">
-<button class="text-secondary hover:underline font-medium inline-flex items-center gap-1" onclick="event.stopPropagation(); openDrawer('Liam O’Connor', '+353 87 123 4567', '3 Stays', 'Dec 31, 2023', 'English', ['Returning', 'Spa Lover'])">
-                View <span class="material-symbols-outlined text-sm">arrow_forward</span>
-</button>
-</td>
-</tr>
-<!-- Row 6 -->
-<tr class="hover:bg-surface-container transition-colors cursor-pointer group" onclick="openDrawer('Ananya Deshmukh', '+91 99112 33445', '1 Stay', 'Feb 14, 2024', 'Hindi', ['Corporate'])">
-<td class="py-4 px-6 flex items-center gap-3">
-<img class="w-10 h-10 rounded-full object-cover shadow-sm" data-alt="Portrait of a young Indian professional woman with sleek hair and confident expression." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnHyF8C5Y1nSteClqxCpO5_pzt7tsGUErZ8K1w5hYx9lnn0_QEEJR3CyvqN3IsJpeQaVX7UrOOMHUCI9cHWs8XStidu67nEYcb5HoySqJPH8K7aG9MIoNlGLXkXYNEblr8LjWRWA9zVB6KJLA6nR8EPLYKP_N8gFh9oIFIuRaCS5RhrZKpAjZbWoJuUS_711F17avojk8sdrxEoVogzfzerFfjTMH0An4W016dzQ"/>
-<div>
-<div class="font-medium text-on-surface group-hover:text-secondary transition-colors">Ananya Deshmukh</div>
-<div class="text-label-sm text-on-surface-variant">Room 410 (Sea View)</div>
-</div>
-</td>
-<td class="py-4 px-4 text-on-surface-variant">+91 99112 33445</td>
-<td class="py-4 px-4 text-center"><span class="bg-primary-fixed text-on-primary-fixed font-semibold px-2.5 py-1 rounded-full text-label-sm">1</span></td>
-<td class="py-4 px-4 text-on-surface-variant">Feb 14, 2024</td>
-<td class="py-4 px-4"><span class="bg-surface-container-high text-on-surface px-2.5 py-1 rounded-full text-label-sm font-medium">Hindi</span></td>
-<td class="py-4 px-4">
-<div class="flex items-center gap-1.5 flex-wrap">
-<span class="bg-primary-container text-on-primary px-2 py-0.5 rounded text-label-sm font-medium">Corporate</span>
-</div>
-</td>
-<td class="py-4 px-6 text-right">
-<button class="text-secondary hover:underline font-medium inline-flex items-center gap-1" onclick="event.stopPropagation(); openDrawer('Ananya Deshmukh', '+91 99112 33445', '1 Stay', 'Feb 14, 2024', 'Hindi', ['Corporate'])">
-                View <span class="material-symbols-outlined text-sm">arrow_forward</span>
-</button>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<!-- Pagination Footer -->
-<div class="p-4 bg-surface-container-low flex items-center justify-between border-t border-outline-variant/10 text-body-sm text-on-surface-variant">
-<div>Page 1 of 24</div>
-<div class="flex items-center gap-2">
-<button class="px-3 py-1.5 rounded bg-surface hover:bg-surface-container text-on-surface disabled:opacity-50 shadow-sm" disabled="">Previous</button>
-<button class="px-3 py-1.5 rounded bg-secondary text-on-secondary shadow-sm">1</button>
-<button class="px-3 py-1.5 rounded bg-surface hover:bg-surface-container text-on-surface shadow-sm">2</button>
-<button class="px-3 py-1.5 rounded bg-surface hover:bg-surface-container text-on-surface shadow-sm">3</button>
-<button class="px-3 py-1.5 rounded bg-surface hover:bg-surface-container text-on-surface shadow-sm">Next</button>
-</div>
-</div>
-</div>
-<!-- SLIDE-OVER GUEST PROFILE PREVIEW -->
-<div class="fixed inset-0 z-50 overflow-hidden pointer-events-none transition-opacity duration-300 opacity-0" id="guestDrawer">
-<!-- Backdrop -->
-<div class="absolute inset-0 bg-primary/40 backdrop-blur-sm pointer-events-none transition-opacity" id="drawerBackdrop" onclick="closeDrawer()"></div>
-<!-- Panel -->
-<div class="absolute inset-y-0 right-0 max-w-xl w-full bg-surface shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 ease-in-out pointer-events-auto" id="drawerPanel">
-<!-- Drawer Header -->
-<div class="p-6 bg-primary-container text-on-primary flex items-center justify-between">
-<div class="flex items-center gap-3">
-<img class="w-14 h-14 rounded-full object-cover border-2 border-primary-fixed" data-alt="Portrait preview of the selected guest" id="drawerAvatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBS4xC7ORhIGgP14tXxYw31hgzqM5ypM4ki6PrqIethT4R5pwQTEP27uiBKgQ3c7JQlU0hzwUcBfKFLEv6uA0k7hfuob4imkEZ55vspn3DZFYI5ychf4DMbNOdrgxKwj7-AKev10WcSV9nd45bHMyfslBDLKi657F0zaRaRjShzv9HhpZ7ZI-ZP1SlzK3WexhADWpnLqC1DwRBNx5CbMaeA874pvqTuPh1sJVUdjg"/>
-<div>
-<h2 class="text-headline-lg font-headline-lg" id="drawerName">Aarav Sharma</h2>
-<p class="text-body-sm text-primary-fixed-dim" id="drawerSub">Room 304 • Deluxe Suite • In-House</p>
-</div>
-</div>
-<button class="p-2 rounded-full hover:bg-surface-container/20 text-on-primary transition-colors" onclick="closeDrawer()">
-<span class="material-symbols-outlined text-xl">close</span>
-</button>
-</div>
-<!-- Drawer Tabs -->
-<div class="flex border-b border-outline-variant/20 bg-surface-container-low px-6">
-<button class="py-3 px-4 text-body-sm font-medium border-b-2 border-secondary text-secondary" id="tab-overview" onclick="switchTab('overview')">Overview</button>
-<button class="py-3 px-4 text-body-sm font-medium text-on-surface-variant border-b-2 border-transparent hover:text-on-surface" id="tab-ai" onclick="switchTab('ai')">AI Memory</button>
-<button class="py-3 px-4 text-body-sm font-medium text-on-surface-variant border-b-2 border-transparent hover:text-on-surface" id="tab-tickets" onclick="switchTab('tickets')">Past Tickets</button>
-<button class="py-3 px-4 text-body-sm font-medium text-on-surface-variant border-b-2 border-transparent hover:text-on-surface" id="tab-timeline" onclick="switchTab('timeline')">Timeline</button>
-</div>
-<!-- Drawer Content Body -->
-<div class="flex-1 overflow-y-auto p-6 space-y-6">
-<!-- TAB 1: OVERVIEW -->
-<div class="space-y-6" id="content-overview">
-<!-- Contact Details Card -->
-<div class="bg-surface-container-low p-5 rounded-xl shadow-sm space-y-3">
-<h3 class="text-headline-sm font-headline-sm text-on-surface flex items-center gap-2">
-<span class="material-symbols-outlined text-secondary text-base">contact_page</span>
-              Contact &amp; Preferences
-            </h3>
-<div class="grid grid-cols-2 gap-4 pt-2 text-body-sm">
-<div>
-<span class="text-label-md text-on-surface-variant block mb-0.5">Phone Number</span>
-<span class="font-medium text-on-surface" id="drawerPhone">+91 98231 45678</span>
-</div>
-<div>
-<span class="text-label-md text-on-surface-variant block mb-0.5">Email Address</span>
-<span class="font-medium text-on-surface">aarav.sharma@example.com</span>
-</div>
-<div>
-<span class="text-label-md text-on-surface-variant block mb-0.5">Total Stays</span>
-<span class="font-medium text-on-surface" id="drawerStays">4 Stays</span>
-</div>
-<div>
-<span class="text-label-md text-on-surface-variant block mb-0.5">Preferred Language</span>
-<span class="font-medium text-on-surface" id="drawerLang">English (EN)</span>
-</div>
-</div>
-<div class="pt-2">
-<span class="text-label-md text-on-surface-variant block mb-1">Assigned Tags</span>
-<div class="flex items-center gap-2" id="drawerTags">
-<span class="bg-secondary-container text-on-secondary-container px-2.5 py-0.5 rounded text-label-sm font-medium">VIP</span>
-<span class="bg-tertiary-fixed text-on-tertiary-fixed px-2.5 py-0.5 rounded text-label-sm font-medium">Spa Lover</span>
-</div>
-</div>
-</div>
-<!-- Quick Action Bar -->
-<div class="grid grid-cols-3 gap-3">
-<button class="flex flex-col items-center justify-center p-3 rounded-xl bg-surface-container hover:bg-surface-container-high transition-all text-on-surface" onclick="alert('Initiating WhatsApp chat with guest...')">
-<span class="material-symbols-outlined text-secondary mb-1">chat</span>
-<span class="text-label-md font-medium">Message</span>
-</button>
-<button class="flex flex-col items-center justify-center p-3 rounded-xl bg-surface-container hover:bg-surface-container-high transition-all text-on-surface" onclick="alert('Calling guest room...')">
-<span class="material-symbols-outlined text-secondary mb-1">call</span>
-<span class="text-label-md font-medium">Call Room</span>
-</button>
-<button class="flex flex-col items-center justify-center p-3 rounded-xl bg-surface-container hover:bg-surface-container-high transition-all text-on-surface" onclick="alert('Opening folios and billing...')">
-<span class="material-symbols-outlined text-secondary mb-1">receipt_long</span>
-<span class="text-label-md font-medium">Folio</span>
-</button>
-</div>
-</div>
-<!-- TAB 2: AI-REMEMBERED MEMORY -->
-<div class="space-y-4 hidden" id="content-ai">
-<div class="bg-primary-container/5 p-4 rounded-xl border border-primary/10 flex items-start gap-3">
-<span class="material-symbols-outlined text-primary text-xl mt-0.5">neurology</span>
-<div>
-<h4 class="text-headline-sm font-headline-sm text-on-surface mb-1">AI Guest Context Engine</h4>
-<p class="text-body-sm text-on-surface-variant">Synthesized from previous stays, concierge requests, and conversational logs at Sunset Bay.</p>
-</div>
-</div>
-<div class="space-y-3">
-<div class="bg-surface-container-low p-4 rounded-xl shadow-sm">
-<div class="flex items-center justify-between mb-1">
-<span class="text-label-md font-medium text-secondary">Dietary &amp; Dining</span>
-<span class="text-label-sm text-on-surface-variant">Confidence: 99%</span>
-</div>
-<p class="text-body-sm text-on-surface">Prefers gluten-free breakfast options and Earl Grey tea with honey every morning at 8:30 AM.</p>
-</div>
-<div class="bg-surface-container-low p-4 rounded-xl shadow-sm">
-<div class="flex items-center justify-between mb-1">
-<span class="text-label-md font-medium text-secondary">Room Preference</span>
-<span class="text-label-sm text-on-surface-variant">Confidence: 95%</span>
-</div>
-<p class="text-body-sm text-on-surface">Prefers high floors facing North for ocean sunrise views. Dislikes feather pillows (uses hypoallergenic).</p>
-</div>
-<div class="bg-surface-container-low p-4 rounded-xl shadow-sm">
-<div class="flex items-center justify-between mb-1">
-<span class="text-label-md font-medium text-secondary">Activity Habits</span>
-<span class="text-label-sm text-on-surface-variant">Confidence: 91%</span>
-</div>
-<p class="text-body-sm text-on-surface">Regularly books Ayurveda deep tissue massage on the second day of arrival. Prefers pool lounger #12.</p>
-</div>
-</div>
-</div>
-<!-- TAB 3: PAST TICKETS -->
-<div class="space-y-3 hidden" id="content-tickets">
-<div class="bg-surface-container-low p-4 rounded-xl shadow-sm flex items-center justify-between">
-<div>
-<div class="flex items-center gap-2">
-<span class="bg-emerald-100 text-emerald-800 text-label-sm px-2 py-0.5 rounded font-medium">Resolved</span>
-<span class="text-label-sm text-on-surface-variant">#TK-8921 • Oct 15, 2023</span>
-</div>
-<h4 class="text-body-md font-medium text-on-surface mt-1">Extra pool towels requested</h4>
-</div>
-<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
-</div>
-<div class="bg-surface-container-low p-4 rounded-xl shadow-sm flex items-center justify-between">
-<div>
-<div class="flex items-center gap-2">
-<span class="bg-emerald-100 text-emerald-800 text-label-sm px-2 py-0.5 rounded font-medium">Resolved</span>
-<span class="text-label-sm text-on-surface-variant">#TK-8742 • Oct 14, 2023</span>
-</div>
-<h4 class="text-body-md font-medium text-on-surface mt-1">Airport transfer timing confirmation</h4>
-</div>
-<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
-</div>
-</div>
-<!-- TAB 4: CONVERSATION TIMELINE -->
-<div class="space-y-4 hidden" id="content-timeline">
-<div class="relative pl-6 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-outline-variant/30">
-<div class="relative">
-<div class="absolute -left-6 top-1 w-3 h-3 rounded-full bg-secondary ring-4 ring-surface"></div>
-<span class="text-label-sm text-on-surface-variant">Today, 09:14 AM • AI Assistant</span>
-<p class="text-body-sm text-on-surface bg-surface-container-low p-3 rounded-xl mt-1 shadow-sm">"Good morning Mr. Sharma! Your Earl Grey tea and gluten-free toast have been dispatched to Room 304."</p>
-</div>
-<div class="relative">
-<div class="absolute -left-6 top-1 w-3 h-3 rounded-full bg-outline ring-4 ring-surface"></div>
-<span class="text-label-sm text-on-surface-variant">Yesterday, 04:30 PM • WhatsApp</span>
-<p class="text-body-sm text-on-surface bg-surface-container-low p-3 rounded-xl mt-1 shadow-sm">"Can you please book the Ayurveda massage for tomorrow at 10 AM?"</p>
-</div>
-<div class="relative">
-<div class="absolute -left-6 top-1 w-3 h-3 rounded-full bg-secondary ring-4 ring-surface"></div>
-<span class="text-label-sm text-on-surface-variant">Oct 14, 2023, 02:15 PM • Front Desk</span>
-<p class="text-body-sm text-on-surface bg-surface-container-low p-3 rounded-xl mt-1 shadow-sm">Checked in successfully. Assigned Suite 304.</p>
-</div>
-</div>
-</div>
-</div>
-<!-- Drawer Footer -->
-<div class="p-4 bg-surface-container-low border-t border-outline-variant/20 flex items-center justify-between">
-<span class="text-label-sm text-on-surface-variant">Guest ID: #GS-9941</span>
-<button class="bg-primary text-on-primary px-4 py-2 rounded-lg text-body-sm font-medium hover:opacity-90" onclick="closeDrawer()">Close Profile</button>
-</div>
-</div>
-</div>
-<!-- MODAL: ADD NEW GUEST -->
-<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary/40 backdrop-blur-sm hidden" id="addGuestModal">
-<div class="bg-surface w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
-<div class="p-6 bg-primary-container text-on-primary flex items-center justify-between">
-<h3 class="text-headline-md font-headline-md">Add New Guest Profile</h3>
-<button class="p-1.5 rounded-full hover:bg-surface-container/20 text-on-primary" onclick="closeAddGuestModal()">
-<span class="material-symbols-outlined text-xl">close</span>
-</button>
-</div>
-<div class="p-6 space-y-4">
-<div>
-<label class="text-label-md text-on-surface-variant block mb-1">Full Name</label>
-<input class="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg px-3 py-2 text-body-sm text-on-surface outline-none focus:border-secondary" placeholder="e.g. David Miller" type="text"/>
-</div>
-<div class="grid grid-cols-2 gap-4">
-<div>
-<label class="text-label-md text-on-surface-variant block mb-1">Phone Number</label>
-<input class="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg px-3 py-2 text-body-sm text-on-surface outline-none focus:border-secondary" placeholder="+1 555 0192" type="text"/>
-</div>
-<div>
-<label class="text-label-md text-on-surface-variant block mb-1">Preferred Language</label>
-<select class="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg px-3 py-2 text-body-sm text-on-surface outline-none focus:border-secondary">
-<option>English</option>
-<option>Russian</option>
-<option>German</option>
-<option>Hindi</option>
-</select>
-</div>
-</div>
-<div>
-<label class="text-label-md text-on-surface-variant block mb-1">Tags</label>
-<div class="flex items-center gap-2 flex-wrap">
-<label class="inline-flex items-center gap-1.5 bg-surface-container px-3 py-1.5 rounded-lg text-body-sm cursor-pointer">
-<input class="rounded accent-secondary" type="checkbox"/> VIP
-            </label>
-<label class="inline-flex items-center gap-1.5 bg-surface-container px-3 py-1.5 rounded-lg text-body-sm cursor-pointer">
-<input class="rounded accent-secondary" type="checkbox"/> Returning
-            </label>
-<label class="inline-flex items-center gap-1.5 bg-surface-container px-3 py-1.5 rounded-lg text-body-sm cursor-pointer">
-<input class="rounded accent-secondary" type="checkbox"/> Corporate
-            </label>
-<label class="inline-flex items-center gap-1.5 bg-surface-container px-3 py-1.5 rounded-lg text-body-sm cursor-pointer">
-<input class="rounded accent-secondary" type="checkbox"/> Family
-            </label>
-</div>
-</div>
-</div>
-<div class="p-4 bg-surface-container-low flex items-center justify-end gap-3">
-<button class="px-4 py-2 rounded-lg bg-surface hover:bg-surface-container text-on-surface text-body-sm font-medium" onclick="closeAddGuestModal()">Cancel</button>
-<button class="px-4 py-2 rounded-lg bg-secondary text-on-secondary text-body-sm font-medium" onclick="closeAddGuestModal(); alert('Guest successfully registered!');">Save Guest</button>
-</div>
-</div>
-</div>
-<!-- CLIENT-SIDE SCRIPT FOR INTERACTIVITY -->
-<script>
-    function openDrawer(name, phone, stays, lastVisit, lang, tags) {
-      document.getElementById('drawerName').innerText = name;
-      document.getElementById('drawerPhone').innerText = phone;
-      document.getElementById('drawerStays').innerText = stays;
-      document.getElementById('drawerLang').innerText = lang + ' (EN)';
-      
-      const drawer = document.getElementById('guestDrawer');
-      const panel = document.getElementById('drawerPanel');
-      drawer.classList.remove('pointer-events-none', 'opacity-0');
-      drawer.classList.add('opacity-100');
-      panel.classList.remove('translate-x-full');
-    }
+      <div class="px-4 mb-6">
+        <div class="bg-primary p-3 rounded-xl flex items-center justify-between text-on-primary cursor-pointer">
+          <div class="flex items-center gap-2"><span class="material-symbols-outlined text-sm">apartment</span><span
+              class="text-body-sm font-medium">Sunset Bay Resort</span></div><span
+            class="material-symbols-outlined text-sm">unfold_more</span>
+        </div>
+      </div>
+      <nav class="flex-1 px-4 space-y-1" data-active-classes="bg-secondary text-on-secondary font-bold rounded-xl"><a
+          aria-current="page"
+          class="flex items-center justify-between px-4 py-3 transition-all bg-secondary text-on-secondary font-bold rounded-xl"
+          data-path="dashboard" href="#"><span class="material-symbols-outlined mr-3">dashboard</span>Dashboard</a><a
+          class="flex items-center justify-between px-4 py-3 rounded-xl text-primary-fixed-dim hover:bg-surface-container-high hover:text-on-surface transition-all"
+          data-path="conversations" href="#">
+          <div class="flex items-center"><span class="material-symbols-outlined mr-3">chat</span>Conversations</div>
+          <span
+            class="bg-secondary-container text-on-secondary-container text-label-sm px-2 py-0.5 rounded-full">7</span>
+        </a><a
+          class="flex items-center px-4 py-3 rounded-xl text-primary-fixed-dim hover:bg-surface-container-high hover:text-on-surface transition-all"
+          data-path="tickets" href="#"><span
+            class="material-symbols-outlined mr-3">confirmation_number</span>Tickets</a><a
+          class="flex items-center px-4 py-3 rounded-xl text-primary-fixed-dim hover:bg-surface-container-high hover:text-on-surface transition-all"
+          data-path="guests" href="#"><span class="material-symbols-outlined mr-3">group</span>Guests</a><a
+          class="flex items-center px-4 py-3 rounded-xl text-primary-fixed-dim hover:bg-surface-container-high hover:text-on-surface transition-all"
+          data-path="knowledge-base" href="#"><span class="material-symbols-outlined mr-3">menu_book</span>Knowledge
+          Base</a><a
+          class="flex items-center px-4 py-3 rounded-xl text-primary-fixed-dim hover:bg-surface-container-high hover:text-on-surface transition-all"
+          data-path="analytics" href="#"><span class="material-symbols-outlined mr-3">analytics</span>Analytics</a><a
+          class="flex items-center px-4 py-3 rounded-xl text-primary-fixed-dim hover:bg-surface-container-high hover:text-on-surface transition-all"
+          data-path="triggers-and-alerts" href="#"><span class="material-symbols-outlined mr-3">bolt</span>Triggers
+          &amp; Alerts</a><a
+          class="flex items-center px-4 py-3 rounded-xl text-primary-fixed-dim hover:bg-surface-container-high hover:text-on-surface transition-all"
+          data-path="settings" href="#"><span class="material-symbols-outlined mr-3">settings</span>Settings</a></nav>
+    </div>
+    <div class="px-4 pt-4 border-t border-outline-variant/20">
+      <div class="flex items-center gap-3 px-2"><img alt="Profile" class="w-9 h-9 rounded-full object-cover"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYuf5ThWCtj7pbiidRxX44c7_Zei1tdmHaXFscoH85EO_oX0TcvB5pJbqVTUvGeO5ZgbeYYgwB-jT9koZGXCkQNuY1MZIlXVEWmzl2-OJ5Q6KlTrY5jx15t9hhh2Oqb5E2zi16JJ6YM6kkNJ8JvdiqUeG4NKjnVPtSjijOsnLgYv0Reap--37RcVehblDBl9jYB8kD5nnt3clD1NvfIKdll89Qt_QhFzJlcb-faA" />
+        <div class="flex flex-col overflow-hidden"><span class="text-body-sm font-medium text-on-primary truncate">Meera
+            Prabhu</span><span class="text-label-sm text-on-primary-container truncate">Manager</span></div>
+      </div>
+    </div>
+  </aside>
+  <div class="pl-[240px]">
+    <header
+      class="fixed top-0 left-[240px] right-0 h-16 bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-gutter">
+      <div class="flex items-center gap-4 text-on-surface-variant text-body-sm"><span
+          class="hover:text-on-surface cursor-pointer">Home</span><span
+          class="material-symbols-outlined text-xs">chevron_right</span><span
+          class="text-on-surface font-medium">Dashboard</span></div>
+      <div class="flex items-center gap-4">
+        <div
+          class="flex items-center bg-surface-container px-3 py-1.5 rounded-lg border border-outline-variant/30 text-on-surface-variant">
+          <span class="material-symbols-outlined text-sm mr-2">search</span><input
+            class="bg-transparent border-none outline-none text-body-sm text-on-surface w-64"
+            placeholder="Search guests, rooms, tickets..." type="text" /></div>
+        <div
+          class="flex items-center gap-2 bg-surface-container px-3 py-1.5 rounded-lg border border-outline-variant/30 text-body-sm text-on-surface-variant cursor-pointer">
+          <span class="material-symbols-outlined text-sm">language</span><span>EN</span></div>
+        <div
+          class="flex items-center gap-2 bg-surface-container px-3 py-1.5 rounded-lg border border-outline-variant/30 text-body-sm text-on-surface">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span><span
+            class="text-label-md font-medium">AI Online</span></div>
+        <div class="relative cursor-pointer"><span
+            class="material-symbols-outlined text-on-surface-variant hover:text-on-surface">notifications</span><span
+            class="absolute top-0 right-0 w-2 h-2 rounded-full bg-secondary"></span></div><img alt="Profile"
+          class="w-8 h-8 rounded-full object-cover cursor-pointer"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYuf5ThWCtj7pbiidRxX44c7_Zei1tdmHaXFscoH85EO_oX0TcvB5pJbqVTUvGeO5ZgbeYYgwB-jT9koZGXCkQNuY1MZIlXVEWmzl2-OJ5Q6KlTrY5jx15t9hhh2Oqb5E2zi16JJ6YM6kkNJ8JvdiqUeG4NKjnVPtSjijOsnLgYv0Reap--37RcVehblDBl9jYB8kD5nnt3clD1NvfIKdll89Qt_QhFzJlcb-faA" />
+      </div>
+    </header>
+    <main class="relative pt-16 bg-[#F6F3F3] min-h-screen p-gutter">
+      <div class="flex flex-col w-full pb-16">
+        <!-- Top Stats & Header Action Row -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+          <div>
+            <div class="flex items-center gap-2 text-label-md text-on-surface-variant uppercase tracking-wider mb-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+              Directory &amp; CRM
+            </div>
+            <h1 class="text-headline-xl font-headline-xl text-on-surface">Guest Management</h1>
+          </div>
+          <div class="flex items-center gap-3">
+            <button
+              class="flex items-center gap-2 bg-surface-container hover:bg-surface-container-high text-on-surface px-4 py-2.5 rounded-lg text-body-sm font-medium transition-all shadow-sm"
+              onclick="openExportModal()">
+              <span class="material-symbols-outlined text-base">download</span>
+              Export CSV
+            </button>
+            <button
+              class="flex items-center gap-2 bg-secondary text-on-secondary px-4 py-2.5 rounded-lg text-body-sm font-medium transition-all shadow-sm hover:opacity-90"
+              onclick="openAddGuestModal()">
+              <span class="material-symbols-outlined text-base">person_add</span>
+              Add New Guest
+            </button>
+          </div>
+        </div>
+        <!-- Metric Overview Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter mb-8">
+          <div class="bg-surface-container-low p-5 rounded-xl shadow-sm flex items-center justify-between">
+            <div>
+              <p class="text-label-md text-on-surface-variant mb-1">Total Registered</p>
+              <h3 class="text-headline-lg font-headline-lg text-on-surface">1,482</h3>
+              <span class="text-label-sm text-emerald-600 font-medium mt-1 inline-block">+12% this month</span>
+            </div>
+            <div
+              class="w-12 h-12 rounded-xl bg-primary-container text-on-primary flex items-center justify-center shadow-sm">
+              <span class="material-symbols-outlined text-2xl">group</span>
+            </div>
+          </div>
+          <div class="bg-surface-container-low p-5 rounded-xl shadow-sm flex items-center justify-between">
+            <div>
+              <p class="text-label-md text-on-surface-variant mb-1">In-House Now</p>
+              <h3 class="text-headline-lg font-headline-lg text-on-surface">128</h3>
+              <span class="text-label-sm text-on-surface-variant font-medium mt-1 inline-block">42 rooms occupied</span>
+            </div>
+            <div
+              class="w-12 h-12 rounded-xl bg-secondary-container text-on-secondary-container flex items-center justify-center shadow-sm">
+              <span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">hotel</span>
+            </div>
+          </div>
+          <div class="bg-surface-container-low p-5 rounded-xl shadow-sm flex items-center justify-between">
+            <div>
+              <p class="text-label-md text-on-surface-variant mb-1">VIP &amp; Returning</p>
+              <h3 class="text-headline-lg font-headline-lg text-on-surface">346</h3>
+              <span class="text-label-sm text-emerald-600 font-medium mt-1 inline-block">23% retention rate</span>
+            </div>
+            <div
+              class="w-12 h-12 rounded-xl bg-tertiary-container text-on-tertiary flex items-center justify-center shadow-sm">
+              <span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">star</span>
+            </div>
+          </div>
+          <div class="bg-surface-container-low p-5 rounded-xl shadow-sm flex items-center justify-between">
+            <div>
+              <p class="text-label-md text-on-surface-variant mb-1">AI Profiles Built</p>
+              <h3 class="text-headline-lg font-headline-lg text-on-surface">1,420</h3>
+              <span class="text-label-sm text-on-surface-variant font-medium mt-1 inline-block">95.8% sync rate</span>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-primary text-on-primary flex items-center justify-center shadow-sm">
+              <span class="material-symbols-outlined text-2xl">neurology</span>
+            </div>
+          </div>
+        </div>
+        <!-- Search, Filter & Table Area -->
+        <div class="bg-surface-container-low rounded-xl shadow-sm overflow-hidden flex flex-col">
+          <!-- Toolbar -->
+          <div class="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex items-center gap-3 flex-1">
+              <div class="flex items-center bg-surface px-3 py-2 rounded-lg shadow-sm w-full md:w-80">
+                <span class="material-symbols-outlined text-on-surface-variant text-base mr-2">search</span>
+                <input class="bg-transparent border-none outline-none text-body-sm text-on-surface w-full"
+                  id="guestSearch" oninput="filterGuests()" placeholder="Search by name, phone or tag..." type="text" />
+              </div>
+              <div class="hidden sm:flex items-center gap-2">
+                <select
+                  class="bg-surface text-on-surface text-body-sm px-3 py-2 rounded-lg shadow-sm outline-none cursor-pointer"
+                  id="tagFilter" onchange="filterGuests()">
+                  <option value="">All Tags</option>
+                  <option value="VIP">VIP</option>
+                  <option value="Returning">Returning</option>
+                  <option value="Corporate">Corporate</option>
+                  <option value="Family">Family</option>
+                  <option value="Spa Lover">Spa Lover</option>
+                </select>
+                <select
+                  class="bg-surface text-on-surface text-body-sm px-3 py-2 rounded-lg shadow-sm outline-none cursor-pointer"
+                  id="langFilter" onchange="filterGuests()">
+                  <option value="">All Languages</option>
+                  <option value="English">English</option>
+                  <option value="Russian">Russian</option>
+                  <option value="German">German</option>
+                  <option value="Hindi">Hindi</option>
+                </select>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 text-body-sm text-on-surface-variant">
+              <span>Showing <strong class="text-on-surface" id="visibleCount">6</strong> of 6 guests</span>
+            </div>
+          </div>
+          <!-- Table Container -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-surface-container text-on-surface-variant text-label-md uppercase tracking-wider">
+                  <th class="py-3 px-6 cursor-pointer hover:text-on-surface" onclick="sortTable(0)">Guest <span
+                      class="material-symbols-outlined text-xs align-middle">unfold_more</span></th>
+                  <th class="py-3 px-4">Phone</th>
+                  <th class="py-3 px-4 cursor-pointer hover:text-on-surface text-center" onclick="sortTable(2)">Stays
+                    <span class="material-symbols-outlined text-xs align-middle">unfold_more</span></th>
+                  <th class="py-3 px-4 cursor-pointer hover:text-on-surface" onclick="sortTable(3)">Last Visit <span
+                      class="material-symbols-outlined text-xs align-middle">unfold_more</span></th>
+                  <th class="py-3 px-4">Preferred Language</th>
+                  <th class="py-3 px-4">Tags</th>
+                  <th class="py-3 px-6 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody class="text-body-sm text-on-surface" id="guestTableBody">
+                <!-- Row 1 -->
+                <tr class="hover:bg-surface-container transition-colors cursor-pointer group"
+                  onclick="openDrawer('Aarav Sharma', '+91 98231 45678', '4 Stays', 'Oct 14, 2023', 'English', ['VIP', 'Spa Lover'])">
+                  <td class="py-4 px-6 flex items-center gap-3">
+                    <img class="w-10 h-10 rounded-full object-cover shadow-sm"
+                      data-alt="Portrait of an Indian man in his late 30s with a neat beard and professional smile, wearing a casual linen shirt, warm ambient lighting."
+                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJ2IYwqsZ1yKFIhO23HwUnyvmMXjDfpbNixVV2nRdZU3il84Hd0_0_vqjjE7b-kbKnqDsv2vTq7PO6auJc0lzHHBo8jfc6MqS43aKxI-CNpQ4Lzm_hThbwyg-dPxCHqjCfc2f_uh_j3LYkfN5zVMY5W4iRilhnqyL-bzIzY9_l4Y4v8p-bXM9JMnmQP9fB5r1UvE2fmKOIybPH5dZoahgbtf1yEpwntwS3QeOhrQ" />
+                    <div>
+                      <div class="font-medium text-on-surface group-hover:text-secondary transition-colors">Aarav Sharma
+                      </div>
+                      <div class="text-label-sm text-on-surface-variant">Room 304 (Deluxe Suite)</div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-4 text-on-surface-variant">+91 98231 45678</td>
+                  <td class="py-4 px-4 text-center"><span
+                      class="bg-primary-fixed text-on-primary-fixed font-semibold px-2.5 py-1 rounded-full text-label-sm">4</span>
+                  </td>
+                  <td class="py-4 px-4 text-on-surface-variant">Oct 14, 2023</td>
+                  <td class="py-4 px-4"><span
+                      class="bg-surface-container-high text-on-surface px-2.5 py-1 rounded-full text-label-sm font-medium">English</span>
+                  </td>
+                  <td class="py-4 px-4">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <span
+                        class="bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded text-label-sm font-medium">VIP</span>
+                      <span
+                        class="bg-tertiary-fixed text-on-tertiary-fixed px-2 py-0.5 rounded text-label-sm font-medium">Spa
+                        Lover</span>
+                    </div>
+                  </td>
+                  <td class="py-4 px-6 text-right">
+                    <button class="text-secondary hover:underline font-medium inline-flex items-center gap-1"
+                      onclick="event.stopPropagation(); openDrawer('Aarav Sharma', '+91 98231 45678', '4 Stays', 'Oct 14, 2023', 'English', ['VIP', 'Spa Lover'])">
+                      View <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </button>
+                  </td>
+                </tr>
+                <!-- Row 2 -->
+                <tr class="hover:bg-surface-container transition-colors cursor-pointer group"
+                  onclick="openDrawer('Elena Rostova', '+7 916 456 7890', '2 Stays', 'Jan 05, 2024', 'Russian', ['Returning'])">
+                  <td class="py-4 px-6 flex items-center gap-3">
+                    <img class="w-10 h-10 rounded-full object-cover shadow-sm"
+                      data-alt="Portrait of a Russian woman in her early 30s with blonde hair tied back, wearing sunglasses resting on her head, bright tropical resort background."
+                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuBg4z22A594CZaliuIvzD5SfLs8Aaeq1tXFnjPuOQgci18lnVVJfe5JEPtRDYBYOh2H95FsIIFslQ8RZuXYA9f1JSg9_0ELfgY7eESh95VBLdY0CVuZtETJlyMDvI-4ocCIPVRw2PIsUAkfszFWeioSZY3JU4kHHH777lb7H4SENWeg-mTtXiib3cJ4AT5gYycUKTqxDNblg0_26TJ-wnU1SnQFOT4-N8aXsGFWEA" />
+                    <div>
+                      <div class="font-medium text-on-surface group-hover:text-secondary transition-colors">Elena
+                        Rostova</div>
+                      <div class="text-label-sm text-on-surface-variant">Room 112 (Sea View)</div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-4 text-on-surface-variant">+7 916 456 7890</td>
+                  <td class="py-4 px-4 text-center"><span
+                      class="bg-primary-fixed text-on-primary-fixed font-semibold px-2.5 py-1 rounded-full text-label-sm">2</span>
+                  </td>
+                  <td class="py-4 px-4 text-on-surface-variant">Jan 05, 2024</td>
+                  <td class="py-4 px-4"><span
+                      class="bg-surface-container-high text-on-surface px-2.5 py-1 rounded-full text-label-sm font-medium">Russian</span>
+                  </td>
+                  <td class="py-4 px-4">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <span
+                        class="bg-surface-container text-on-surface-variant px-2 py-0.5 rounded text-label-sm font-medium">Returning</span>
+                    </div>
+                  </td>
+                  <td class="py-4 px-6 text-right">
+                    <button class="text-secondary hover:underline font-medium inline-flex items-center gap-1"
+                      onclick="event.stopPropagation(); openDrawer('Elena Rostova', '+7 916 456 7890', '2 Stays', 'Jan 05, 2024', 'Russian', ['Returning'])">
+                      View <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </button>
+                  </td>
+                </tr>
+                <!-- Row 3 -->
+                <tr class="hover:bg-surface-container transition-colors cursor-pointer group"
+                  onclick="openDrawer('Marcus Schmidt', '+49 151 23456789', '1 Stay', 'Nov 20, 2023', 'German', ['Corporate'])">
+                  <td class="py-4 px-6 flex items-center gap-3">
+                    <img class="w-10 h-10 rounded-full object-cover shadow-sm"
+                      data-alt="Portrait of a German businessman in his 40s with short silver hair and glasses, wearing a crisp collarless shirt."
+                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuCkX3U9TJTTz6qoGSWFfu876gnVo0dosLjX34qk4GCBoiJ4x1eyRe6_nyIDmrMwGfMCdMqxwfqW1WO0nYeM1U1nAdXRGZwzECk7q-VTWrjLRNexNcMqXFRFmwG9_tbFAZt2pNp-rLGtatWH6m9CJi5SZ7pHsMRKIjAu9Cia9zUC1PLUsxQG9tnGjckxqUwsTIDikB8dWVku5McdF3VUZG0USJMHbdbvj2tL2fSfQw" />
+                    <div>
+                      <div class="font-medium text-on-surface group-hover:text-secondary transition-colors">Marcus
+                        Schmidt</div>
+                      <div class="text-label-sm text-on-surface-variant">Checked Out</div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-4 text-on-surface-variant">+49 151 23456789</td>
+                  <td class="py-4 px-4 text-center"><span
+                      class="bg-primary-fixed text-on-primary-fixed font-semibold px-2.5 py-1 rounded-full text-label-sm">1</span>
+                  </td>
+                  <td class="py-4 px-4 text-on-surface-variant">Nov 20, 2023</td>
+                  <td class="py-4 px-4"><span
+                      class="bg-surface-container-high text-on-surface px-2.5 py-1 rounded-full text-label-sm font-medium">German</span>
+                  </td>
+                  <td class="py-4 px-4">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <span
+                        class="bg-primary-container text-on-primary px-2 py-0.5 rounded text-label-sm font-medium">Corporate</span>
+                    </div>
+                  </td>
+                  <td class="py-4 px-6 text-right">
+                    <button class="text-secondary hover:underline font-medium inline-flex items-center gap-1"
+                      onclick="event.stopPropagation(); openDrawer('Marcus Schmidt', '+49 151 23456789', '1 Stay', 'Nov 20, 2023', 'German', ['Corporate'])">
+                      View <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </button>
+                  </td>
+                </tr>
+                <!-- Row 4 -->
+                <tr class="hover:bg-surface-container transition-colors cursor-pointer group"
+                  onclick="openDrawer('Priya Nair', '+91 97412 88990', '6 Stays', 'Feb 12, 2024', 'English', ['VIP', 'Family'])">
+                  <td class="py-4 px-6 flex items-center gap-3">
+                    <img class="w-10 h-10 rounded-full object-cover shadow-sm"
+                      data-alt="Portrait of an Indian woman in her late 20s with long dark hair, wearing traditional elegant attire with warm resort lighting."
+                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuAqSJmiKxM5PfQYLl_Hv8G7aatzxgwrXu_fwv7gujlQ0jDqE1Y4IJ8la2pdJBVmD-QO_F1e-zNYyHtjsRFsSeLZFcrtg4wXp7pZe0hkGLbHdTDH3oAN1YYMnsdRCTwqM_eG6LeUUaKBzQG8JRBPeKxe-JiRvPSDHSZVfZi-9PJIzUVzyyqvd2zo7qS0stCVK7czQc5TYvmapawUKd4slQv9-lzdXsFENk_IAqfAZw" />
+                    <div>
+                      <div class="font-medium text-on-surface group-hover:text-secondary transition-colors">Priya Nair
+                      </div>
+                      <div class="text-label-sm text-on-surface-variant">Room 205 (Family Villa)</div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-4 text-on-surface-variant">+91 97412 88990</td>
+                  <td class="py-4 px-4 text-center"><span
+                      class="bg-primary-fixed text-on-primary-fixed font-semibold px-2.5 py-1 rounded-full text-label-sm">6</span>
+                  </td>
+                  <td class="py-4 px-4 text-on-surface-variant">Feb 12, 2024</td>
+                  <td class="py-4 px-4"><span
+                      class="bg-surface-container-high text-on-surface px-2.5 py-1 rounded-full text-label-sm font-medium">English</span>
+                  </td>
+                  <td class="py-4 px-4">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <span
+                        class="bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded text-label-sm font-medium">VIP</span>
+                      <span
+                        class="bg-error-container text-on-error-container px-2 py-0.5 rounded text-label-sm font-medium">Family</span>
+                    </div>
+                  </td>
+                  <td class="py-4 px-6 text-right">
+                    <button class="text-secondary hover:underline font-medium inline-flex items-center gap-1"
+                      onclick="event.stopPropagation(); openDrawer('Priya Nair', '+91 97412 88990', '6 Stays', 'Feb 12, 2024', 'English', ['VIP', 'Family'])">
+                      View <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </button>
+                  </td>
+                </tr>
+                <!-- Row 5 -->
+                <tr class="hover:bg-surface-container transition-colors cursor-pointer group"
+                  onclick="openDrawer('Liam O’Connor', '+353 87 123 4567', '3 Stays', 'Dec 31, 2023', 'English', ['Returning', 'Spa Lover'])">
+                  <td class="py-4 px-6 flex items-center gap-3">
+                    <img class="w-10 h-10 rounded-full object-cover shadow-sm"
+                      data-alt="Portrait of an Irish man in his 30s with reddish beard, smiling warmly outdoors."
+                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1t3TgUzpX6HYhtcp-B0dLPi4JBI1ZuOu-2gp9jDGB6WKwE2Mops0ZXvEwYFw55jU2syW1WvaHGoV7Fo3vOLaoh1claKulVk_x4IIAcjePlXUSMcVwMTQwP0CNrfRksV5rlOTWSW-YqDuaO3MI2hc_61EPLn_F6n6XmGqoGX4zU_tQ9m3rfutTz5p7Ty9ngFXJuNnLAxG-kg9yvt-pgkqGf5ZWqYJkUjdZEXfg8g" />
+                    <div>
+                      <div class="font-medium text-on-surface group-hover:text-secondary transition-colors">Liam
+                        O’Connor</div>
+                      <div class="text-label-sm text-on-surface-variant">Checked Out</div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-4 text-on-surface-variant">+353 87 123 4567</td>
+                  <td class="py-4 px-4 text-center"><span
+                      class="bg-primary-fixed text-on-primary-fixed font-semibold px-2.5 py-1 rounded-full text-label-sm">3</span>
+                  </td>
+                  <td class="py-4 px-4 text-on-surface-variant">Dec 31, 2023</td>
+                  <td class="py-4 px-4"><span
+                      class="bg-surface-container-high text-on-surface px-2.5 py-1 rounded-full text-label-sm font-medium">English</span>
+                  </td>
+                  <td class="py-4 px-4">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <span
+                        class="bg-surface-container text-on-surface-variant px-2 py-0.5 rounded text-label-sm font-medium">Returning</span>
+                      <span
+                        class="bg-tertiary-fixed text-on-tertiary-fixed px-2 py-0.5 rounded text-label-sm font-medium">Spa
+                        Lover</span>
+                    </div>
+                  </td>
+                  <td class="py-4 px-6 text-right">
+                    <button class="text-secondary hover:underline font-medium inline-flex items-center gap-1"
+                      onclick="event.stopPropagation(); openDrawer('Liam O’Connor', '+353 87 123 4567', '3 Stays', 'Dec 31, 2023', 'English', ['Returning', 'Spa Lover'])">
+                      View <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </button>
+                  </td>
+                </tr>
+                <!-- Row 6 -->
+                <tr class="hover:bg-surface-container transition-colors cursor-pointer group"
+                  onclick="openDrawer('Ananya Deshmukh', '+91 99112 33445', '1 Stay', 'Feb 14, 2024', 'Hindi', ['Corporate'])">
+                  <td class="py-4 px-6 flex items-center gap-3">
+                    <img class="w-10 h-10 rounded-full object-cover shadow-sm"
+                      data-alt="Portrait of a young Indian professional woman with sleek hair and confident expression."
+                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnHyF8C5Y1nSteClqxCpO5_pzt7tsGUErZ8K1w5hYx9lnn0_QEEJR3CyvqN3IsJpeQaVX7UrOOMHUCI9cHWs8XStidu67nEYcb5HoySqJPH8K7aG9MIoNlGLXkXYNEblr8LjWRWA9zVB6KJLA6nR8EPLYKP_N8gFh9oIFIuRaCS5RhrZKpAjZbWoJuUS_711F17avojk8sdrxEoVogzfzerFfjTMH0An4W016dzQ" />
+                    <div>
+                      <div class="font-medium text-on-surface group-hover:text-secondary transition-colors">Ananya
+                        Deshmukh</div>
+                      <div class="text-label-sm text-on-surface-variant">Room 410 (Sea View)</div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-4 text-on-surface-variant">+91 99112 33445</td>
+                  <td class="py-4 px-4 text-center"><span
+                      class="bg-primary-fixed text-on-primary-fixed font-semibold px-2.5 py-1 rounded-full text-label-sm">1</span>
+                  </td>
+                  <td class="py-4 px-4 text-on-surface-variant">Feb 14, 2024</td>
+                  <td class="py-4 px-4"><span
+                      class="bg-surface-container-high text-on-surface px-2.5 py-1 rounded-full text-label-sm font-medium">Hindi</span>
+                  </td>
+                  <td class="py-4 px-4">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <span
+                        class="bg-primary-container text-on-primary px-2 py-0.5 rounded text-label-sm font-medium">Corporate</span>
+                    </div>
+                  </td>
+                  <td class="py-4 px-6 text-right">
+                    <button class="text-secondary hover:underline font-medium inline-flex items-center gap-1"
+                      onclick="event.stopPropagation(); openDrawer('Ananya Deshmukh', '+91 99112 33445', '1 Stay', 'Feb 14, 2024', 'Hindi', ['Corporate'])">
+                      View <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- Pagination Footer -->
+          <div
+            class="p-4 bg-surface-container-low flex items-center justify-between border-t border-outline-variant/10 text-body-sm text-on-surface-variant">
+            <div>Page 1 of 24</div>
+            <div class="flex items-center gap-2">
+              <button
+                class="px-3 py-1.5 rounded bg-surface hover:bg-surface-container text-on-surface disabled:opacity-50 shadow-sm"
+                disabled="">Previous</button>
+              <button class="px-3 py-1.5 rounded bg-secondary text-on-secondary shadow-sm">1</button>
+              <button
+                class="px-3 py-1.5 rounded bg-surface hover:bg-surface-container text-on-surface shadow-sm">2</button>
+              <button
+                class="px-3 py-1.5 rounded bg-surface hover:bg-surface-container text-on-surface shadow-sm">3</button>
+              <button
+                class="px-3 py-1.5 rounded bg-surface hover:bg-surface-container text-on-surface shadow-sm">Next</button>
+            </div>
+          </div>
+        </div>
+        <!-- SLIDE-OVER GUEST PROFILE PREVIEW -->
+        <div class="fixed inset-0 z-50 overflow-hidden pointer-events-none transition-opacity duration-300 opacity-0"
+          id="guestDrawer">
+          <!-- Backdrop -->
+          <div class="absolute inset-0 bg-primary/40 backdrop-blur-sm pointer-events-none transition-opacity"
+            id="drawerBackdrop" onclick="closeDrawer()"></div>
+          <!-- Panel -->
+          <div
+            class="absolute inset-y-0 right-0 max-w-xl w-full bg-surface shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300 ease-in-out pointer-events-auto"
+            id="drawerPanel">
+            <!-- Drawer Header -->
+            <div class="p-6 bg-primary-container text-on-primary flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <img class="w-14 h-14 rounded-full object-cover border-2 border-primary-fixed"
+                  data-alt="Portrait preview of the selected guest" id="drawerAvatar"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBS4xC7ORhIGgP14tXxYw31hgzqM5ypM4ki6PrqIethT4R5pwQTEP27uiBKgQ3c7JQlU0hzwUcBfKFLEv6uA0k7hfuob4imkEZ55vspn3DZFYI5ychf4DMbNOdrgxKwj7-AKev10WcSV9nd45bHMyfslBDLKi657F0zaRaRjShzv9HhpZ7ZI-ZP1SlzK3WexhADWpnLqC1DwRBNx5CbMaeA874pvqTuPh1sJVUdjg" />
+                <div>
+                  <h2 class="text-headline-lg font-headline-lg" id="drawerName">Aarav Sharma</h2>
+                  <p class="text-body-sm text-primary-fixed-dim" id="drawerSub">Room 304 • Deluxe Suite • In-House</p>
+                </div>
+              </div>
+              <button class="p-2 rounded-full hover:bg-surface-container/20 text-on-primary transition-colors"
+                onclick="closeDrawer()">
+                <span class="material-symbols-outlined text-xl">close</span>
+              </button>
+            </div>
+            <!-- Drawer Tabs -->
+            <div class="flex border-b border-outline-variant/20 bg-surface-container-low px-6">
+              <button class="py-3 px-4 text-body-sm font-medium border-b-2 border-secondary text-secondary"
+                id="tab-overview" onclick="switchTab('overview')">Overview</button>
+              <button
+                class="py-3 px-4 text-body-sm font-medium text-on-surface-variant border-b-2 border-transparent hover:text-on-surface"
+                id="tab-ai" onclick="switchTab('ai')">AI Memory</button>
+              <button
+                class="py-3 px-4 text-body-sm font-medium text-on-surface-variant border-b-2 border-transparent hover:text-on-surface"
+                id="tab-tickets" onclick="switchTab('tickets')">Past Tickets</button>
+              <button
+                class="py-3 px-4 text-body-sm font-medium text-on-surface-variant border-b-2 border-transparent hover:text-on-surface"
+                id="tab-timeline" onclick="switchTab('timeline')">Timeline</button>
+            </div>
+            <!-- Drawer Content Body -->
+            <div class="flex-1 overflow-y-auto p-6 space-y-6">
+              <!-- TAB 1: OVERVIEW -->
+              <div class="space-y-6" id="content-overview">
+                <!-- Contact Details Card -->
+                <div class="bg-surface-container-low p-5 rounded-xl shadow-sm space-y-3">
+                  <h3 class="text-headline-sm font-headline-sm text-on-surface flex items-center gap-2">
+                    <span class="material-symbols-outlined text-secondary text-base">contact_page</span>
+                    Contact &amp; Preferences
+                  </h3>
+                  <div class="grid grid-cols-2 gap-4 pt-2 text-body-sm">
+                    <div>
+                      <span class="text-label-md text-on-surface-variant block mb-0.5">Phone Number</span>
+                      <span class="font-medium text-on-surface" id="drawerPhone">+91 98231 45678</span>
+                    </div>
+                    <div>
+                      <span class="text-label-md text-on-surface-variant block mb-0.5">Email Address</span>
+                      <span class="font-medium text-on-surface">aarav.sharma@example.com</span>
+                    </div>
+                    <div>
+                      <span class="text-label-md text-on-surface-variant block mb-0.5">Total Stays</span>
+                      <span class="font-medium text-on-surface" id="drawerStays">4 Stays</span>
+                    </div>
+                    <div>
+                      <span class="text-label-md text-on-surface-variant block mb-0.5">Preferred Language</span>
+                      <span class="font-medium text-on-surface" id="drawerLang">English (EN)</span>
+                    </div>
+                  </div>
+                  <div class="pt-2">
+                    <span class="text-label-md text-on-surface-variant block mb-1">Assigned Tags</span>
+                    <div class="flex items-center gap-2" id="drawerTags">
+                      <span
+                        class="bg-secondary-container text-on-secondary-container px-2.5 py-0.5 rounded text-label-sm font-medium">VIP</span>
+                      <span
+                        class="bg-tertiary-fixed text-on-tertiary-fixed px-2.5 py-0.5 rounded text-label-sm font-medium">Spa
+                        Lover</span>
+                    </div>
+                  </div>
+                </div>
+                <!-- Quick Action Bar -->
+                <div class="grid grid-cols-3 gap-3">
+                  <button
+                    class="flex flex-col items-center justify-center p-3 rounded-xl bg-surface-container hover:bg-surface-container-high transition-all text-on-surface"
+                    onclick="alert('Initiating WhatsApp chat with guest...')">
+                    <span class="material-symbols-outlined text-secondary mb-1">chat</span>
+                    <span class="text-label-md font-medium">Message</span>
+                  </button>
+                  <button
+                    class="flex flex-col items-center justify-center p-3 rounded-xl bg-surface-container hover:bg-surface-container-high transition-all text-on-surface"
+                    onclick="alert('Calling guest room...')">
+                    <span class="material-symbols-outlined text-secondary mb-1">call</span>
+                    <span class="text-label-md font-medium">Call Room</span>
+                  </button>
+                  <button
+                    class="flex flex-col items-center justify-center p-3 rounded-xl bg-surface-container hover:bg-surface-container-high transition-all text-on-surface"
+                    onclick="alert('Opening folios and billing...')">
+                    <span class="material-symbols-outlined text-secondary mb-1">receipt_long</span>
+                    <span class="text-label-md font-medium">Folio</span>
+                  </button>
+                </div>
+              </div>
+              <!-- TAB 2: AI-REMEMBERED MEMORY -->
+              <div class="space-y-4 hidden" id="content-ai">
+                <div class="bg-primary-container/5 p-4 rounded-xl border border-primary/10 flex items-start gap-3">
+                  <span class="material-symbols-outlined text-primary text-xl mt-0.5">neurology</span>
+                  <div>
+                    <h4 class="text-headline-sm font-headline-sm text-on-surface mb-1">AI Guest Context Engine</h4>
+                    <p class="text-body-sm text-on-surface-variant">Synthesized from previous stays, concierge requests,
+                      and conversational logs at Sunset Bay.</p>
+                  </div>
+                </div>
+                <div class="space-y-3">
+                  <div class="bg-surface-container-low p-4 rounded-xl shadow-sm">
+                    <div class="flex items-center justify-between mb-1">
+                      <span class="text-label-md font-medium text-secondary">Dietary &amp; Dining</span>
+                      <span class="text-label-sm text-on-surface-variant">Confidence: 99%</span>
+                    </div>
+                    <p class="text-body-sm text-on-surface">Prefers gluten-free breakfast options and Earl Grey tea with
+                      honey every morning at 8:30 AM.</p>
+                  </div>
+                  <div class="bg-surface-container-low p-4 rounded-xl shadow-sm">
+                    <div class="flex items-center justify-between mb-1">
+                      <span class="text-label-md font-medium text-secondary">Room Preference</span>
+                      <span class="text-label-sm text-on-surface-variant">Confidence: 95%</span>
+                    </div>
+                    <p class="text-body-sm text-on-surface">Prefers high floors facing North for ocean sunrise views.
+                      Dislikes feather pillows (uses hypoallergenic).</p>
+                  </div>
+                  <div class="bg-surface-container-low p-4 rounded-xl shadow-sm">
+                    <div class="flex items-center justify-between mb-1">
+                      <span class="text-label-md font-medium text-secondary">Activity Habits</span>
+                      <span class="text-label-sm text-on-surface-variant">Confidence: 91%</span>
+                    </div>
+                    <p class="text-body-sm text-on-surface">Regularly books Ayurveda deep tissue massage on the second
+                      day of arrival. Prefers pool lounger #12.</p>
+                  </div>
+                </div>
+              </div>
+              <!-- TAB 3: PAST TICKETS -->
+              <div class="space-y-3 hidden" id="content-tickets">
+                <div class="bg-surface-container-low p-4 rounded-xl shadow-sm flex items-center justify-between">
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <span
+                        class="bg-emerald-100 text-emerald-800 text-label-sm px-2 py-0.5 rounded font-medium">Resolved</span>
+                      <span class="text-label-sm text-on-surface-variant">#TK-8921 • Oct 15, 2023</span>
+                    </div>
+                    <h4 class="text-body-md font-medium text-on-surface mt-1">Extra pool towels requested</h4>
+                  </div>
+                  <span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+                </div>
+                <div class="bg-surface-container-low p-4 rounded-xl shadow-sm flex items-center justify-between">
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <span
+                        class="bg-emerald-100 text-emerald-800 text-label-sm px-2 py-0.5 rounded font-medium">Resolved</span>
+                      <span class="text-label-sm text-on-surface-variant">#TK-8742 • Oct 14, 2023</span>
+                    </div>
+                    <h4 class="text-body-md font-medium text-on-surface mt-1">Airport transfer timing confirmation</h4>
+                  </div>
+                  <span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+                </div>
+              </div>
+              <!-- TAB 4: CONVERSATION TIMELINE -->
+              <div class="space-y-4 hidden" id="content-timeline">
+                <div
+                  class="relative pl-6 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-outline-variant/30">
+                  <div class="relative">
+                    <div class="absolute -left-6 top-1 w-3 h-3 rounded-full bg-secondary ring-4 ring-surface"></div>
+                    <span class="text-label-sm text-on-surface-variant">Today, 09:14 AM • AI Assistant</span>
+                    <p class="text-body-sm text-on-surface bg-surface-container-low p-3 rounded-xl mt-1 shadow-sm">"Good
+                      morning Mr. Sharma! Your Earl Grey tea and gluten-free toast have been dispatched to Room 304."
+                    </p>
+                  </div>
+                  <div class="relative">
+                    <div class="absolute -left-6 top-1 w-3 h-3 rounded-full bg-outline ring-4 ring-surface"></div>
+                    <span class="text-label-sm text-on-surface-variant">Yesterday, 04:30 PM • WhatsApp</span>
+                    <p class="text-body-sm text-on-surface bg-surface-container-low p-3 rounded-xl mt-1 shadow-sm">"Can
+                      you please book the Ayurveda massage for tomorrow at 10 AM?"</p>
+                  </div>
+                  <div class="relative">
+                    <div class="absolute -left-6 top-1 w-3 h-3 rounded-full bg-secondary ring-4 ring-surface"></div>
+                    <span class="text-label-sm text-on-surface-variant">Oct 14, 2023, 02:15 PM • Front Desk</span>
+                    <p class="text-body-sm text-on-surface bg-surface-container-low p-3 rounded-xl mt-1 shadow-sm">
+                      Checked in successfully. Assigned Suite 304.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Drawer Footer -->
+            <div
+              class="p-4 bg-surface-container-low border-t border-outline-variant/20 flex items-center justify-between">
+              <span class="text-label-sm text-on-surface-variant">Guest ID: #GS-9941</span>
+              <button class="bg-primary text-on-primary px-4 py-2 rounded-lg text-body-sm font-medium hover:opacity-90"
+                onclick="closeDrawer()">Close Profile</button>
+            </div>
+          </div>
+        </div>
+        <!-- MODAL: ADD NEW GUEST -->
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary/40 backdrop-blur-sm hidden"
+          id="addGuestModal">
+          <div
+            class="bg-surface w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div class="p-6 bg-primary-container text-on-primary flex items-center justify-between">
+              <h3 class="text-headline-md font-headline-md">Add New Guest Profile</h3>
+              <button class="p-1.5 rounded-full hover:bg-surface-container/20 text-on-primary"
+                onclick="closeAddGuestModal()">
+                <span class="material-symbols-outlined text-xl">close</span>
+              </button>
+            </div>
+            <div class="p-6 space-y-4">
+              <div>
+                <label class="text-label-md text-on-surface-variant block mb-1">Full Name</label>
+                <input
+                  class="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg px-3 py-2 text-body-sm text-on-surface outline-none focus:border-secondary"
+                  placeholder="e.g. David Miller" type="text" />
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="text-label-md text-on-surface-variant block mb-1">Phone Number</label>
+                  <input
+                    class="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg px-3 py-2 text-body-sm text-on-surface outline-none focus:border-secondary"
+                    placeholder="+1 555 0192" type="text" />
+                </div>
+                <div>
+                  <label class="text-label-md text-on-surface-variant block mb-1">Preferred Language</label>
+                  <select
+                    class="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg px-3 py-2 text-body-sm text-on-surface outline-none focus:border-secondary">
+                    <option>English</option>
+                    <option>Russian</option>
+                    <option>German</option>
+                    <option>Hindi</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label class="text-label-md text-on-surface-variant block mb-1">Tags</label>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <label
+                    class="inline-flex items-center gap-1.5 bg-surface-container px-3 py-1.5 rounded-lg text-body-sm cursor-pointer">
+                    <input class="rounded accent-secondary" type="checkbox" /> VIP
+                  </label>
+                  <label
+                    class="inline-flex items-center gap-1.5 bg-surface-container px-3 py-1.5 rounded-lg text-body-sm cursor-pointer">
+                    <input class="rounded accent-secondary" type="checkbox" /> Returning
+                  </label>
+                  <label
+                    class="inline-flex items-center gap-1.5 bg-surface-container px-3 py-1.5 rounded-lg text-body-sm cursor-pointer">
+                    <input class="rounded accent-secondary" type="checkbox" /> Corporate
+                  </label>
+                  <label
+                    class="inline-flex items-center gap-1.5 bg-surface-container px-3 py-1.5 rounded-lg text-body-sm cursor-pointer">
+                    <input class="rounded accent-secondary" type="checkbox" /> Family
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="p-4 bg-surface-container-low flex items-center justify-end gap-3">
+              <button
+                class="px-4 py-2 rounded-lg bg-surface hover:bg-surface-container text-on-surface text-body-sm font-medium"
+                onclick="closeAddGuestModal()">Cancel</button>
+              <button class="px-4 py-2 rounded-lg bg-secondary text-on-secondary text-body-sm font-medium"
+                onclick="closeAddGuestModal(); alert('Guest successfully registered!');">Save Guest</button>
+            </div>
+          </div>
+        </div>
+        <!-- CLIENT-SIDE SCRIPT FOR INTERACTIVITY -->
+        <script>
+          function openDrawer(name, phone, stays, lastVisit, lang, tags) {
+            document.getElementById('drawerName').innerText = name;
+            document.getElementById('drawerPhone').innerText = phone;
+            document.getElementById('drawerStays').innerText = stays;
+            document.getElementById('drawerLang').innerText = lang + ' (EN)';
 
-    function closeDrawer() {
-      const drawer = document.getElementById('guestDrawer');
-      const panel = document.getElementById('drawerPanel');
-      panel.classList.add('translate-x-full');
-      drawer.classList.remove('opacity-100');
-      drawer.classList.add('opacity-0');
-      setTimeout(() => {
-        drawer.classList.add('pointer-events-none');
-      }, 300);
-    }
+            const drawer = document.getElementById('guestDrawer');
+            const panel = document.getElementById('drawerPanel');
+            drawer.classList.remove('pointer-events-none', 'opacity-0');
+            drawer.classList.add('opacity-100');
+            panel.classList.remove('translate-x-full');
+          }
 
-    function switchTab(tabId) {
-      ['overview', 'ai', 'tickets', 'timeline'].forEach(t => {
-        document.getElementById('content-' + t).classList.add('hidden');
-        document.getElementById('tab-' + t).classList.remove('border-secondary', 'text-secondary');
-        document.getElementById('tab-' + t).classList.add('border-transparent', 'text-on-surface-variant');
-      });
-      document.getElementById('content-' + tabId).classList.remove('hidden');
-      document.getElementById('tab-' + tabId).classList.add('border-secondary', 'text-secondary');
-      document.getElementById('tab-' + tabId).classList.remove('border-transparent', 'text-on-surface-variant');
-    }
+          function closeDrawer() {
+            const drawer = document.getElementById('guestDrawer');
+            const panel = document.getElementById('drawerPanel');
+            panel.classList.add('translate-x-full');
+            drawer.classList.remove('opacity-100');
+            drawer.classList.add('opacity-0');
+            setTimeout(() => {
+              drawer.classList.add('pointer-events-none');
+            }, 300);
+          }
 
-    function openAddGuestModal() {
-      document.getElementById('addGuestModal').classList.remove('hidden');
-    }
+          function switchTab(tabId) {
+            ['overview', 'ai', 'tickets', 'timeline'].forEach(t => {
+              document.getElementById('content-' + t).classList.add('hidden');
+              document.getElementById('tab-' + t).classList.remove('border-secondary', 'text-secondary');
+              document.getElementById('tab-' + t).classList.add('border-transparent', 'text-on-surface-variant');
+            });
+            document.getElementById('content-' + tabId).classList.remove('hidden');
+            document.getElementById('tab-' + tabId).classList.add('border-secondary', 'text-secondary');
+            document.getElementById('tab-' + tabId).classList.remove('border-transparent', 'text-on-surface-variant');
+          }
 
-    function closeAddGuestModal() {
-      document.getElementById('addGuestModal').classList.add('hidden');
-    }
+          function openAddGuestModal() {
+            document.getElementById('addGuestModal').classList.remove('hidden');
+          }
 
-    function openExportModal() {
-      alert('Generating guest directory CSV export...');
-    }
+          function closeAddGuestModal() {
+            document.getElementById('addGuestModal').classList.add('hidden');
+          }
 
-    function filterGuests() {
-      const query = document.getElementById('guestSearch').value.toLowerCase();
-      const tagVal = document.getElementById('tagFilter').value.toLowerCase();
-      const langVal = document.getElementById('langFilter').value.toLowerCase();
-      
-      const rows = document.querySelectorAll('#guestTableBody tr');
-      let visible = 0;
+          function openExportModal() {
+            alert('Generating guest directory CSV export...');
+          }
 
-      rows.forEach(row => {
-        const text = row.innerText.toLowerCase();
-        const matchesQuery = text.includes(query);
-        const matchesTag = !tagVal || text.includes(tagVal);
-        const matchesLang = !langVal || text.includes(langVal);
+          function filterGuests() {
+            const query = document.getElementById('guestSearch').value.toLowerCase();
+            const tagVal = document.getElementById('tagFilter').value.toLowerCase();
+            const langVal = document.getElementById('langFilter').value.toLowerCase();
 
-        if (matchesQuery && matchesTag && matchesLang) {
-          row.style.display = '';
-          visible++;
-        } else {
-          row.style.display = 'none';
-        }
-      });
-      document.getElementById('visibleCount').innerText = visible;
-    }
+            const rows = document.querySelectorAll('#guestTableBody tr');
+            let visible = 0;
 
-    let sortDirection = false;
-    function sortTable(colIndex) {
-      const tbody = document.getElementById('guestTableBody');
-      const rowsArray = Array.from(tbody.querySelectorAll('tr'));
-      
-      sortDirection = !sortDirection;
+            rows.forEach(row => {
+              const text = row.innerText.toLowerCase();
+              const matchesQuery = text.includes(query);
+              const matchesTag = !tagVal || text.includes(tagVal);
+              const matchesLang = !langVal || text.includes(langVal);
 
-      rowsArray.sort((a, b) => {
-        const valA = a.querySelectorAll('td')[colIndex].innerText.toLowerCase();
-        const valB = b.querySelectorAll('td')[colIndex].innerText.toLowerCase();
-        if (valA < valB) return sortDirection ? -1 : 1;
-        if (valA > valB) return sortDirection ? 1 : -1;
-        return 0;
-      });
+              if (matchesQuery && matchesTag && matchesLang) {
+                row.style.display = '';
+                visible++;
+              } else {
+                row.style.display = 'none';
+              }
+            });
+            document.getElementById('visibleCount').innerText = visible;
+          }
 
-      rowsArray.forEach(row => tbody.appendChild(row));
-    }
-  </script>
-</div></main></div><script src="../assets/app.js"></script></body></html>
+          let sortDirection = false;
+          function sortTable(colIndex) {
+            const tbody = document.getElementById('guestTableBody');
+            const rowsArray = Array.from(tbody.querySelectorAll('tr'));
+
+            sortDirection = !sortDirection;
+
+            rowsArray.sort((a, b) => {
+              const valA = a.querySelectorAll('td')[colIndex].innerText.toLowerCase();
+              const valB = b.querySelectorAll('td')[colIndex].innerText.toLowerCase();
+              if (valA < valB) return sortDirection ? -1 : 1;
+              if (valA > valB) return sortDirection ? 1 : -1;
+              return 0;
+            });
+
+            rowsArray.forEach(row => tbody.appendChild(row));
+          }
+        </script>
+      </div>
+    </main>
+  </div>
+  <script src="../assets/app.js"></script>
+</body>
+
+</html>

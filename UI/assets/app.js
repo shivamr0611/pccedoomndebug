@@ -10,13 +10,10 @@
   const PAGES = {
     dashboard: 'dashboard',
     conversations: 'conversations',
-    tickets: 'tickets',
     guests: 'guests',
     'knowledge-base': 'knowledge_base',
-    analytics: 'analytics',
     'triggers-and-alerts': 'triggers_alerts',
     settings: 'settings',
-    message: 'message',
   };
 
   /* Makes a row of buttons/links behave as tabs: exactly one active at a time. */
@@ -75,48 +72,33 @@
       const link = $('a[data-path="settings"]', sideNav).cloneNode(true);
       link.dataset.path = 'message';
       link.lastChild.textContent = 'Message';
-      const icon = $('.material-symbols-outlined', link);
-      if (icon) icon.textContent = 'send';
+      $('.material-symbols-outlined', link).textContent = 'send';
       sideNav.appendChild(link);
     }
-
-    const currentKey = getActivePageKey();
-
-    $$('aside a[data-path]').forEach((a) => {
-      const pathKey = a.dataset.path;
-      const folder = PAGES[pathKey];
-      if (folder) {
-        a.href = '../' + folder + '/code.html';
-        const pre = document.createElement('link');
-        pre.rel = 'prefetch';
-        pre.href = a.href;
-        document.head.appendChild(pre);
-      }
-
-      const isCurrent = pathKey === currentKey;
-      if (isCurrent) {
-        a.setAttribute('aria-current', 'page');
-        a.classList.add('bg-secondary', 'text-on-secondary', 'font-bold');
-        a.classList.remove('text-primary-fixed-dim', 'hover:bg-surface-container-high', 'hover:text-on-surface');
-      } else {
-        a.removeAttribute('aria-current');
-        a.classList.remove('bg-secondary', 'text-on-secondary', 'font-bold');
-        a.classList.add('text-primary-fixed-dim', 'hover:bg-surface-container-high', 'hover:text-on-surface');
-      }
-    });
-
-    // Update header breadcrumb title if present
-    const breadcrumb = $('header span.text-on-surface.font-medium');
-    if (breadcrumb && PAGE_TITLES[currentKey]) {
-      breadcrumb.textContent = PAGE_TITLES[currentKey];
+    if (location.pathname.includes('/message/')) {
+      const cur = $('aside a[data-path="dashboard"]');
+      const me = $('aside a[data-path="message"]');
+      const activeCls = cur.className;
+      cur.className = $('aside a[data-path="settings"]').className;
+      cur.removeAttribute('aria-current');
+      me.className = activeCls;
     }
+    $$('aside a[data-path]').forEach((a) => {
+      const folder = PAGES[a.dataset.path];
+      if (!folder) return;
+      a.href = '../' + folder + '/code.html';
+      const pre = document.createElement('link');
+      pre.rel = 'prefetch';
+      pre.href = a.href;
+      document.head.appendChild(pre);
+    });
   }
 
   /* Dashboard: 7D / 14D / 30D period switch + Needs attention row edit & takeover & delete */
   function initDashboard() {
     const periods = $$('button').filter((b) => ['7D', '14D', '30D'].includes(text(b)));
     if (periods.length) {
-      tabGroup(periods, periods.findIndex((b) => text(b) === '14D'), () => {});
+      tabGroup(periods, periods.findIndex((b) => text(b) === '14D'), () => { });
     }
 
     let activeEditRow = null;
@@ -574,6 +556,7 @@
 
   /* Conversations: status filter tabs + search + row selection */
   function initConversations() {
+    if (document.body.dataset.liveConversations) return; // rendered from Supabase by conversations.js
     const search = $('input[placeholder^="Search conversations"]');
     if (!search) return;
     const list = $('.space-y-2.overflow-y-auto');
