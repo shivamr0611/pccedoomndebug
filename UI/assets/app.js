@@ -41,6 +41,33 @@
     document.head.appendChild(style);
   }
 
+  const PAGE_TITLES = {
+    dashboard: 'Dashboard',
+    conversations: 'Conversations',
+    tickets: 'Tickets',
+    guests: 'Guests',
+    'knowledge-base': 'Knowledge Base',
+    analytics: 'Analytics',
+    'triggers-and-alerts': 'Triggers & Alerts',
+    settings: 'Settings',
+    message: 'Message',
+  };
+
+  function getActivePageKey() {
+    const raw = (window.location.pathname || window.location.href || '').toLowerCase().replace(/\\/g, '/');
+    for (const [key, folder] of Object.entries(PAGES)) {
+      if (raw.includes('/' + folder.toLowerCase() + '/') || raw.includes('/' + folder.toLowerCase() + '.html')) {
+        return key;
+      }
+    }
+    for (const key of Object.keys(PAGES)) {
+      if (raw.includes('/' + key.toLowerCase() + '/') || raw.includes('/' + key.toLowerCase() + '.html')) {
+        return key;
+      }
+    }
+    return 'dashboard';
+  }
+
   function wireSidebar() {
     enablePageTransitions();
     const sideNav = $('aside nav');
@@ -48,28 +75,41 @@
       const link = $('a[data-path="settings"]', sideNav).cloneNode(true);
       link.dataset.path = 'message';
       link.lastChild.textContent = 'Message';
-      $('.material-symbols-outlined', link).textContent = 'send';
+      const icon = $('.material-symbols-outlined', link);
+      if (icon) icon.textContent = 'send';
       sideNav.appendChild(link);
     }
-    if (location.pathname.includes('/message/')) {
-      const cur = $('aside a[data-path="dashboard"]');
-      const me = $('aside a[data-path="message"]');
-      if (cur && me) {
-        const activeCls = cur.className;
-        cur.className = $('aside a[data-path="settings"]').className;
-        cur.removeAttribute('aria-current');
-        me.className = activeCls;
-      }
-    }
+
+    const currentKey = getActivePageKey();
+
     $$('aside a[data-path]').forEach((a) => {
-      const folder = PAGES[a.dataset.path];
-      if (!folder) return;
-      a.href = '../' + folder + '/code.html';
-      const pre = document.createElement('link');
-      pre.rel = 'prefetch';
-      pre.href = a.href;
-      document.head.appendChild(pre);
+      const pathKey = a.dataset.path;
+      const folder = PAGES[pathKey];
+      if (folder) {
+        a.href = '../' + folder + '/code.html';
+        const pre = document.createElement('link');
+        pre.rel = 'prefetch';
+        pre.href = a.href;
+        document.head.appendChild(pre);
+      }
+
+      const isCurrent = pathKey === currentKey;
+      if (isCurrent) {
+        a.setAttribute('aria-current', 'page');
+        a.classList.add('bg-secondary', 'text-on-secondary', 'font-bold');
+        a.classList.remove('text-primary-fixed-dim', 'hover:bg-surface-container-high', 'hover:text-on-surface');
+      } else {
+        a.removeAttribute('aria-current');
+        a.classList.remove('bg-secondary', 'text-on-secondary', 'font-bold');
+        a.classList.add('text-primary-fixed-dim', 'hover:bg-surface-container-high', 'hover:text-on-surface');
+      }
     });
+
+    // Update header breadcrumb title if present
+    const breadcrumb = $('header span.text-on-surface.font-medium');
+    if (breadcrumb && PAGE_TITLES[currentKey]) {
+      breadcrumb.textContent = PAGE_TITLES[currentKey];
+    }
   }
 
   /* Dashboard: 7D / 14D / 30D period switch + Needs attention row edit & takeover & delete */
@@ -805,11 +845,286 @@
     render(names[0] || 'Rooms and Rates');
   }
 
-  /* Tickets: Kanban / List view toggle */
+  /* Tickets: Interactive Kanban board, Slide-over (Assignee, Status, Resolve), and New Ticket */
   function initTickets() {
     const cards = $$('[onclick="openSlideOver()"]');
-    if (!cards.length) return;
-    const board = cards[0].parentElement.parentElement.parentElement;
+    const board = cards.length ? cards[0].parentElement.parentElement.parentElement : null;
+    if (!board) return;
+
+    const STAFF_AVATARS = {
+      'Ramesh Kumar': 'https://lh3.googleusercontent.com/aida-public/AB6AXuCuZKxrutaJ3DxiBK9gnOJlfriV5lPgvqmtw0DFco7nWqQgbvPHBolMeglqU3cE3uNor-fuUuaZq5t-bkWuavtvQapUcPBwHIyh6jo_BSPXJksmvvgjprFZiVv1Vvp02Tf8AqbXY3kMJeAB_ExOtTVLnP4cqE2EkDutAM26eTVXJcTMS1G0XFJPuM0ar3kUZE9_HB_VIrrujir7-IHCV_Ra_9Ztzn6f1g4tbzT04A',
+      'Priya Kamat': 'https://lh3.googleusercontent.com/aida-public/AB6AXuBp-5-gbiP_gHYgvAfNoSKDtSdIEVfP9Mo_mfeQVGWKIB55yjycOknJz4Fjjl0Yjzbw027gePaJ0_VsDlNJNdAV6OOZVG0rovpWtHXVR0CamURLB1EmJo62DRWcGU6o_MtXjtaywMGo6fAbmCqgIXN7H0p01r50KXNmVWQ4dWbhAE9n5MdkhPDSo2Bj6mdJXAMXNA6Ad49_SuZ-MUs8F-FRgsslrZpcALniqlMqfQ',
+      'Anthony Fernandes': 'https://lh3.googleusercontent.com/aida-public/AB6AXuDPrtqibJTLvRWSJzmzW3gmdkHuLfCiFHw2ZB22exrOb9ofQP73ntWNnk4_Lj8x3lm9uAeUCxnel7mqzjDANypDwkvTwlteN6CNQhhDmDqdElnW3yOX49PQHk7_LDwR32jcRDdcKLW4Bck5hj1thBiFqMmNEJos4pqEbTbXOliAiBFFkxqDsyN7XiMch2lPnYOqH-jB4Aytp54zv32oF5vDio-l8n9Xjbhc02AxBQ',
+      'Sunita Rao': 'https://lh3.googleusercontent.com/aida-public/AB6AXuAsfC360j_vVpAXMU33dfo0MZrZ3MQbCrY-BnzqAVVpjB_gpXpoLvPNy9780XeZfH50VRBrUsJwb570kZhebxHDMQvJasPLhiJA5FLJfsH0KEbmfb9UPEjbNEm_hzKYwNqHsE_Y7XWzA3xkjc-iSXavhELtuh6QLpRe9X5xfwJPOwhZf4w7eCYK9FBKAjoEc5T6cAO7-7Ro4_JytU4KknUEJmFaDxyHQh3C3HxU9Q',
+      'Michael Dsouza': 'https://lh3.googleusercontent.com/aida-public/AB6AXuA7BKGMmD_M_HCPpYGDBJU5reSItXUGqFCWPoji1vY6mftWPf-xHvR1pqaz3XwK4GzTV7p0AxELlOvsBRRv6XXrD8I49XHPbjC9YMke_3h0e-CFIvtbJULCgJ0u0AAeicdAFXK1jchHosyDJN-OMe10NKs_ezh4aRgdOVB_ehByDU7sT-CFHpuLmGha9fTgm3mjOb9wZ-vc3G6YkR6WSJAKufDPeJZL6lLdboC4BQ',
+      'Unassigned': 'https://lh3.googleusercontent.com/aida-public/AB6AXuAYuf5ThWCtj7pbiidRxX44c7_Zei1tdmHaXFscoH85EO_oX0TcvB5pJbqVTUvGeO5ZgbeYYgwB-jT9koZGXCkQNuY1MZIlXVEWmzl2-OJ5Q6KlTrY5jx15t9hhh2Oqb5E2zi16JJ6YM6kkNJ8JvdiqUeG4NKjnVPtSjijOsnLgYv0Reap--37RcVehblDBl9jYB8kD5nnt3clD1NvfIKdll89Qt_QhFzJlcb-faA',
+    };
+
+    let activeCard = null;
+
+    function updateTicketCounts() {
+      const colNew = $('[data-column-status="New"]');
+      const colInProg = $('[data-column-status="In progress"]');
+      const colWait = $('[data-column-status="Waiting on guest"]');
+      const colRes = $('[data-column-status="Resolved"]');
+
+      const countNew = colNew ? $$('.cursor-pointer', colNew).length : 0;
+      const countInProg = colInProg ? $$('.cursor-pointer', colInProg).length : 0;
+      const countWait = colWait ? $$('.cursor-pointer', colWait).length : 0;
+      const countRes = colRes ? $$('.cursor-pointer', colRes).filter((c) => !text(c).includes('more resolved')).length : 0;
+
+      const badgeNew = $('#countColNew');
+      if (badgeNew) badgeNew.textContent = countNew;
+      const badgeInProg = $('#countColInProgress');
+      if (badgeInProg) badgeInProg.textContent = countInProg;
+      const badgeWait = $('#countColWaiting');
+      if (badgeWait) badgeWait.textContent = countWait;
+      const badgeRes = $('#countColResolved');
+      if (badgeRes) badgeRes.textContent = countRes + 10;
+
+      const activeBadge = $('#activeTicketsBadge');
+      if (activeBadge) activeBadge.textContent = `${countNew + countInProg + countWait} Active`;
+    }
+
+    // Attach click listeners to all cards in board
+    function wireCardClicks() {
+      $$('.cursor-pointer', board).forEach((card) => {
+        if (text(card).includes('more resolved')) return;
+        card.onclick = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          activeCard = card;
+          openTicketSlideOver(card);
+        };
+      });
+    }
+
+    function openTicketSlideOver(card) {
+      const idEl = $('.font-label-md', card);
+      const ticketId = idEl ? text(idEl) : '#TK-842';
+
+      const roomSpan = $$('.text-label-sm', card).find((s) => text(s).startsWith('Room') || text(s).startsWith('Suite'));
+      const room = roomSpan ? text(roomSpan) : 'Room 204';
+
+      const prioritySpan = $$('.text-label-sm', card).find((s) => ['High', 'Medium', 'Low', 'Normal'].includes(text(s)));
+      const priority = prioritySpan ? text(prioritySpan) : 'High';
+
+      const titleEl = $('h3', card);
+      const title = titleEl ? text(titleEl) : 'Ticket Issue';
+
+      const colContainer = card.closest('[data-column-status]');
+      const status = colContainer ? colContainer.dataset.columnStatus : 'New';
+
+      const avatarImg = $('img', card);
+      const assignee = card.dataset.assignee || (avatarImg && avatarImg.dataset.assignee) || 'Ramesh Kumar';
+
+      // Populate slide-over
+      const elId = $('#slideOverTicketId');
+      if (elId) elId.textContent = ticketId;
+      const elPri = $('#slideOverPriority');
+      if (elPri) elPri.textContent = priority + ' Priority';
+      const elRoom = $('#slideOverRoom');
+      if (elRoom) elRoom.textContent = room;
+      const elTitle = $('#slideOverTitle');
+      if (elTitle) elTitle.textContent = title;
+
+      const selAssignee = $('#ticketAssigneeSelect');
+      if (selAssignee) selAssignee.value = assignee;
+      const selStatus = $('#ticketStatusSelect');
+      if (selStatus) selStatus.value = status;
+
+      const resolveBtn = $('#markResolvedBtn');
+      if (resolveBtn) {
+        if (status === 'Resolved') {
+          resolveBtn.innerHTML = '<span class="material-symbols-outlined text-sm">check_circle</span> Resolved';
+          resolveBtn.disabled = true;
+          resolveBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        } else {
+          resolveBtn.innerHTML = '<span class="material-symbols-outlined text-sm">check_circle</span> Mark as Resolved';
+          resolveBtn.disabled = false;
+          resolveBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+      }
+
+      // Show panel
+      const overlay = $('#slideOverOverlay');
+      const panel = $('#ticketSlideOver');
+      if (overlay) overlay.classList.remove('hidden');
+      if (panel) panel.classList.remove('translate-x-full');
+    }
+
+    window.openSlideOver = function (target) {
+      const card = (target instanceof HTMLElement ? target : null) || window.event?.target?.closest('.group') || activeCard || $('.cursor-pointer', board);
+      if (card) {
+        activeCard = card;
+        openTicketSlideOver(card);
+      } else {
+        const overlay = $('#slideOverOverlay');
+        const panel = $('#ticketSlideOver');
+        if (overlay) overlay.classList.remove('hidden');
+        if (panel) panel.classList.remove('translate-x-full');
+      }
+    };
+
+    window.closeSlideOver = function () {
+      const overlay = $('#slideOverOverlay');
+      const panel = $('#ticketSlideOver');
+      if (overlay) overlay.classList.add('hidden');
+      if (panel) panel.classList.add('translate-x-full');
+    };
+
+    window.saveTicketChanges = function () {
+      if (!activeCard) {
+        window.closeSlideOver();
+        return;
+      }
+      const newAssignee = $('#ticketAssigneeSelect') ? $('#ticketAssigneeSelect').value : 'Ramesh Kumar';
+      const newStatus = $('#ticketStatusSelect') ? $('#ticketStatusSelect').value : 'In progress';
+
+      activeCard.dataset.assignee = newAssignee;
+      const avatarImg = $('img', activeCard);
+      if (avatarImg && STAFF_AVATARS[newAssignee]) {
+        avatarImg.src = STAFF_AVATARS[newAssignee];
+        avatarImg.alt = newAssignee;
+        avatarImg.dataset.alt = newAssignee;
+      }
+
+      const currentCol = activeCard.closest('[data-column-status]');
+      const currentStatus = currentCol ? currentCol.dataset.columnStatus : '';
+
+      if (newStatus !== currentStatus) {
+        const targetCol = $(`[data-column-status="${newStatus}"]`);
+        if (targetCol) {
+          targetCol.prepend(activeCard);
+        }
+
+        const h3 = $('h3', activeCard);
+        const schedSpan = $('.material-symbols-outlined.text-xs', activeCard)?.parentElement;
+
+        if (newStatus === 'Resolved') {
+          activeCard.classList.add('opacity-75');
+          if (h3) h3.classList.add('line-through');
+          if (schedSpan) {
+            schedSpan.className = 'text-label-sm text-emerald-600 flex items-center gap-1';
+            schedSpan.innerHTML = '<span class="material-symbols-outlined text-xs">check_circle</span>Resolved';
+          }
+        } else {
+          activeCard.classList.remove('opacity-75');
+          if (h3) h3.classList.remove('line-through');
+          if (schedSpan) {
+            schedSpan.className = 'text-label-sm text-on-surface-variant flex items-center gap-1';
+            schedSpan.innerHTML = '<span class="material-symbols-outlined text-xs">schedule</span>Just now';
+          }
+        }
+
+        updateTicketCounts();
+      }
+
+      // Add timeline entry
+      const timeline = $('#slideOverTimeline');
+      if (timeline) {
+        const entry = document.createElement('div');
+        entry.className = 'relative';
+        entry.innerHTML = `
+          <span class="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-[#00ABE7]"></span>
+          <p class="font-body-sm font-medium text-on-surface">Updated: ${newStatus} • Assigned to ${newAssignee}</p>
+          <span class="text-label-sm text-on-surface-variant">Just now • Meera Prabhu (Manager)</span>
+        `;
+        timeline.prepend(entry);
+      }
+
+      window.closeSlideOver();
+    };
+
+    window.markTicketResolved = function () {
+      if (!activeCard) {
+        window.closeSlideOver();
+        return;
+      }
+      const selStatus = $('#ticketStatusSelect');
+      if (selStatus) selStatus.value = 'Resolved';
+
+      // Add timeline entry
+      const timeline = $('#slideOverTimeline');
+      if (timeline) {
+        const entry = document.createElement('div');
+        entry.className = 'relative';
+        entry.innerHTML = `
+          <span class="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+          <p class="font-body-sm font-medium text-on-surface">Marked as Resolved</p>
+          <span class="text-label-sm text-on-surface-variant">Just now • Meera Prabhu (Manager)</span>
+        `;
+        timeline.prepend(entry);
+      }
+
+      window.saveTicketChanges();
+    };
+
+    window.openNewTicketModal = function () {
+      const overlay = $('#newTicketModalOverlay');
+      const modal = $('#newTicketModal');
+      if (overlay) overlay.classList.remove('hidden');
+      if (modal) modal.classList.remove('hidden');
+    };
+
+    window.closeNewTicketModal = function () {
+      const overlay = $('#newTicketModalOverlay');
+      const modal = $('#newTicketModal');
+      if (overlay) overlay.classList.add('hidden');
+      if (modal) modal.classList.add('hidden');
+    };
+
+    window.submitNewTicket = function () {
+      const room = $('#newTicketRoom')?.value.trim() || 'Room 301';
+      const title = $('#newTicketTitle')?.value.trim() || 'Guest Service Request';
+      const category = $('#newTicketCategory')?.value || 'Maintenance';
+      const priority = $('#newTicketPriority')?.value || 'Normal';
+
+      const idNum = Math.floor(844 + Math.random() * 50);
+      const ticketId = `#TK-${idNum}`;
+
+      const priColor = priority === 'High' ? 'bg-[#ffdad5] text-[#8a1a12] border-l-2 border-[#EE6352]' : 'bg-surface-container text-on-surface-variant';
+      const catIcon = category === 'Maintenance' ? 'ac_unit' : category === 'Housekeeping' ? 'room_service' : category === 'Concierge' ? 'near_me' : 'restaurant';
+
+      const newCard = document.createElement('div');
+      newCard.className = 'bg-surface-container-lowest p-4 rounded-xl shadow-[0_4px_12px_rgba(12,27,51,0.06)] cursor-pointer hover:shadow-md transition-all group';
+      newCard.dataset.assignee = 'Ramesh Kumar';
+      newCard.innerHTML = `
+        <div class="flex items-center justify-between mb-2">
+          <span class="font-label-md text-on-surface-variant font-bold">${ticketId}</span>
+          <span class="text-label-sm text-on-surface-variant flex items-center gap-1"><span class="material-symbols-outlined text-xs">schedule</span>Just now</span>
+        </div>
+        <div class="flex items-center gap-2 mb-2">
+          <span class="bg-surface-container text-on-surface text-label-sm px-2 py-0.5 rounded-md font-medium">${room}</span>
+          <span class="text-label-sm px-2 py-0.5 rounded-md ${priColor}">${priority}</span>
+        </div>
+        <h3 class="font-headline-sm text-on-surface mb-3 group-hover:text-[#00ABE7] transition-colors">${title}</h3>
+        <div class="flex items-center justify-between pt-2">
+          <div class="flex items-center gap-1.5 text-on-surface-variant text-body-sm">
+            <span class="material-symbols-outlined text-sm text-[#00ABE7]">${catIcon}</span>
+            <span>${category}</span>
+          </div>
+          <img class="w-6 h-6 rounded-full object-cover" src="${STAFF_AVATARS['Ramesh Kumar']}" alt="Ramesh Kumar"/>
+        </div>
+      `;
+
+      newCard.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        activeCard = newCard;
+        openTicketSlideOver(newCard);
+      };
+
+      const newCol = $('[data-column-status="New"]');
+      if (newCol) newCol.prepend(newCard);
+
+      updateTicketCounts();
+      window.closeNewTicketModal();
+    };
+
+    wireCardClicks();
+
+    // Kanban / List view toggle
     const columns = Array.from(board.children);
     const kanbanCls = board.className;
     const viewBtns = $$('button').filter((b) => ['view_kanban', 'view_list'].includes(iconOf(b)));
