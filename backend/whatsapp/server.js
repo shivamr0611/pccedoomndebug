@@ -152,16 +152,15 @@ async function sendBot(chat, text) {
   await client.sendMessage(chat, BOT_MARK + text);
 }
 
-async function sendPaymentQr(chat, caption, orderId, amount, targetChat = null) {
+async function sendPaymentQr(chat, caption, orderId, amount) {
   try {
-    const dest = targetChat || chat;
     const qr = await createPaymentQr(orderId, amount);
     const media = new MessageMedia('image/png', qr.toString('base64'), 'upi-payment-qr.png');
     rememberBotText(caption);
-    console.log('-> sending payment QR image (' + qr.length + ' bytes) to ' + dest + ' (orig chat: ' + chat + ')');
-    await client.sendMessage(dest, media, { caption: BOT_MARK + caption });
+    console.log('-> sending payment QR image (' + qr.length + ' bytes) to ' + chat);
+    await client.sendMessage(chat, media, { caption: BOT_MARK + caption });
   } catch (err) {
-    console.error('Failed to send QR media:', err.message);
+    console.error('Failed to send QR media:', err.stack || err.message || err);
     await client.sendMessage(chat, BOT_MARK + caption);
   }
 }
@@ -414,8 +413,7 @@ client.on('message_create', async (msg) => {
     );
     if (replyText) {
       if (awaitingQr) {
-        const targetChat = sender.phone ? (sender.phone.replace(/^\+/, '') + '@c.us') : chat;
-        await sendPaymentQr(chat, replyText, pending.orderId, pending.amount, targetChat);
+        await sendPaymentQr(chat, replyText, pending.orderId, pending.amount);
         pendingPayments.set(senderKey, {
           ...pending,
           awaitingPaymentConfirmation: true,
