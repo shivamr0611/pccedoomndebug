@@ -257,7 +257,7 @@ async function resolveSender(msg, chat) {
   return { phone, name };
 }
 
-const BOOKING_INTENT_RE = /\b(?:book(?:ing)?(?:\s+(?:for|a|the|it|room|me))?|confirm\s+booking|booking\s+kar(?:na|o|do)?|room\s+book|बुकिंग|बुक|कमरा\s+चाहिए|रूम\s+चाहिए|खोली\s+हवी|खोली\s+पाहिजे)\b/i;
+const BOOKING_INTENT_RE = /(?:^|[^\p{L}\p{N}])(?:book(?:ing)?(?:\s+(?:for|a|the|it|room|me))?|confirm\s+booking|booking\s+kar(?:na|o|do)?|room\s+book|बुकिंग|बुक|कमरा\s*चाहिए|रूम\s*चाहिए|खोली\s*हवी|खोली\s*पाहिजे)(?:[^\p{L}\p{N}]|$)/iu;
 
 const HINDI_MONTHS = {
   जनवरी: '01', फ़रवरी: '02', फरवरी: '02', मार्च: '03', अप्रैल: '04', अप्रेल: '04',
