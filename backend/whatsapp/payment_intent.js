@@ -4,7 +4,7 @@ const paymentConfig = require('../../payment-config.json');
 const { upiId: PAYEE_UPI_ID } = paymentConfig;
 const AMOUNT_PATTERN = String.raw`([\d,]+(?:\.\d{1,2})?)`;
 
-const PAYMENT_TERMS = /(?:\b(?:pay(?:ments?)?|paid|paying|upi|transfer|checkout|bill|invoice|price|cost|money|INR|rupees?)\b|\bRs\.?|₹|पेमेंट|भुगतान|यूपीआई|पैसे|पैसा|भरणा|भरायचे|रक्कम|पैसे\s*(?:दे|भेज|भर|चुक))/iu;
+const PAYMENT_TERMS = /(?:\b(?:pay(?:ments?)?|paid|paying|upi|transfer|checkout|bill|invoice|price|cost|money|INR|rupees?)\b|\bRs\.?|₹|पेमेंट|भुगतान|यूपीआई|पैसे|पैसा|भरणा|भरायचे|रक्कम|पैसे\s*(?:दे|भेज|भर|चुक)|दुडू|फारीक|फारीकपोण|भाडे)/iu;
 const THUMBS_UP = /^\s*(?:👍(?:\uFE0F)?(?:[🏻🏼🏽🏾🏿])?)(?:\s*👍(?:\uFE0F)?(?:[🏻🏼🏽🏾🏿])?)*\s*$/u;
 
 function isPaymentRelated(text) {

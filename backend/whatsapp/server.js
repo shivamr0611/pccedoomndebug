@@ -256,12 +256,22 @@ async function resolveSender(msg, chat) {
   return { phone, name };
 }
 
-const BOOKING_INTENT_RE = /(?:^|[^\p{L}\p{N}])(?:book(?:ing)?(?:\s+(?:for|a|the|it|room|me))?|confirm\s+booking|booking\s+kar(?:na|o|do)?|room\s+book|बुकिंग|बुक|कमरा\s*चाहिए|रूम\s*चाहिए|खोली\s*हवी|खोली\s*पाहिजे)(?:[^\p{L}\p{N}]|$)/iu;
+const BOOKING_INTENT_RE = /(?:^|[^\p{L}\p{N}])(?:book(?:ing)?(?:\s+(?:for|a|the|it|room|me))?|confirm\s+booking|booking\s+kar(?:na|o|do|at)?|room\s+book|बुकिंग|बुक|कमरा\s*चाहिए|रूम\s*चाहिए|खोली\s*(?:हवी|पाहिजे|जाय|बुक\s*करा|बुक\s*कर)|खोलीची\s*बुकिंग|आरक्षण|नक्की\s*करा|कन्फर्म\s*करा)(?:[^\p{L}\p{N}]|$)/iu;
 
-const HINDI_MONTHS = {
-  जनवरी: '01', फ़रवरी: '02', फरवरी: '02', मार्च: '03', अप्रैल: '04', अप्रेल: '04',
-  मई: '05', जून: '06', जुलाई: '07', अगस्त: '08', सितंबर: '09', सितम्बर: '09',
-  अक्टूबर: '10', नवम्बर: '11', नवंबर: '11', दिसंबर: '12', दिसम्बर: '12'
+const REGIONAL_MONTHS = {
+  // Hindi, Marathi & Konkani forms
+  जनवरी: '01', जाने: '01', जानेवारी: '01',
+  फ़रवरी: '02', फरवरी: '02', फेब्रु: '02', फेब्रुवारी: '02', फेब्रुआरी: '02',
+  मार्च: '03',
+  अप्रैल: '04', अप्रेल: '04', एप्रिल: '04',
+  मई: '05', मे: '05',
+  जून: '06',
+  जुलाई: '07', जुलै: '07',
+  अगस्त: '08', ऑगस्ट: '08',
+  सितंबर: '09', सितम्बर: '09', सप्टेंबर: '09',
+  अक्टूबर: '10', ऑक्टोबर: '10',
+  नवम्बर: '11', नवंबर: '11', नोव्हेंबर: '11', नोव्हेंबर: '11',
+  दिसंबर: '12', दिसम्बर: '12', डिसेंबर: '12'
 };
 
 function extractDateFromText(text) {
@@ -274,11 +284,11 @@ function extractDateFromText(text) {
     let year = m[3] ? (m[3].length === 2 ? '20' + m[3] : m[3]) : '2026';
     return year + '-' + month + '-' + day;
   }
-  const mHindi = raw.match(/(\d{1,2})\s+(जनवरी|फ़रवरी|फरवरी|मार्च|अप्रैल|अप्रेल|मई|जून|जुलाई|अगस्त|सितंबर|सितम्बर|अक्टूबर|नवम्बर|नवंबर|दिसंबर|दिसम्बर)\s*(?:(\d{2,4}))?/i);
-  if (mHindi) {
-    const month = HINDI_MONTHS[mHindi[2]];
-    const day = mHindi[1].padStart(2, '0');
-    let year = mHindi[3] ? (mHindi[3].length === 2 ? '20' + mHindi[3] : mHindi[3]) : '2026';
+  const mRegional = raw.match(/(\d{1,2})\s+(जनवरी|जानेवारी|फ़रवरी|फरवरी|फेब्रुवारी|फेब्रुआरी|मार्च|अप्रैल|अप्रेल|एप्रिल|मई|मे|जून|जुलाई|जुलै|अगस्त|ऑगस्ट|सितंबर|सितम्बर|सप्टेंबर|अक्टूबर|ऑक्टोबर|नवम्बर|नवंबर|नोव्हेंबर|दिसंबर|दिसम्बर|डिसेंबर)\s*(?:(\d{2,4}))?/i);
+  if (mRegional) {
+    const month = REGIONAL_MONTHS[mRegional[2]];
+    const day = mRegional[1].padStart(2, '0');
+    let year = mRegional[3] ? (mRegional[3].length === 2 ? '20' + mRegional[3] : mRegional[3]) : '2026';
     return year + '-' + month + '-' + day;
   }
   const iso = raw.match(/\b(\d{4}-\d{2}-\d{2})\b/);
