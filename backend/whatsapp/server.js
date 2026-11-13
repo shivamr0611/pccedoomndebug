@@ -22,30 +22,43 @@ client.on('ready', () => {
 client.on('disconnected', () => {
   ready = false;
 });
-const GEMINI_MODEL = 'gemini-2.5-flash';
+const GEMINI_MODELS = ['gemini-3.8-flash', 'gemini-3.1-flash-lite', 'gemini-3.5-flash', 'gemini-flash-latest'];
 
 // Asks Gemini to say "hi" in the same language (and script) as the guest's message.
 async function greetInLanguageOf(text) {
   const key = process.env.GEMINI_API_KEY;
   if (!key) throw new Error('GEMINI_API_KEY is not set');
-  const r = await fetch(
-    'https://generativelanguage.googleapis.com/v1beta/models/' + GEMINI_MODEL + ':generateContent',
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
-      body: JSON.stringify({
-        systemInstruction: {
-          parts: [{ text: 'Detect the language and script of the user message and reply with only a short friendly "hi" greeting in that same language and script. Output only the greeting.' }],
-        },
-        contents: [{ role: 'user', parts: [{ text: text }] }],
-        generationConfig: { thinkingConfig: { thinkingBudget: 0 } },
-      }),
+
+  let lastError = null;
+  for (const model of GEMINI_MODELS) {
+    try {
+      const r = await fetch(
+        'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
+          body: JSON.stringify({
+            systemInstruction: {
+              parts: [{ text: 'Detect the language and script of the user message and reply with only a short friendly "hi" greeting in that same language and script. Output only the greeting.' }],
+            },
+            contents: [{ role: 'user', parts: [{ text: text }] }],
+            generationConfig: { thinkingConfig: { thinkingBudget: 0 } },
+          }),
+        }
+      );
+      const d = await r.json();
+      if (!r.ok) {
+        lastError = new Error((d.error && d.error.message) || 'Gemini HTTP ' + r.status);
+        continue;
+      }
+      const out = d.candidates && d.candidates[0] && d.candidates[0].content && d.candidates[0].content.parts.map((p) => p.text).join('').trim();
+      if (out) return out;
+    } catch (err) {
+      lastError = err;
     }
-  );
-  const d = await r.json();
-  if (!r.ok) throw new Error((d.error && d.error.message) || 'Gemini HTTP ' + r.status);
-  const out = d.candidates && d.candidates[0] && d.candidates[0].content.parts.map((p) => p.text).join('').trim();
-  return out || 'hi';
+  }
+  if (lastError) throw lastError;
+  return 'hi';
 }
 
 client.on('message', async (msg) => {
