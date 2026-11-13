@@ -1,0 +1,33 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.sqlite3
+*.db
+
+# Node
+node_modules/
+dist/
+build/
+coverage/
+.vite/
+.next/
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# WhatsApp session and caches
+.wwebjs_auth/
+.wwebjs_cache/
+
+# OS / IDE / logs
+.DS_Store
+.idea/
+.vscode/
+*.log
+*.pma

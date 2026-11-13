@@ -16,6 +16,7 @@
     analytics: 'analytics',
     'triggers-and-alerts': 'triggers_alerts',
     settings: 'settings',
+    message: 'message',
   };
 
   /* Makes a row of buttons/links behave as tabs: exactly one active at a time. */
@@ -33,10 +34,39 @@
     });
   }
 
+  /* Cross-document view transitions fade between pages instead of a hard flash. */
+  function enablePageTransitions() {
+    const style = document.createElement('style');
+    style.textContent = '@view-transition { navigation: auto; }';
+    document.head.appendChild(style);
+  }
+
   function wireSidebar() {
+    enablePageTransitions();
+    const sideNav = $('aside nav');
+    if (sideNav && !$('a[data-path="message"]', sideNav)) {
+      const link = $('a[data-path="settings"]', sideNav).cloneNode(true);
+      link.dataset.path = 'message';
+      link.lastChild.textContent = 'Message';
+      $('.material-symbols-outlined', link).textContent = 'send';
+      sideNav.appendChild(link);
+    }
+    if (location.pathname.includes('/message/')) {
+      const cur = $('aside a[data-path="dashboard"]');
+      const me = $('aside a[data-path="message"]');
+      const activeCls = cur.className;
+      cur.className = $('aside a[data-path="settings"]').className;
+      cur.removeAttribute('aria-current');
+      me.className = activeCls;
+    }
     $$('aside a[data-path]').forEach((a) => {
       const folder = PAGES[a.dataset.path];
-      if (folder) a.href = '../' + folder + '/code.html';
+      if (!folder) return;
+      a.href = '../' + folder + '/code.html';
+      const pre = document.createElement('link');
+      pre.rel = 'prefetch';
+      pre.href = a.href;
+      document.head.appendChild(pre);
     });
   }
 
