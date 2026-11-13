@@ -67,6 +67,7 @@ async function answerFromKnowledge(query, items, apiKey, fetchImpl = fetch, sear
     .map((item, index) => `[${index + 1}] ${item.category} — ${item.title}\n${item.content}`)
     .join('\n\n')
     .slice(0, 12000);
+  const todayString = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
   const response = await fetchImpl('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + apiKey },
@@ -79,6 +80,7 @@ async function answerFromKnowledge(query, items, apiKey, fetchImpl = fetch, sear
         {
           role: 'system',
           content:
+            `Today's date is ${todayString}. Never accept or confirm a booking for a past date; if the guest asks to book a past date, politely inform them that bookings can only be made for today or future dates. ` +
             'Reply only in the single primary language and script used in the current guest question. If the guest mixes languages, use the dominant language only; do not code-switch or include phrases in another language. ' +
             'Translate facts from the knowledge-base entries into the guest language when needed; never reply in the entry language just because it is the source language. ' +
             'Choose the reply language from the current guest question only, not from conversation history or knowledge-base entries. ' +

@@ -73,12 +73,16 @@ async function createLocalizedPaymentReply(text, apiKey, fetchImpl = fetch, opti
     ? 'The user has not specified an amount. Never assume one; ask what amount they want to pay and do not say a QR is ready.'
     : `The exact amount requested is ₹${amountLabel(normalizedAmount)}. Do not change or guess the amount.`;
   const intentInstruction = options.confirmationReceived
-    ? 'The guest replied with a thumbs-up after receiving the payment QR, reporting that they sent payment. Acknowledge the report and clearly say it is not verified and remains pending until staff confirms. Do not say payment is complete.'
+    ? (options.confirmedBooking
+        ? `The guest completed payment by sending 👍. Confirm their room booking for room ${options.confirmedBooking.roomNumber} on ${options.confirmedBooking.date}. Thank them and confirm their booking is locked in.`
+        : 'The guest replied with a thumbs-up after receiving the payment QR, reporting that they sent payment. Acknowledge the report and clearly say it is not verified and remains pending until staff confirms. Do not say payment is complete.')
     : options.paymentRequested
       ? 'The guest has already requested a payment. Confirm the amount or ask for it.'
       : '';
   const replyInstruction = options.confirmationReceived
-    ? 'reply (acknowledge the guest-reported transfer and explicitly state that payment is unverified and pending staff confirmation; do not claim it is complete)'
+    ? (options.confirmedBooking
+        ? `reply (warmly confirm that their payment was received and room ${options.confirmedBooking.roomNumber} is now booked and confirmed for ${options.confirmedBooking.date})`
+        : 'reply (acknowledge the guest-reported transfer and explicitly state that payment is unverified and pending staff confirmation; do not claim it is complete)')
     : 'reply (a natural response in the user language; if amount is missing ask for it, otherwise state the exact requested amount and invite them to reply with 👍 to receive the QR)';
   const languageInstruction = options.language
     ? `Reply only in ${options.language}.`
@@ -125,7 +129,7 @@ async function createLocalizedPaymentReply(text, apiKey, fetchImpl = fetch, opti
     reply: parsed.reply.trim(),
     qrCaption: normalizedAmount == null
       ? null
-      : parsed.qr_caption.trim() + `\nPayable UPI QR: ₹${amountLabel(normalizedAmount)} to ${PAYEE_UPI_ID}. Verify details in your UPI app; this bot cannot verify payment.`,
+      : parsed.qr_caption.trim() + `\nPayable UPI QR: ₹${amountLabel(normalizedAmount)} to ${PAYEE_UPI_ID}. This bot cannot verify payment. After completing payment, reply with 👍 to confirm and lock your room.`,
   };
 }
 

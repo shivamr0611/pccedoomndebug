@@ -250,6 +250,20 @@ async function resolveSender(msg, chat) {
   return { phone, name };
 }
 
+const BOOKING_INTENT_RE = /\b(?:book(?:\s+the|\s+a)?\s+room|book\s+it|confirm\s+booking|booking\s+kar(?:na|o|do)?|room\s+book)\b/i;
+
+function extractDateFromText(text) {
+  const m = String(text || '').match(/(\d{1,2})\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{4})/i);
+  if (m) {
+    const months = { january: '01', february: '02', march: '03', april: '04', may: '05', june: '06', july: '07', august: '08', september: '09', october: '10', november: '11', december: '12' };
+    const month = months[m[2].toLowerCase()];
+    const day = m[1].padStart(2, '0');
+    return m[3] + '-' + month + '-' + day;
+  }
+  const iso = String(text || '').match(/\b(\d{4}-\d{2}-\d{2})\b/);
+  return iso ? iso[1] : null;
+}
+
 client.on('message_create', async (msg) => {
   const isVoiceMessage = msg.hasMedia && ['audio', 'ptt'].includes(msg.type);
   const isNonDirectChat = (address) => /@(g\.us|newsletter|broadcast)$/i.test(String(address || ''));
@@ -284,11 +298,35 @@ client.on('message_create', async (msg) => {
     let nextPendingPayment = null;
     let paymentReply = null;
     if (awaitingPaymentConfirmation) {
+      let bookedRoom = null;
+      if (dashboardStore) {
+        try {
+          const bookingDate = pending.bookingDate || new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+          const nextDay = new Date(Date.parse(bookingDate + 'T00:00:00Z') + 86400000).toISOString().slice(0, 10);
+          const existing = await dashboardStore.listRoomBookings(bookingDate, nextDay);
+          const occupied = new Set(existing.map((b) => b.room_number));
+          for (const roomNo of ROOM_NUMBERS) {
+            if (!occupied.has(roomNo)) {
+              await dashboardStore.setRoomBooking(bookingDate, roomNo, true);
+              bookedRoom = { roomNumber: roomNo, date: bookingDate };
+              console.log(`[booking] Locked room ${roomNo} for date ${bookingDate} in Supabase`);
+              break;
+            }
+          }
+        } catch (bookingError) {
+          console.error('[booking] Error locking room:', bookingError.message);
+        }
+      }
       paymentReply = await createLocalizedPaymentReply(
         paymentText,
         process.env.GROQ_API_KEY,
         fetch,
-        { amount: pending.amount, language: pending.language, confirmationReceived: true }
+        {
+          amount: pending.amount,
+          language: pending.language,
+          confirmationReceived: true,
+          confirmedBooking: bookedRoom,
+        }
       );
       replyOverride = paymentReply.reply;
     } else if (awaitingQr) {
@@ -317,24 +355,32 @@ client.on('message_create', async (msg) => {
       );
       replyOverride = paymentReply.reply;
       nextPendingPayment = pending;
-    } else if (isPaymentRelated(paymentText)) {
-      const amount = extractPaymentAmount(paymentText);
-      paymentReply = await createLocalizedPaymentReply(
-        paymentText,
-        process.env.GROQ_API_KEY,
-        fetch,
-        { amount }
-      );
-      replyOverride = paymentReply.reply;
-      if (paymentReply.wantsPayment) {
-        nextPendingPayment = {
-          amount: paymentReply.amount,
-          awaitingAmount: paymentReply.amount == null,
-          qrCaption: paymentReply.qrCaption,
-          orderId: 'PAY-' + require('crypto').randomBytes(4).toString('hex').toUpperCase(),
-          expiresAt: Date.now() + 10 * 60 * 1000,
-          language: paymentReply.language,
-        };
+    } else if (isPaymentRelated(paymentText) || BOOKING_INTENT_RE.test(paymentText)) {
+      const parsedDate = extractDateFromText(paymentText);
+      const todayIso = new Date().toISOString().slice(0, 10);
+      if (parsedDate && parsedDate < todayIso) {
+        replyOverride = `I’m sorry, but we cannot accept bookings for past dates (${parsedDate}). Please choose today (${todayIso}) or a future date.`;
+      } else {
+        const extractedAmt = extractPaymentAmount(paymentText);
+        const bookingAmt = extractedAmt || 1000;
+        paymentReply = await createLocalizedPaymentReply(
+          paymentText,
+          process.env.GROQ_API_KEY,
+          fetch,
+          { amount: bookingAmt, paymentRequested: true }
+        );
+        replyOverride = paymentReply.reply;
+        if (paymentReply.wantsPayment) {
+          nextPendingPayment = {
+            amount: paymentReply.amount || bookingAmt,
+            bookingDate: parsedDate,
+            awaitingAmount: false,
+            qrCaption: paymentReply.qrCaption,
+            orderId: 'PAY-' + require('crypto').randomBytes(4).toString('hex').toUpperCase(),
+            expiresAt: Date.now() + 10 * 60 * 1000,
+            language: paymentReply.language,
+          };
+        }
       }
     }
     const replyText = await conversations.handleIncomingMessage(
@@ -364,7 +410,19 @@ client.on('message_create', async (msg) => {
   }
 });
 
-const UI_ORIGINS = ['http://127.0.0.1:8081', 'http://localhost:8081'].concat(process.env.UI_ORIGIN ? [process.env.UI_ORIGIN] : []);
+const UI_ORIGINS = [
+  'http://127.0.0.1:8081',
+  'http://localhost:8081',
+  'http://127.0.0.1:5500',
+  'http://localhost:5500',
+  'http://127.0.0.1:5000',
+  'http://localhost:5000',
+  'http://127.0.0.1:3000',
+  'http://localhost:3000',
+  'http://127.0.0.1:5173',
+  'http://localhost:5173',
+  'null',
+].concat(process.env.UI_ORIGIN ? [process.env.UI_ORIGIN] : []);
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
