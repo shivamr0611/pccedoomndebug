@@ -72,7 +72,7 @@
     });
   }
 
-  /* Dashboard: 7D / 14D / 30D period switch + Needs attention row edit & takeover */
+  /* Dashboard: 7D / 14D / 30D period switch + Needs attention row edit & takeover & delete */
   function initDashboard() {
     const periods = $$('button').filter((b) => ['7D', '14D', '30D'].includes(text(b)));
     if (periods.length) {
@@ -81,39 +81,63 @@
 
     let activeEditRow = null;
 
-    // Attach click events to Needs Attention table
+    function updateAlertBanner() {
+      const bannerText = $('.text-body-md.text-on-surface.font-medium');
+      const table = $('table');
+      if (bannerText && table) {
+        const count = $$('tbody tr', table).length;
+        bannerText.textContent = `${count} guest${count === 1 ? '' : 's'} have been waiting for staff for more than 5 minutes`;
+      }
+    }
+
     const table = $('table');
     if (table) {
-      const rows = $$('tbody tr', table);
-
-      rows.forEach((tr) => {
-        const takeoverBtn = $('.takeover-btn', tr);
+      table.onclick = (e) => {
+        const takeoverBtn = e.target.closest('.takeover-btn');
         if (takeoverBtn) {
-          takeoverBtn.onclick = (e) => {
-            e.stopPropagation();
-            if (takeoverBtn.dataset.taken === 'true') {
-              window.location.href = '../conversations/code.html';
-              return;
-            }
-            takeoverBtn.dataset.taken = 'true';
-            takeoverBtn.className = 'border border-emerald-500 bg-emerald-500/10 text-emerald-600 px-2.5 py-1 rounded-lg text-label-md font-semibold transition-all flex items-center gap-1';
-            takeoverBtn.innerHTML = '<span class="material-symbols-outlined text-xs">check_circle</span> In Progress';
-            const priorityCell = tr.children[3];
-            if (priorityCell) {
-              priorityCell.innerHTML = '<span class="bg-emerald-500/10 text-emerald-600 px-2 py-0.5 rounded-full text-label-sm font-bold">Assigned</span>';
-            }
-          };
+          e.preventDefault();
+          e.stopPropagation();
+          if (takeoverBtn.dataset.taken === 'true') {
+            window.location.href = '../conversations/code.html';
+            return;
+          }
+          takeoverBtn.dataset.taken = 'true';
+          takeoverBtn.className = 'border border-emerald-500 bg-emerald-500/10 text-emerald-600 px-2.5 py-1 rounded-lg text-label-md font-semibold transition-all flex items-center gap-1';
+          takeoverBtn.innerHTML = '<span class="material-symbols-outlined text-xs">check_circle</span> In Progress';
+          const tr = takeoverBtn.closest('tr');
+          if (tr && tr.children[3]) {
+            tr.children[3].innerHTML = '<span class="bg-emerald-500/10 text-emerald-600 px-2 py-0.5 rounded-full text-label-sm font-bold">Assigned</span>';
+          }
+          return;
         }
 
-        const editBtn = $('.edit-issue-btn', tr);
+        const editBtn = e.target.closest('.edit-issue-btn');
         if (editBtn) {
-          editBtn.onclick = (e) => {
-            e.stopPropagation();
+          e.preventDefault();
+          e.stopPropagation();
+          const tr = editBtn.closest('tr');
+          if (tr) {
             activeEditRow = tr;
             openDashboardEditModal(tr);
-          };
+          }
+          return;
         }
-      });
+
+        const delBtn = e.target.closest('.delete-issue-btn');
+        if (delBtn) {
+          e.preventDefault();
+          e.stopPropagation();
+          const tr = delBtn.closest('tr');
+          if (tr) {
+            const guestName = text(tr.children[0].querySelector('span')) || 'this guest';
+            if (confirm(`Dismiss/delete attention item for ${guestName}?`)) {
+              tr.remove();
+              updateAlertBanner();
+            }
+          }
+          return;
+        }
+      };
     }
 
     function openDashboardEditModal(tr) {
@@ -625,36 +649,17 @@
     const tabsCol = grid.children[0];
     const main = grid.children[1];
     const tabs = $$('a', tabsCol);
-    const names = tabs.map((a) => text(a).replace(/\d+$/, '').trim());
+    const names = tabs.map((a) => {
+      const span = $('div > span:last-child', a);
+      return span ? text(span) : text(a).replace(/\d+$/, '').trim();
+    });
 
-    let activeCategory = names[0];
+    let activeCategory = names[0] || 'Rooms and Rates';
 
-    // Ensure KB Edit Modal exists in the document
-    let kbModal = $('#kbEditModal');
-    if (!kbModal) {
-      kbModal = document.createElement('div');
-      kbModal.id = 'kbEditModal';
-      kbModal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0c1b33]/40 backdrop-blur-sm hidden';
-      kbModal.innerHTML = `
-        <div class="bg-surface-container-lowest rounded-xl shadow-2xl border border-outline-variant/20 p-space-lg w-full max-w-lg flex flex-col gap-4">
-          <div class="flex items-center justify-between border-b border-outline-variant/15 pb-3">
-            <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-secondary text-xl">edit_note</span>
-              <h3 class="text-headline-sm font-bold text-on-surface" id="kbModalTitle">Edit Item</h3>
-            </div>
-            <button class="p-1 rounded-full hover:bg-surface-container text-on-surface-variant" onclick="document.getElementById('kbEditModal').classList.add('hidden')">
-              <span class="material-symbols-outlined text-lg">close</span>
-            </button>
-          </div>
-          <div class="flex flex-col gap-3" id="kbModalFields"></div>
-          <div class="flex items-center justify-end gap-2 pt-2 border-t border-outline-variant/15">
-            <button class="px-4 py-2 rounded-lg bg-surface hover:bg-surface-container text-on-surface text-body-sm font-medium" onclick="document.getElementById('kbEditModal').classList.add('hidden')">Cancel</button>
-            <button class="px-4 py-2 rounded-lg bg-secondary text-on-secondary text-body-sm font-semibold hover:opacity-90 transition-all shadow-sm" id="kbModalSaveBtn">Save Changes</button>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(kbModal);
-    }
+    window.closeKbModal = function () {
+      const m = $('#kbEditModal');
+      if (m) m.classList.add('hidden');
+    };
 
     function openKbEditModal(category, rowIndex) {
       const d = KB[category];
@@ -662,8 +667,11 @@
       const isNew = rowIndex === -1;
       const rowData = isNew ? d.cols.map(() => '') : d.rows[rowIndex];
 
-      $('#kbModalTitle').textContent = isNew ? `Add New ${category} Item` : `Edit ${category} Item`;
+      const modalTitle = $('#kbModalTitle');
+      if (modalTitle) modalTitle.textContent = isNew ? `Add New ${category} Item` : `Edit ${category} Item`;
       const fieldsContainer = $('#kbModalFields');
+      if (!fieldsContainer) return;
+
       fieldsContainer.innerHTML = d.cols.map((colName, colIdx) => {
         const val = rowData[colIdx] || '';
         if (colName === 'Availability') {
@@ -686,71 +694,115 @@
         `;
       }).join('');
 
-      $('#kbModalSaveBtn').onclick = () => {
-        const newRow = [];
-        $$('.kb-input', fieldsContainer).forEach((input) => {
-          newRow.push(input.value.trim());
-        });
-        if (isNew) {
-          d.rows.push(newRow);
-        } else {
-          d.rows[rowIndex] = newRow;
-        }
-        render(category);
-        kbModal.classList.add('hidden');
-      };
+      const saveBtn = $('#kbModalSaveBtn');
+      if (saveBtn) {
+        saveBtn.onclick = () => {
+          const newRow = [];
+          $$('.kb-input', fieldsContainer).forEach((input) => {
+            newRow.push(input.value.trim());
+          });
+          if (isNew) {
+            d.rows.push(newRow);
+          } else {
+            d.rows[rowIndex] = newRow;
+          }
+          render(category);
+          window.closeKbModal();
+        };
+      }
 
-      kbModal.classList.remove('hidden');
+      const modal = $('#kbEditModal');
+      if (modal) modal.classList.remove('hidden');
     }
 
-    // Connect header buttons (Import / Add New)
-    const headerBtns = $$('button', main);
-    const addBtn = headerBtns.find((b) => /add/i.test(text(b)) || text(b).includes('Add'));
+    // Connect Add New button
+    const addBtn = $('#kbAddBtn') || $$('button', main).find((b) => /add/i.test(text(b)));
     if (addBtn) {
-      addBtn.onclick = () => openKbEditModal(activeCategory, -1);
+      addBtn.onclick = (e) => {
+        e.preventDefault();
+        openKbEditModal(activeCategory, -1);
+      };
     }
+
+    // Event delegation on table for Edit and Delete buttons
+    table.onclick = (e) => {
+      const editBtn = e.target.closest('button[data-action="edit"]');
+      if (editBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        const rowIdx = parseInt(editBtn.dataset.row, 10);
+        openKbEditModal(activeCategory, isNaN(rowIdx) ? 0 : rowIdx);
+        return;
+      }
+      const delBtn = e.target.closest('button[data-action="delete"]');
+      if (delBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        const rowIdx = parseInt(delBtn.dataset.row, 10);
+        const d = KB[activeCategory];
+        if (d) {
+          const idx = isNaN(rowIdx) ? 0 : rowIdx;
+          if (confirm(`Delete this item from ${activeCategory}?`)) {
+            d.rows.splice(idx, 1);
+            render(activeCategory);
+          }
+        }
+        return;
+      }
+    };
 
     function render(name) {
       activeCategory = name;
       const d = KB[name];
       if (!d) return;
-      $('h2', main).textContent = d.title;
-      $('h2 + p', main).textContent = d.desc;
-      $('thead tr', table).innerHTML = d.cols.map((c) => '<th class="p-3">' + c + '</th>').join('') + '<th class="p-3 text-right">Actions</th>';
-      $('tbody', table).innerHTML = d.rows
-        .map((r, rowIndex) => {
-          const cells = r.slice(0, -1).map((v, i) => '<td class="p-3' + (i === 0 ? ' font-medium' : '') + '">' + v + '</td>').join('');
-          const status = '<td class="p-3"><span class="px-2 py-0.5 rounded-full ' + (KB_STATUS[r[r.length - 1]] || 'bg-surface-container text-on-surface-variant') + '">' + r[r.length - 1] + '</span></td>';
-          return '<tr class="hover:bg-surface-container-low/50 transition-colors">' + cells + status +
-            '<td class="p-3 text-right"><div class="flex items-center justify-end gap-1">' +
-            '<button data-action="edit" data-row="' + rowIndex + '" class="p-1.5 rounded hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-all" title="Edit row"><span class="material-symbols-outlined text-sm">edit</span></button>' +
-            '<button data-action="delete" data-row="' + rowIndex + '" class="p-1.5 rounded hover:bg-surface-container-high text-on-surface-variant hover:text-error transition-all" title="Delete row"><span class="material-symbols-outlined text-sm">delete</span></button>' +
-            '</div></td></tr>';
-        })
-        .join('');
 
-      // Wire edit and delete buttons on rows
-      $$('button[data-action="edit"]', table).forEach((btn) => {
-        btn.onclick = (e) => {
-          e.stopPropagation();
-          openKbEditModal(activeCategory, parseInt(btn.dataset.row, 10));
-        };
-      });
+      const titleEl = $('h2', main);
+      if (titleEl) titleEl.textContent = d.title;
+      const descEl = $('h2 + p', main);
+      if (descEl) descEl.textContent = d.desc;
 
-      $$('button[data-action="delete"]', table).forEach((btn) => {
-        btn.onclick = (e) => {
-          e.stopPropagation();
-          const idx = parseInt(btn.dataset.row, 10);
-          if (confirm('Delete this item from ' + activeCategory + '?')) {
-            d.rows.splice(idx, 1);
-            render(activeCategory);
-          }
-        };
-      });
+      const theadTr = $('thead tr', table);
+      if (theadTr) {
+        theadTr.innerHTML = d.cols.map((c) => '<th class="p-3">' + c + '</th>').join('') + '<th class="p-3 text-right">Actions</th>';
+      }
+
+      const tbody = $('tbody', table);
+      if (tbody) {
+        tbody.innerHTML = d.rows
+          .map((r, rowIndex) => {
+            const cells = r.slice(0, -1).map((v, i) => '<td class="p-3' + (i === 0 ? ' font-medium' : '') + '">' + v + '</td>').join('');
+            const status = '<td class="p-3"><span class="px-2 py-0.5 rounded-full ' + (KB_STATUS[r[r.length - 1]] || 'bg-surface-container text-on-surface-variant') + '">' + r[r.length - 1] + '</span></td>';
+            return '<tr class="hover:bg-surface-container-low/50 transition-colors">' + cells + status +
+              '<td class="p-3 text-right"><div class="flex items-center justify-end gap-1">' +
+              '<button data-action="edit" data-row="' + rowIndex + '" class="p-1.5 rounded hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-all" title="Edit item"><span class="material-symbols-outlined text-sm">edit</span></button>' +
+              '<button data-action="delete" data-row="' + rowIndex + '" class="p-1.5 rounded hover:bg-surface-container-high text-on-surface-variant hover:text-error transition-all" title="Delete item"><span class="material-symbols-outlined text-sm">delete</span></button>' +
+              '</div></td></tr>';
+          })
+          .join('');
+      }
     }
 
-    tabGroup(tabs, 0, (i) => render(names[i]));
-    render(names[0]);
+    // Wire vertical tabs navigation
+    tabs.forEach((tab, i) => {
+      tab.onclick = (e) => {
+        e.preventDefault();
+        tabs.forEach((t) => {
+          t.className = 'flex items-center justify-between px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface font-headline-sm transition-all';
+          const icon = $('span.material-symbols-outlined', t);
+          if (icon) icon.style.fontVariationSettings = "'FILL' 0";
+          const badge = $('.text-label-sm', t);
+          if (badge) badge.className = 'text-label-sm text-on-surface-variant/60';
+        });
+        tab.className = 'flex items-center justify-between px-4 py-3 rounded-lg bg-secondary text-on-secondary font-headline-sm transition-all shadow-xs';
+        const icon = $('span.material-symbols-outlined', tab);
+        if (icon) icon.style.fontVariationSettings = "'FILL' 1";
+        const badge = $('.text-label-sm', tab);
+        if (badge) badge.className = 'text-label-sm bg-on-secondary/20 px-2 py-0.5 rounded-full';
+        render(names[i]);
+      };
+    });
+
+    render(names[0] || 'Rooms and Rates');
   }
 
   /* Tickets: Kanban / List view toggle */
@@ -776,11 +828,17 @@
     });
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
+  function boot() {
     wireSidebar();
     initDashboard();
     initConversations();
     initKnowledgeBase();
     initTickets();
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
 })();

@@ -74,7 +74,7 @@
 <button class="px-4 py-2 rounded-lg bg-surface-container-lowest text-on-surface font-label-md hover:bg-surface-bright transition-all shadow-xs flex items-center gap-1.5">
 <span class="material-symbols-outlined text-sm">upload_file</span> Import
           </button>
-<button class="px-4 py-2 rounded-lg bg-secondary text-on-secondary font-label-md hover:opacity-90 transition-all shadow-xs flex items-center gap-1.5">
+<button id="kbAddBtn" class="px-4 py-2 rounded-lg bg-secondary text-on-secondary font-label-md hover:opacity-90 transition-all shadow-xs flex items-center gap-1.5">
 <span class="material-symbols-outlined text-sm">add</span> Add item
           </button>
 </div>
@@ -150,4 +150,26 @@
 </div>
 </div>
 </div>
-</div></main></div><script src="../assets/app.js"></script></body></html>
+</div></main></div>
+
+<!-- Modal: KB Edit/Add Item -->
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0c1b33]/40 backdrop-blur-sm hidden" id="kbEditModal">
+  <div class="bg-surface-container-lowest rounded-xl shadow-2xl border border-outline-variant/20 p-space-lg w-full max-w-lg flex flex-col gap-4">
+    <div class="flex items-center justify-between border-b border-outline-variant/15 pb-3">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-secondary text-xl">edit_note</span>
+        <h3 class="text-headline-sm font-bold text-on-surface" id="kbModalTitle">Edit Item</h3>
+      </div>
+      <button class="p-1 rounded-full hover:bg-surface-container text-on-surface-variant" onclick="closeKbModal()">
+        <span class="material-symbols-outlined text-lg">close</span>
+      </button>
+    </div>
+    <div class="flex flex-col gap-3 max-h-[60vh] overflow-y-auto pr-1" id="kbModalFields"></div>
+    <div class="flex items-center justify-end gap-2 pt-2 border-t border-outline-variant/15">
+      <button class="px-4 py-2 rounded-lg bg-surface hover:bg-surface-container text-on-surface text-body-sm font-medium" onclick="closeKbModal()">Cancel</button>
+      <button class="px-4 py-2 rounded-lg bg-secondary text-on-secondary text-body-sm font-semibold hover:opacity-90 transition-all shadow-sm" id="kbModalSaveBtn">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/app.js"></script></body></html>
