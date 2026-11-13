@@ -25,9 +25,11 @@ npm run dev:whatsapp
 
 Pair the WhatsApp Web client using its terminal QR. For voice messages, the backend transcribes the original language and sends the transcript through the same language-aware reply flow, so replies stay in the guest's language. Set a newly rotated `SARVAM_API_KEY` locally. Never share API keys in chat.
 
+Messages in the current conversation are available to the AI as memory for follow-ups. Relevant older messages are retained alongside recent context; property policies, prices, and availability still come from the knowledge base or room calendar, not prior AI replies.
+
 ## Supabase setup
 
-Apply `supabase/migrations/20261113020000_knowledge_base_items.sql` and `supabase/migrations/20261113030000_room_bookings.sql` to the configured Supabase project. Room occupancy is stored per room and date; no booking rows means all rooms are unoccupied. Then serve the admin UI and start the WhatsApp backend:
+Apply `supabase/migrations/20261113020000_knowledge_base_items.sql`, `supabase/migrations/20261113030000_room_bookings.sql`, and `supabase/migrations/20261114010000_room_booking_payment_status.sql` to the configured Supabase project. Room occupancy is stored per room and date; no booking rows means all rooms are unoccupied. Then serve the admin UI and start the WhatsApp backend:
 
 ```sh
 cd UI && python3 -m http.server 8081
@@ -36,6 +38,10 @@ npm run dev:whatsapp
 ```
 
 Open `http://127.0.0.1:8081/knowledge_base/code.html`. Add, edit, disable, or delete entries there; the data is persisted in Supabase and enabled entries are fetched for each WhatsApp message. Use **Test retrieval** to preview the current entries. The old sample room, policy, and FAQ values were removed rather than treated as verified property information.
+
+## WhatsApp room bookings and payments
+
+The WhatsApp agent and the Guests tab calendar use the same Supabase `room_bookings` data. The agent checks dates, weekdays, and month/day requests against that calendar; a missing year resolves to the next upcoming date, and invalid or unclear dates prompt for clarification. For a booking, it asks for the guest count and only quotes a rate that matches the enabled knowledge-base entry for one room, one night, and that guest count. After asking whether the guest wants to pay, it generates a real UPI QR for the quoted amount. When the guest reports payment with 👍, the room is held in `room_bookings` with `payment_status = pending_verification` and a payment reference. Staff must verify the transfer before treating it as paid; the bot cannot verify UPI transfers, and it does not generate a mock transaction ID. If the knowledge base has no matching rate, the bot asks the guest to contact staff instead of guessing.
 
 ## Checks
 

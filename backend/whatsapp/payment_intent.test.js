@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const {
   createPaymentQr,
   createLocalizedPaymentReply,
+  localizePaymentReply,
   paymentIntentPayload,
   extractPaymentAmount,
   isPaymentRelated,
@@ -152,4 +153,31 @@ test('post-QR thumbs-up confirms the guest report without claiming payment is ve
   assert.match(prompt, /do not claim it is complete/);
   assert.equal(reply.reply, 'We received your confirmation. Payment is pending staff verification.');
   assert.equal(reply.wantsPayment, false);
+});
+
+test('voice payment replies and stored QR captions use the detected language', async () => {
+  const outputs = ['मुझे ₹500 का QR भेजें।', '₹500 के लिए UPI QR। भुगतान से पहले विवरण जाँचें।'];
+  let calls = 0;
+  const localized = await localizePaymentReply(
+    {
+      language: 'English',
+      reply: 'Reply with thumbs up to receive the QR.',
+      qrCaption: 'UPI QR for ₹500. Verify details before paying.',
+    },
+    'Hindi',
+    'test-key',
+    async (_url, options) => {
+      const request = JSON.parse(options.body);
+      assert.match(request.messages[0].content, /into Hindi/);
+      return {
+        ok: true,
+        json: async () => ({ choices: [{ message: { content: outputs[calls++] } }] }),
+      };
+    }
+  );
+
+  assert.equal(localized.language, 'Hindi');
+  assert.match(localized.reply, /मुझे/);
+  assert.match(localized.qrCaption, /₹500/);
+  assert.equal(calls, 2);
 });

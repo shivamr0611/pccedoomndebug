@@ -1,5 +1,6 @@
 const QRCode = require('qrcode');
 const paymentConfig = require('../../payment-config.json');
+const { translateReplyToLanguage } = require('./reply_language');
 
 const { upiId: PAYEE_UPI_ID } = paymentConfig;
 const AMOUNT_PATTERN = String.raw`([\d,]+(?:\.\d{1,2})?)`;
@@ -133,6 +134,18 @@ async function createLocalizedPaymentReply(text, apiKey, fetchImpl = fetch, opti
   };
 }
 
+async function localizePaymentReply(paymentReply, language, apiKey, fetchImpl = fetch) {
+  if (!language) return paymentReply;
+  return {
+    ...paymentReply,
+    language,
+    reply: await translateReplyToLanguage(paymentReply.reply, language, apiKey, fetchImpl),
+    qrCaption: paymentReply.qrCaption
+      ? await translateReplyToLanguage(paymentReply.qrCaption, language, apiKey, fetchImpl)
+      : null,
+  };
+}
+
 async function createPaymentQr(orderId, amount) {
   return QRCode.toBuffer(paymentIntentPayload(orderId, amount), {
     type: 'png',
@@ -145,6 +158,7 @@ async function createPaymentQr(orderId, amount) {
 module.exports = {
   createPaymentQr,
   createLocalizedPaymentReply,
+  localizePaymentReply,
   paymentIntentPayload,
   extractPaymentAmount,
   isPaymentRelated,

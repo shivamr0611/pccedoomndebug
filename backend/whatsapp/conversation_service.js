@@ -41,7 +41,7 @@ function parseCommand(text) {
 /**
  * @param {object} deps
  * @param {object} deps.store      data access, see createSupabaseStore / the in-memory store in the tests
- * @param {(text: string, history: {sender: string, body: string}[]) => Promise<string>} deps.aiReply
+ * @param {(text: string, history: {sender: string, body: string}[], context?: object) => Promise<string>} deps.aiReply
  *        the existing AI reply pipeline
  * @param {(messages: {sender: string, body: string}[]) => Promise<string>} deps.summarize
  *        builds an admin-only summary when a conversation is closed
@@ -94,7 +94,7 @@ function createConversationService({ store, aiReply, summarize, logger = console
 
   /** Generates and stores a summary for the admin dashboard without exposing it in WhatsApp. */
   async function saveAdminSummary(conversation) {
-    if (!summarize || conversation.summary) return;
+    if (!summarize) return;
     try {
       const messages = (await store.listMessages(conversation.id)).filter(
         (message) => !(message.sender === 'guest' && /^\/close$/i.test(message.body.trim()))
@@ -126,7 +126,7 @@ function createConversationService({ store, aiReply, summarize, logger = console
    * Main entry point. Returns the text to send back to the guest,
    * or null when nothing should be sent (empty text, or a retried message that was already handled).
    */
-  async function handleIncomingMessage(phone, text, providerMessageId = null, profile = {}, replyOverride = null) {
+  async function handleIncomingMessage(phone, text, providerMessageId = null, profile = {}, replyOverride = null, replyContext = {}) {
     if (!String(text || '').trim()) return null;
     try {
       const guest = await getOrCreateGuest(normalizePhone(phone), profile.name || null);
@@ -142,11 +142,21 @@ function createConversationService({ store, aiReply, summarize, logger = console
         if (!active) return REPLIES.noneOpen;
         const saved = await saveMessage(active.id, 'guest', text, providerMessageId);
         if (!saved) {
-          logger.log('[conversation] duplicate message ' + providerMessageId + ' ignored');
-          return null;
+          if (!providerMessageId || !store.findMessageByProviderId) return null;
+          const existing = await store.findMessageByProviderId(providerMessageId);
+          if (
+            !existing ||
+            existing.conversation_id !== active.id ||
+            existing.sender !== 'guest' ||
+            parseCommand(existing.body) !== 'close'
+          ) {
+            logger.log('[conversation] duplicate message ' + providerMessageId + ' ignored');
+            return null;
+          }
+          logger.log('[conversation] retrying previously saved /close message ' + providerMessageId);
         }
         const closed = await store.closeConversationById(active.id);
-        if (!closed) return REPLIES.noneOpen;
+        if (!closed) return saved ? REPLIES.noneOpen : null;
         await startConversation(guest.id);
         await saveAdminSummary(closed);
         return REPLIES.closed;
@@ -154,9 +164,7 @@ function createConversationService({ store, aiReply, summarize, logger = console
 
       const conversation = (await getOpenConversation(guest.id)) || (await startConversation(guest.id)).conversation;
 
-      const history = store.listRecentMessages
-        ? await store.listRecentMessages(conversation.id, 12)
-        : (await store.listMessages(conversation.id)).slice(-12);
+      const history = await store.listMessages(conversation.id);
       const saved = await saveMessage(conversation.id, 'guest', text, providerMessageId);
       if (!saved) {
         logger.log('[conversation] duplicate message ' + providerMessageId + ' ignored');
@@ -166,7 +174,7 @@ function createConversationService({ store, aiReply, summarize, logger = console
       let reply;
       try {
         reply = replyOverride === null
-          ? await aiReply(text, history.map(({ sender, body }) => ({ sender, body })))
+          ? await aiReply(text, history.map(({ sender, body }) => ({ sender, body })), replyContext)
           : replyOverride;
       } catch (e) {
         logger.error('AI reply failed:', e.message);
@@ -349,6 +357,13 @@ function createSupabaseStore({ url, serviceRoleKey, fetchImpl = fetch }) {
     deleteConversation: async (id) =>
       (await rest('DELETE', 'conversations?id=eq.' + q(id))).length > 0,
     findConversationById: async (id) => first(await rest('GET', 'conversations?select=*&limit=1&id=eq.' + q(id))),
+    findMessageByProviderId: async (providerMessageId) =>
+      first(
+        await rest(
+          'GET',
+          'messages?select=id,conversation_id,sender,body&limit=1&provider_message_id=eq.' + q(providerMessageId)
+        )
+      ),
     setSummary: (id, summary) => rest('PATCH', 'conversations?id=eq.' + q(id), { summary }),
     insertMessage: async (row) => first(await rest('POST', 'messages', row)),
     listKnowledgeBaseItems: () =>
@@ -365,7 +380,7 @@ function createSupabaseStore({ url, serviceRoleKey, fetchImpl = fetch }) {
     deleteKnowledgeBaseItem: async (id) =>
       (await rest('DELETE', 'knowledge_base_items?id=eq.' + q(id))).length > 0,
     listMessages: (conversationId) =>
-      rest('GET', 'messages?select=sender,body,created_at&order=created_at.asc&conversation_id=eq.' + q(conversationId)),
+      fetchAll('messages?select=sender,body,created_at&order=created_at.asc&conversation_id=eq.' + q(conversationId)),
     listRecentMessages: async (conversationId, limit = 12) => {
       const rows = await rest(
         'GET',
@@ -382,6 +397,33 @@ function createSupabaseStore({ url, serviceRoleKey, fetchImpl = fetch }) {
           q(startDate) + ',booking_date.lt.' + q(endDate) + ')' +
           '&order=booking_date.asc,room_number.asc'
       ),
+    reserveRoom: async ({
+      bookingDate,
+      roomNumber,
+      guestPhone,
+      guestName,
+      amountInr,
+      mockTransactionId = null,
+      paymentReference = null,
+      paymentStatus = 'manual',
+    }) =>
+      first(
+        await rest(
+          'POST',
+          'room_bookings?on_conflict=booking_date,room_number',
+          {
+            booking_date: bookingDate,
+            room_number: roomNumber,
+            guest_phone: guestPhone,
+            guest_name: guestName,
+            amount_inr: amountInr,
+            mock_transaction_id: mockTransactionId,
+            payment_reference: paymentReference,
+            payment_status: paymentStatus,
+          },
+          'resolution=ignore-duplicates,return=representation'
+        )
+      ),
     setRoomBooking: async (bookingDate, roomNumber, occupied) => {
       const filter =
         'booking_date=eq.' + q(bookingDate) + '&room_number=eq.' + q(roomNumber);
@@ -391,7 +433,7 @@ function createSupabaseStore({ url, serviceRoleKey, fetchImpl = fetch }) {
           'POST',
           'room_bookings?on_conflict=booking_date,room_number',
           { booking_date: bookingDate, room_number: roomNumber },
-          'resolution=merge-duplicates,return=representation'
+          'resolution=ignore-duplicates,return=representation'
         )
       );
     },

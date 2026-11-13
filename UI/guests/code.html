@@ -54,8 +54,18 @@
         <div class="flex flex-col"><span class="text-headline-sm font-bold text-on-primary">Sunset Bay</span><span
             class="text-label-sm text-on-primary-container">Calangute, Goa</span></div>
       </div>
-<h1 class="text-headline-xl font-headline-xl text-on-surface">Guest Management</h1>
-</div>
+      <nav class="px-4 space-y-2">
+        <a href="../dashboard/code.html" class="block rounded-lg px-4 py-2 text-on-primary-container hover:bg-white/10">Dashboard</a>
+        <a href="../conversations/code.html" class="block rounded-lg px-4 py-2 text-on-primary-container hover:bg-white/10">Conversations</a>
+        <a href="code.html" aria-current="page" class="block rounded-lg bg-white/10 px-4 py-2 text-on-primary">Guests</a>
+        <a href="../knowledge_base/code.html" class="block rounded-lg px-4 py-2 text-on-primary-container hover:bg-white/10">Knowledge Base</a>
+      </nav>
+    </div>
+  </aside>
+  <div class="ml-[240px] min-h-screen p-8">
+    <main class="max-w-[1600px] mx-auto">
+      <header class="flex items-center justify-between mb-6">
+        <h1 class="text-headline-xl font-headline-xl text-on-surface">Guest Management</h1>
 <div class="flex items-center gap-3">
 <button class="flex items-center gap-2 bg-surface-container hover:bg-surface-container-high text-on-surface px-4 py-2.5 rounded-lg text-body-sm font-medium transition-all shadow-sm" onclick="openExportModal()">
 <span class="material-symbols-outlined text-base">download</span>
@@ -66,50 +76,7 @@
         Add New Guest
       </button>
 </div>
-</div>
-<!-- Metric Overview Cards -->
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter mb-8">
-<div class="bg-surface-container-low p-5 rounded-xl shadow-sm flex items-center justify-between">
-<div>
-<p class="text-label-md text-on-surface-variant mb-1">Total Registered</p>
-<h3 class="text-headline-lg font-headline-lg text-on-surface">1,482</h3>
-<span class="text-label-sm text-emerald-600 font-medium mt-1 inline-block">+12% this month</span>
-</div>
-<div class="w-12 h-12 rounded-xl bg-primary-container text-on-primary flex items-center justify-center shadow-sm">
-<span class="material-symbols-outlined text-2xl">group</span>
-</div>
-</div>
-<div class="bg-surface-container-low p-5 rounded-xl shadow-sm flex items-center justify-between">
-<div>
-<p class="text-label-md text-on-surface-variant mb-1">In-House Now</p>
-<h3 class="text-headline-lg font-headline-lg text-on-surface">128</h3>
-<span class="text-label-sm text-on-surface-variant font-medium mt-1 inline-block">42 rooms occupied</span>
-</div>
-<div class="w-12 h-12 rounded-xl bg-secondary-container text-on-secondary-container flex items-center justify-center shadow-sm">
-<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">hotel</span>
-</div>
-</div>
-<div class="bg-surface-container-low p-5 rounded-xl shadow-sm flex items-center justify-between">
-<div>
-<p class="text-label-md text-on-surface-variant mb-1">VIP &amp; Returning</p>
-<h3 class="text-headline-lg font-headline-lg text-on-surface">346</h3>
-<span class="text-label-sm text-emerald-600 font-medium mt-1 inline-block">23% retention rate</span>
-</div>
-<div class="w-12 h-12 rounded-xl bg-tertiary-container text-on-tertiary flex items-center justify-center shadow-sm">
-<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">star</span>
-</div>
-</div>
-<div class="bg-surface-container-low p-5 rounded-xl shadow-sm flex items-center justify-between">
-<div>
-<p class="text-label-md text-on-surface-variant mb-1">AI Profiles Built</p>
-<h3 class="text-headline-lg font-headline-lg text-on-surface">1,420</h3>
-<span class="text-label-sm text-on-surface-variant font-medium mt-1 inline-block">95.8% sync rate</span>
-</div>
-<div class="w-12 h-12 rounded-xl bg-primary text-on-primary flex items-center justify-center shadow-sm">
-<span class="material-symbols-outlined text-2xl">neurology</span>
-</div>
-</div>
-</div>
+</header>
 <!-- Search, Filter & Table Area -->
 <div class="grid grid-cols-1 xl:grid-cols-12 gap-gutter items-start mb-8">
 <div class="xl:col-span-7 bg-surface-container-low rounded-xl shadow-sm overflow-hidden flex flex-col">
@@ -609,14 +576,16 @@
       const month = displayedRoomMonth.getMonth();
       const firstWeekday = new Date(year, month, 1).getDay();
       const daysInMonth = new Date(year, month + 1, 0).getDate();
-      const weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+      const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
       monthLabel.textContent = displayedRoomMonth.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
       calendar.replaceChildren();
       weekdays.forEach((weekday) => {
         const label = document.createElement('span');
-        label.className = 'text-center text-label-sm text-on-surface-variant py-1';
+        label.className = 'min-w-0 text-center text-[8px] sm:text-[10px] leading-3 text-on-surface-variant py-1';
         label.textContent = weekday;
+        label.setAttribute('aria-label', weekday);
+        label.style.overflowWrap = 'anywhere';
         calendar.append(label);
       });
 
@@ -807,13 +776,6 @@
       drawer.classList.add('opacity-100');
       panel.classList.remove('translate-x-full');
     }
-
-            const drawer = document.getElementById('guestDrawer');
-            const panel = document.getElementById('drawerPanel');
-            drawer.classList.remove('pointer-events-none', 'opacity-0');
-            drawer.classList.add('opacity-100');
-            panel.classList.remove('translate-x-full');
-          }
 
           function closeDrawer() {
             const drawer = document.getElementById('guestDrawer');

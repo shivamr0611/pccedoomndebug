@@ -16,7 +16,12 @@
     return e;
   };
 
-  const state = { list: [], guests: [], filter: 'all', query: '', selectedId: null, selectedGuestId: null, detail: null, failed: false, actionError: null, sending: false };
+  const state = {
+    list: [], guests: [], filter: 'all', query: '', selectedId: null, selectedGuestId: null,
+    detail: null, failed: false, actionError: null, sending: false,
+    summaryConversationId: null, summaryKey: null, summary: null, summaryLoading: false,
+    summaryError: null, summaryRequestId: 0,
+  };
 
   const labelOf = (c) => c.code || String(c.id).slice(0, 8).toUpperCase();
   const nameOf = (c) => (c.guests && c.guests.name) || phoneOf(c);
@@ -275,10 +280,26 @@
 
     const sum = el('div', 'bg-[#00ABE7]/10 p-4 rounded-xl');
     const sh = el('div', 'flex items-center gap-2 mb-3 text-[#00ABE7]');
-    sh.append(el('span', 'material-symbols-outlined text-lg', 'auto_awesome'), el('h4', 'text-headline-sm font-bold text-on-surface', 'AI Summary'));
-    const st = el('p', 'text-body-sm text-on-surface-variant', d.summary || 'A summary will appear here after the conversation is closed.');
+    sh.append(
+      el('span', 'material-symbols-outlined text-lg', 'auto_awesome'),
+      el('h4', 'text-headline-sm font-bold text-on-surface', 'Chat Summary'),
+      el('span', 'text-[10px] text-outline', 'up to 100 words')
+    );
+    const summary = state.summaryConversationId === d.id ? state.summary : d.summary;
+    const summaryText = state.summaryLoading && state.summaryConversationId === d.id
+      ? 'Generating summary…'
+      : state.summaryError && state.summaryConversationId === d.id
+        ? 'Could not generate summary: ' + state.summaryError
+        : summary || (d.messages.length ? 'Summary not available.' : 'No messages to summarize yet.');
+    const st = el('p', 'text-body-sm text-on-surface-variant', summaryText);
     st.style.whiteSpace = 'pre-wrap';
     sum.append(sh, st);
+    if (state.summaryError && state.summaryConversationId === d.id) {
+      const retry = el('button', 'mt-2 text-label-sm font-semibold text-[#00ABE7] hover:underline', 'Retry summary');
+      retry.type = 'button';
+      retry.addEventListener('click', () => loadConversationSummary(d, true));
+      sum.append(retry);
+    }
 
     const idBox = el('div', 'bg-surface-container p-4 rounded-xl');
     idBox.append(el('span', 'text-[10px] text-outline block mb-1', 'Conversation ID'), el('code', 'text-body-md font-bold text-on-surface', d.code || d.id), el('div', 'text-[10px] text-outline break-all mt-1', d.id));
@@ -290,7 +311,7 @@
     actions.append(deleteButton);
     if (state.actionError) actions.append(el('p', 'text-sm text-error', state.actionError));
 
-    const cards = [card, sum, idBox, dataCard('Conversation record (conversations table)', d), actions];
+    const cards = [card, sum, idBox, actions];
     if (d.guests) cards.push(dataCard('Guest record (guests table)', d.guests));
     panel.replaceChildren(...cards);
   }
@@ -327,9 +348,75 @@
     } catch (e) {
       if (state.selectedId !== selectedId) return;
       state.detail = null;
+      state.summaryRequestId++;
+      state.summaryConversationId = null;
+      state.summaryKey = null;
+      state.summaryLoading = false;
     }
     renderChat();
     renderList();
+    if (state.detail) loadConversationSummary(state.detail);
+  }
+
+  function summaryKeyOf(conversation) {
+    const lastMessage = conversation.messages[conversation.messages.length - 1];
+    return conversation.id + ':' + conversation.messages.length + ':' +
+      (lastMessage ? lastMessage.id || lastMessage.created_at || lastMessage.body : '');
+  }
+
+  async function loadConversationSummary(conversation, force = false) {
+    const key = summaryKeyOf(conversation);
+    if (conversation.status === 'closed' && conversation.summary) {
+      state.summaryRequestId++;
+      state.summaryConversationId = conversation.id;
+      state.summaryKey = key;
+      state.summary = conversation.summary;
+      state.summaryLoading = false;
+      state.summaryError = null;
+      renderPanel(conversation, nameOf(conversation));
+      return;
+    }
+    if (!conversation.messages.length) {
+      state.summaryConversationId = conversation.id;
+      state.summaryKey = key;
+      state.summary = '';
+      state.summaryLoading = false;
+      state.summaryError = null;
+      renderPanel(conversation, nameOf(conversation));
+      return;
+    }
+    if (!force && state.summaryConversationId === conversation.id && state.summaryKey === key) return;
+    if (state.summaryLoading) return;
+
+    const requestId = ++state.summaryRequestId;
+    state.summaryConversationId = conversation.id;
+    state.summaryKey = key;
+    state.summary = '';
+    state.summaryLoading = true;
+    state.summaryError = null;
+    renderPanel(conversation, nameOf(conversation));
+    try {
+      const result = await api('/' + encodeURIComponent(conversation.id) + '/summary', { method: 'POST' });
+      if (state.selectedId !== conversation.id || state.summaryRequestId !== requestId) return;
+      if (!result || typeof result.summary !== 'string' || !result.summary.trim()) {
+        throw new Error('Summary response was empty.');
+      }
+      state.summaryLoading = false;
+      if (!state.detail) return;
+      if (summaryKeyOf(state.detail) !== key) {
+        state.summaryKey = null;
+        renderPanel(state.detail, nameOf(state.detail));
+        loadConversationSummary(state.detail);
+        return;
+      }
+      state.summary = result.summary;
+      renderPanel(state.detail, nameOf(state.detail));
+    } catch (error) {
+      if (state.selectedId !== conversation.id || state.summaryRequestId !== requestId) return;
+      state.summaryLoading = false;
+      state.summaryError = error.message || 'Summary request failed.';
+      renderPanel(state.detail, nameOf(state.detail));
+    }
   }
 
   function markConversationRead(conversation) {
@@ -360,6 +447,12 @@
     state.selectedGuestId = null;
     state.detail = null;
     state.actionError = null;
+    state.summaryRequestId++;
+    state.summaryConversationId = null;
+    state.summaryKey = null;
+    state.summary = null;
+    state.summaryLoading = false;
+    state.summaryError = null;
     $('#replyStatus').textContent = '';
     $('#replyStatus').classList.remove('text-error');
     renderList();
@@ -372,6 +465,12 @@
     state.selectedId = null;
     state.detail = null;
     state.actionError = null;
+    state.summaryRequestId++;
+    state.summaryConversationId = null;
+    state.summaryKey = null;
+    state.summary = null;
+    state.summaryLoading = false;
+    state.summaryError = null;
     $('#replyStatus').textContent = '';
     $('#replyStatus').classList.remove('text-error');
     renderList();

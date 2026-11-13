@@ -42,7 +42,7 @@ test('room bookings can be saved idempotently and removed', async () => {
 
   assert.deepEqual(await store.setRoomBooking(booking.booking_date, booking.room_number, true), booking);
   assert.equal(calls[0].options.method, 'POST');
-  assert.equal(calls[0].options.headers.Prefer, 'resolution=merge-duplicates,return=representation');
+  assert.equal(calls[0].options.headers.Prefer, 'resolution=ignore-duplicates,return=representation');
   assert.equal(new URL(calls[0].url).searchParams.get('on_conflict'), 'booking_date,room_number');
 
   assert.equal(await store.setRoomBooking(booking.booking_date, booking.room_number, false), true);
@@ -50,4 +50,59 @@ test('room bookings can be saved idempotently and removed', async () => {
   const deleteUrl = new URL(calls[1].url);
   assert.equal(deleteUrl.searchParams.get('booking_date'), 'eq.2026-11-13');
   assert.equal(deleteUrl.searchParams.get('room_number'), 'eq.101');
+});
+
+test('room reservations atomically record guest, cost, payment reference, and pending status', async () => {
+  const reservation = {
+    bookingDate: '2026-11-13',
+    roomNumber: 101,
+    guestPhone: '+919876543210',
+    guestName: 'Priya',
+    amountInr: 5000,
+    mockTransactionId: null,
+    paymentReference: 'ROOM-ABC123',
+    paymentStatus: 'pending_verification',
+  };
+  let request;
+  const store = createSupabaseStore({
+    url: 'https://example.supabase.co',
+    serviceRoleKey: 'test-key',
+    fetchImpl: async (url, options) => {
+      request = { url: new URL(url), ...options };
+      return { ok: true, status: 201, text: async () => JSON.stringify([{
+        booking_date: reservation.bookingDate,
+        room_number: reservation.roomNumber,
+        guest_phone: reservation.guestPhone,
+        guest_name: reservation.guestName,
+        amount_inr: reservation.amountInr,
+        mock_transaction_id: reservation.mockTransactionId,
+        payment_reference: reservation.paymentReference,
+        payment_status: reservation.paymentStatus,
+      }]) };
+    },
+  });
+
+  assert.deepEqual(await store.reserveRoom(reservation), {
+    booking_date: reservation.bookingDate,
+    room_number: reservation.roomNumber,
+    guest_phone: reservation.guestPhone,
+    guest_name: reservation.guestName,
+    amount_inr: reservation.amountInr,
+    mock_transaction_id: reservation.mockTransactionId,
+    payment_reference: reservation.paymentReference,
+    payment_status: reservation.paymentStatus,
+  });
+  assert.equal(request.url.pathname, '/rest/v1/room_bookings');
+  assert.equal(request.url.searchParams.get('on_conflict'), 'booking_date,room_number');
+  assert.equal(request.headers.Prefer, 'resolution=ignore-duplicates,return=representation');
+  assert.deepEqual(JSON.parse(request.body), {
+    booking_date: reservation.bookingDate,
+    room_number: reservation.roomNumber,
+    guest_phone: reservation.guestPhone,
+    guest_name: reservation.guestName,
+    amount_inr: reservation.amountInr,
+    mock_transaction_id: reservation.mockTransactionId,
+    payment_reference: reservation.paymentReference,
+    payment_status: reservation.paymentStatus,
+  });
 });

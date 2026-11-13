@@ -50,6 +50,8 @@ function memoryStore() {
     },
     findConversationByCode: async (code) => s.conversations.find((c) => c.code === code) || null,
     findConversationById: async (cid) => s.conversations.find((c) => c.id === cid) || null,
+    findMessageByProviderId: async (providerMessageId) =>
+      s.messages.find((message) => message.provider_message_id === providerMessageId) || null,
     setSummary: async (cid, summary) => (s.conversations.find((c) => c.id === cid).summary = summary),
     insertMessage: async (row) => {
       if (row.provider_message_id && s.messages.some((m) => m.provider_message_id === row.provider_message_id)) throw uniq();
@@ -113,18 +115,39 @@ test('AI reply receives prior conversation messages without the current guest me
   assert.equal(store.s.messages.at(-1).body, 'AI:and checkout?');
 });
 
+test('AI receives the full conversation history, not only the latest messages', async () => {
+  let receivedHistory;
+  const { svc, phone } = setup({
+    aiReply: async (_text, history) => {
+      receivedHistory = history;
+      return 'Got it.';
+    },
+  });
+
+  for (let index = 0; index < 8; index++) {
+    await svc.handleIncomingMessage(phone, `guest message ${index}`, `history-${index}`);
+  }
+
+  assert.equal(receivedHistory.length, 14);
+  assert.deepEqual(receivedHistory[0], { sender: 'guest', body: 'guest message 0' });
+  assert.deepEqual(receivedHistory.at(-1), { sender: 'ai', body: 'Got it.' });
+});
+
 test('a voice transcription is sent through the normal language-aware reply pipeline', async () => {
   let receivedText;
+  let receivedContext;
   const { svc, store, phone } = setup({
-    aiReply: async (text) => {
+    aiReply: async (text, _history, context) => {
       receivedText = text;
+      receivedContext = context;
       return 'कृपया ताजे तौलिए भेजें।';
     },
   });
   const transcript = 'कृपया ताजे तौलिए भेजें।';
-  const reply = await svc.handleIncomingMessage(phone, transcript, 'voice-1');
+  const reply = await svc.handleIncomingMessage(phone, transcript, 'voice-1', {}, null, { languageHint: 'Hindi' });
 
   assert.equal(receivedText, transcript);
+  assert.deepEqual(receivedContext, { languageHint: 'Hindi' });
   assert.equal(reply, 'कृपया ताजे तौलिए भेजें।');
   assert.deepEqual(store.s.messages.map((message) => [message.sender, message.body]), [
     ['guest', transcript],
@@ -164,6 +187,27 @@ test('a retried /close does not close the newly opened conversation', async () =
   await svc.handleIncomingMessage(phone, 'hello', 'm1');
   assert.equal(await svc.handleIncomingMessage(phone, '/close', 'close-1'), REPLIES.closed);
   assert.equal(await svc.handleIncomingMessage(phone, '/close', 'close-1'), null);
+  assert.equal(store.s.conversations[0].status, 'closed');
+  assert.equal(store.s.conversations[1].status, 'open');
+});
+
+test('a retried /close completes when the first close attempt failed after saving the command', async () => {
+  const { svc, store, phone } = setup();
+  await svc.handleIncomingMessage(phone, 'hello', 'm1');
+  const closeConversation = store.closeConversationById;
+  let failOnce = true;
+  store.closeConversationById = async (id) => {
+    if (failOnce) {
+      failOnce = false;
+      throw new Error('temporary database error');
+    }
+    return closeConversation(id);
+  };
+
+  assert.equal(await svc.handleIncomingMessage(phone, '/close', 'close-retry'), null);
+  assert.equal(store.s.conversations[0].status, 'open');
+  assert.equal(await svc.handleIncomingMessage(phone, '/close', 'close-retry'), REPLIES.closed);
+  assert.equal(store.s.messages.filter((message) => message.provider_message_id === 'close-retry').length, 1);
   assert.equal(store.s.conversations[0].status, 'closed');
   assert.equal(store.s.conversations[1].status, 'open');
 });
@@ -238,6 +282,50 @@ test('Supabase store deletes a conversation by id and reports missing rows', asy
   assert.equal(url.searchParams.get('id'), 'eq.' + id);
   rows = [];
   assert.equal(await store.deleteConversation(id), false);
+});
+
+test('Supabase store looks up a saved provider message for idempotent close retries', async () => {
+  const providerMessageId = 'wamid.HBgM123456789';
+  const message = {
+    id: '00000000-0000-4000-8000-000000000005',
+    conversation_id: '00000000-0000-4000-8000-000000000006',
+    sender: 'guest',
+    body: '/close',
+  };
+  let requestUrl;
+  const store = createSupabaseStore({
+    url: 'https://example.supabase.co',
+    serviceRoleKey: 'test-key',
+    fetchImpl: async (url) => {
+      requestUrl = new URL(url);
+      return { ok: true, status: 200, text: async () => JSON.stringify([message]) };
+    },
+  });
+
+  assert.deepEqual(await store.findMessageByProviderId(providerMessageId), message);
+  assert.equal(requestUrl.pathname, '/rest/v1/messages');
+  assert.equal(requestUrl.searchParams.get('provider_message_id'), 'eq.' + providerMessageId);
+});
+
+test('Supabase store paginates the full message history for AI memory', async () => {
+  const offsets = [];
+  const store = createSupabaseStore({
+    url: 'https://example.supabase.co',
+    serviceRoleKey: 'test-key',
+    fetchImpl: async (url) => {
+      const requestUrl = new URL(url);
+      const offset = Number(requestUrl.searchParams.get('offset'));
+      offsets.push(offset);
+      const rows = offset === 0
+        ? Array.from({ length: 1000 }, (_, index) => ({ sender: 'guest', body: `message ${index}` }))
+        : [{ sender: 'ai', body: 'final message' }];
+      return { ok: true, status: 200, text: async () => JSON.stringify(rows) };
+    },
+  });
+
+  const messages = await store.listMessages('conversation-1');
+  assert.equal(messages.length, 1001);
+  assert.deepEqual(offsets, [0, 1000]);
 });
 
 test('Supabase store checks for conversation tickets before deleting a guest', async () => {

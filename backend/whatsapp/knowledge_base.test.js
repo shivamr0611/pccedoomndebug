@@ -1,6 +1,13 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { answerFromKnowledge, outOfContextReply, retrieveKnowledge } = require('./knowledge_base');
+const {
+  answerFromConversationMemory,
+  answerFromKnowledge,
+  conversationMemory,
+  outOfContextReply,
+  resolveRoomRate,
+  retrieveKnowledge,
+} = require('./knowledge_base');
 const { createSupabaseStore } = require('./conversation_service');
 
 const items = [
@@ -13,6 +20,30 @@ test('knowledge retrieval ranks matching current entries and ignores disabled en
   assert.deepEqual(retrieveKnowledge(items, 'What is the peak rate for Executive Suite?').map((item) => item.id), ['1']);
   assert.deepEqual(retrieveKnowledge(items, 'What time is check-out?').map((item) => item.id), ['2']);
   assert.deepEqual(retrieveKnowledge(items, 'Does the hidden villa have a pool?'), []);
+});
+
+test('room totals are calculated only from enabled matching knowledge-base rates', () => {
+  const rates = [{
+    category: 'booking',
+    title: 'price',
+    content: 'cost to book 1 room for 1 day for 2 people is 1000 rs',
+    enabled: true,
+  }];
+
+  assert.deepEqual(resolveRoomRate(rates, { roomCount: 1, nights: 1, guestCount: 2 }), {
+    amount: 1000,
+    source: 'price',
+  });
+  assert.deepEqual(resolveRoomRate(rates, { roomCount: 2, nights: 2, guestCount: 4 }), {
+    amount: 4000,
+    source: 'price',
+  });
+  assert.equal(resolveRoomRate(rates, { roomCount: 1, nights: 1, guestCount: 1 }), null);
+  assert.equal(resolveRoomRate(rates.map((item) => ({ ...item, enabled: false })), {
+    roomCount: 1,
+    nights: 1,
+    guestCount: 2,
+  }), null);
 });
 
 test('knowledge answers use retrieved entries as context and return their sources', async () => {
@@ -69,6 +100,60 @@ test('follow-up questions use prior conversation context for retrieval and answe
   assert.match(prompt, /What about the maximum/);
 });
 
+test('older relevant chat messages remain available as AI memory', () => {
+  const history = [
+    { sender: 'guest', body: 'My dog is named Poppy, and we arrive on November 22.' },
+    ...Array.from({ length: 20 }, (_, index) => ({
+      sender: index % 2 ? 'ai' : 'guest',
+      body: `Unrelated conversation detail ${index}.`,
+    })),
+  ];
+
+  const memory = JSON.parse(conversationMemory(history, 'What is my dog named?'));
+  assert.ok(memory.some((message) => message.body.includes('Poppy')));
+  assert.equal(memory.length, 13);
+});
+
+test('chat memory answers follow-ups only from the stored conversation', async () => {
+  let request;
+  const answer = await answerFromConversationMemory(
+    'What date did I say we arrive?',
+    'test-key',
+    async (_url, options) => {
+      request = JSON.parse(options.body);
+      return {
+        ok: true,
+        json: async () => ({ choices: [{ message: { content: '{"answer":"You said November 22."}' } }] }),
+      };
+    },
+    [{ sender: 'guest', body: 'My family and I arrive on November 22.' }]
+  );
+
+  assert.equal(answer, 'You said November 22.');
+  assert.equal(request.response_format.type, 'json_object');
+  assert.match(request.messages[0].content, /only the supplied chat memory/);
+  assert.match(request.messages[1].content, /arrive on November 22/);
+});
+
+test('chat memory fallback does not answer when the conversation lacks the detail', async () => {
+  let called = false;
+  const answer = await answerFromConversationMemory(
+    'What is my flight number?',
+    'test-key',
+    async () => {
+      called = true;
+      return {
+        ok: true,
+        json: async () => ({ choices: [{ message: { content: '{"answer":""}' } }] }),
+      };
+    },
+    [{ sender: 'guest', body: 'I am arriving this weekend.' }]
+  );
+  assert.equal(answer, null);
+  assert.equal(called, true);
+  assert.equal(await answerFromConversationMemory('hello', 'test-key', fetch, []), null);
+});
+
 test('no matching knowledge entry does not call the model', async () => {
   let called = false;
   const result = await answerFromKnowledge('What is the airport transfer price?', items, 'test-key', async () => {
@@ -101,6 +186,26 @@ test('translated query can retrieve an English entry while the original question
   assert.deepEqual(result.sources.map((item) => item.id), ['4']);
   assert.equal(result.answer, 'नाश्ता सुबह 7 से 10 बजे तक परोसा जाता है।');
   assert.match(prompt, /नाश्ता कितने बजे मिलता है/);
+});
+
+test('voice language hint overrides the knowledge-base language in the reply instructions', async () => {
+  let systemPrompt;
+  await answerFromKnowledge(
+    'नाश्ता कितने बजे मिलता है?',
+    [{ id: '4', category: 'Dining', title: 'Breakfast hours', content: 'Breakfast is served from 7 to 10 AM.', enabled: true }],
+    'test-key',
+    async (_url, options) => {
+      systemPrompt = JSON.parse(options.body).messages[0].content;
+      return { ok: true, json: async () => ({ choices: [{ message: { content: 'नाश्ता सुबह 7 से 10 बजे तक परोसा जाता है।' } }] }) };
+    },
+    'What time is breakfast served?',
+    [],
+    'Hindi'
+  );
+
+  assert.match(systemPrompt, /voice transcription service identified.*Hindi/s);
+  assert.match(systemPrompt, /Reply only in Hindi/);
+  assert.match(systemPrompt, /not a request to translate it; answer the request/);
 });
 
 test('Supabase knowledge store lists, creates, edits, and deletes entries', async () => {
