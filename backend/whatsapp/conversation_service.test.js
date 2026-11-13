@@ -212,6 +212,62 @@ test('Supabase store deletes a conversation by id and reports missing rows', asy
   assert.equal(await store.deleteConversation(id), false);
 });
 
+test('Supabase store checks for conversation tickets before deleting a guest', async () => {
+  const id = '00000000-0000-4000-8000-000000000002';
+  const calls = [];
+  let conversationRows = [{ id: 'ticket-1' }];
+  const store = createSupabaseStore({
+    url: 'https://example.supabase.co',
+    serviceRoleKey: 'test-key',
+    fetchImpl: async (url, options) => {
+      calls.push({ url, options });
+      const rows = options.method === 'DELETE' ? [{ id }] : conversationRows;
+      return { ok: true, status: 200, text: async () => JSON.stringify(rows) };
+    },
+  });
+
+  assert.equal(await store.guestHasConversations(id), true);
+  const ticketCheckUrl = new URL(calls[0].url);
+  assert.equal(ticketCheckUrl.pathname, '/rest/v1/conversations');
+  assert.equal(ticketCheckUrl.searchParams.get('guest_id'), 'eq.' + id);
+  assert.equal(calls.length, 1);
+  conversationRows = [];
+  assert.equal(await store.guestHasConversations(id), false);
+  assert.equal(await store.deleteGuest(id), true);
+  assert.equal(calls[2].options.method, 'DELETE');
+  assert.equal(new URL(calls[2].url).pathname, '/rest/v1/guests');
+});
+
+test('dashboard conversation list includes the latest guest message for unread tracking', async () => {
+  const conversationId = '00000000-0000-4000-8000-000000000003';
+  const guestId = '00000000-0000-4000-8000-000000000004';
+  const guestMessage = { id: 'guest-message', conversation_id: conversationId, sender: 'guest', body: 'Hello', created_at: '2026-11-13T10:00:00Z' };
+  let messageOrder;
+  const store = createSupabaseStore({
+    url: 'https://example.supabase.co',
+    serviceRoleKey: 'test-key',
+    fetchImpl: async (url) => {
+      const parsedUrl = new URL(url);
+      const { pathname } = parsedUrl;
+      if (pathname.endsWith('/messages')) messageOrder = parsedUrl.searchParams.get('order');
+      const rows = pathname.endsWith('/guests')
+        ? [{ id: guestId, phone: '+919876543210' }]
+        : pathname.endsWith('/conversations')
+          ? [{ id: conversationId, guest_id: guestId, status: 'open', started_at: '2026-11-13T09:00:00Z', guests: { id: guestId } }]
+          : [
+              { id: 'staff-message', conversation_id: conversationId, sender: 'staff', body: 'Hi', created_at: '2026-11-13T10:01:00Z' },
+              guestMessage,
+            ];
+      return { ok: true, status: 200, text: async () => JSON.stringify(rows) };
+    },
+  });
+
+  const { conversations } = await store.dashboardConversations();
+  assert.equal(messageOrder, 'created_at.desc,id.desc');
+  assert.equal(conversations[0].last_message.id, 'staff-message');
+  assert.equal(conversations[0].last_guest_message.id, guestMessage.id);
+});
+
 test('staff message is stored only in an open conversation', async () => {
   const { svc, store, phone } = setup();
   assert.equal(await svc.saveStaffMessage(phone, 'hello from staff'), false);

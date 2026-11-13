@@ -3,6 +3,8 @@
   'use strict';
 
   const API = 'http://127.0.0.1:3001/api/conversations';
+  const GUEST_API = 'http://127.0.0.1:3001/api/guests';
+  const SEND_API = 'http://127.0.0.1:3001/send';
   const POLL_MS = 5000;
 
   const $ = (sel, root = document) => root.querySelector(sel);
@@ -13,10 +15,29 @@
     return e;
   };
 
-  const state = { list: [], guests: [], filter: 'all', query: '', selectedId: null, selectedGuestId: null, detail: null, failed: false, actionError: null };
+  const state = { list: [], guests: [], filter: 'all', query: '', selectedId: null, selectedGuestId: null, detail: null, failed: false, actionError: null, sending: false };
 
   const labelOf = (c) => c.code || String(c.id).slice(0, 8).toUpperCase();
   const nameOf = (c) => (c.guests && c.guests.name) || phoneOf(c);
+  const readMarkerKey = (id) => 'conversation-last-read:' + id;
+  const compareMessageOrder = (left, right) => {
+    const timeDifference = Date.parse(left.created_at) - Date.parse(right.created_at);
+    if (timeDifference) return timeDifference;
+    return left.id === right.id ? 0 : left.id < right.id ? -1 : 1;
+  };
+  const hasUnreadGuestMessage = (conversation) => {
+    const lastGuestMessage = conversation.last_guest_message;
+    if (!lastGuestMessage) return false;
+    const stored = localStorage.getItem(readMarkerKey(conversation.id));
+    if (!stored) return true;
+    if (stored === lastGuestMessage.id) return false;
+    try {
+      const marker = JSON.parse(stored);
+      return !marker.created_at || compareMessageOrder(lastGuestMessage, marker) > 0;
+    } catch {
+      return true;
+    }
+  };
   function phoneOf(c) {
     const p = (c.guests && c.guests.phone) || '';
     const m = p.match(/^\+91(\d{5})(\d{5})$/);
@@ -48,6 +69,20 @@
       : el('span', 'bg-emerald-500/20 text-emerald-600 text-[10px] font-bold px-1.5 py-0.5 rounded', 'Closed');
   }
 
+  function updateReplyComposer(conversation) {
+    const textarea = $('#replyText');
+    const button = $('#replySend');
+    if (!textarea || !button) return;
+    const canReply = !!conversation && conversation.status === 'open' && !!(conversation.guests && conversation.guests.phone);
+    textarea.disabled = !canReply || state.sending;
+    button.disabled = !canReply || state.sending;
+    textarea.placeholder = !conversation
+      ? 'Select an open conversation to send a WhatsApp message.'
+      : conversation.status === 'closed'
+        ? 'This conversation is closed. Select an open conversation to reply.'
+        : 'Type a message to send on WhatsApp…';
+  }
+
   /* ---------- left column ---------- */
   function visibleList() {
     const q = state.query;
@@ -67,9 +102,16 @@
       const span = $('[data-count="' + key + '"]');
       if (span) span.textContent = state.list.length || !state.failed ? '(' + n + ')' : '';
     }
-    const open = state.list.filter((c) => c.status === 'open').length;
+    const unreadCount = state.list.filter(hasUnreadGuestMessage).length;
+    localStorage.setItem('unread-conversation-count', String(unreadCount));
     const badge = $('aside a[data-path="conversations"] span.rounded-full');
-    if (badge) badge.textContent = String(open);
+    if (badge) {
+      badge.textContent = String(unreadCount);
+      badge.hidden = unreadCount === 0;
+    }
+    const notification = $$('header .material-symbols-outlined').find((icon) => icon.textContent.trim() === 'notifications');
+    const notificationDot = notification && notification.parentElement.querySelector('span.absolute');
+    if (notificationDot) notificationDot.hidden = unreadCount === 0;
 
     if (state.failed) {
       box.append(el('p', 'text-body-sm text-[#EE6352] p-3', 'Cannot reach the backend. Is "node server.js" running in backend/whatsapp?'));
@@ -111,6 +153,7 @@
         const preview = c.last_message ? (c.last_message.sender === 'guest' ? '' : c.last_message.sender === 'ai' ? 'AI: ' : 'Staff: ') + c.last_message.body : 'No messages yet';
         const tags = el('div', 'flex items-center gap-2 mt-1.5');
         tags.append(statusBadge(c.status), el('span', 'text-[10px] text-outline', c.message_count + ' msg'));
+        if (hasUnreadGuestMessage(c)) tags.append(el('span', 'rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold text-on-secondary', 'Unread'));
         row.append(top, el('p', 'text-body-sm text-on-surface-variant truncate', preview.replace(/\s+/g, ' ')), tags);
         row.addEventListener('click', () => select(c.id));
         wrap.append(row);
@@ -141,21 +184,30 @@
     head.replaceChildren();
     const lone = !d && state.selectedGuestId ? state.guests.find((g) => g.id === state.selectedGuestId) : null;
     if (lone) {
+      updateReplyComposer(null);
       head.append(avatar(lone.name || lone.phone, 'w-10 h-10 text-sm'));
       const info = el('div');
       info.append(el('div', 'text-headline-sm font-semibold text-on-surface', lone.name || lone.phone), el('div', 'text-body-sm text-outline', lone.name ? lone.phone : 'Guest with no tickets yet'));
       head.append(info);
       msgs.dataset.cid = '';
       msgs.replaceChildren(el('p', 'text-body-sm text-outline text-center mt-10', 'This guest has no conversations yet. They start one by sending a message on WhatsApp.'));
-      panel.replaceChildren(dataCard('Guest record (guests table)', lone));
+      const deleteButton = el('button', 'w-full rounded-lg border border-error px-4 py-2 text-sm font-semibold text-error hover:bg-error-container', 'Delete guest');
+      deleteButton.type = 'button';
+      deleteButton.addEventListener('click', () => deleteGuest(lone, deleteButton));
+      const actions = el('div', 'space-y-2');
+      actions.append(deleteButton);
+      if (state.actionError) actions.append(el('p', 'text-sm text-error', state.actionError));
+      panel.replaceChildren(dataCard('Guest record (guests table)', lone), actions);
       return;
     }
     if (!d) {
+      updateReplyComposer(null);
       head.append(el('span', 'text-body-sm text-outline', 'Select a conversation'));
       msgs.replaceChildren(el('p', 'text-body-sm text-outline text-center mt-10', 'Select a conversation to see its messages.'));
       panel.replaceChildren(el('p', 'text-body-sm text-outline', 'Guest details appear here.'));
       return;
     }
+    updateReplyComposer(d);
     const name = nameOf(d);
     head.append(avatar(name, 'w-10 h-10 text-sm'));
     const info = el('div');
@@ -265,19 +317,52 @@
 
   async function loadDetail() {
     if (!state.selectedId) return;
+    const selectedId = state.selectedId;
     try {
-      state.detail = await api('/' + encodeURIComponent(state.selectedId));
+      const detail = await api('/' + encodeURIComponent(selectedId));
+      if (state.selectedId !== selectedId) return;
+      state.detail = detail;
+      markConversationRead(detail);
     } catch (e) {
+      if (state.selectedId !== selectedId) return;
       state.detail = null;
     }
     renderChat();
+    renderList();
+  }
+
+  function markConversationRead(conversation) {
+    let latestGuestMessage = null;
+    for (let i = conversation.messages.length - 1; i >= 0; i--) {
+      if (conversation.messages[i].sender === 'guest') {
+        latestGuestMessage = conversation.messages[i];
+        break;
+      }
+    }
+    if (!latestGuestMessage) return;
+    const key = readMarkerKey(conversation.id);
+    const stored = localStorage.getItem(key);
+    if (stored === latestGuestMessage.id) return;
+    if (stored) {
+      try {
+        const marker = JSON.parse(stored);
+        if (marker.created_at && compareMessageOrder(marker, latestGuestMessage) >= 0) return;
+      } catch {
+        // Replace a legacy message-id marker with the timestamped format.
+      }
+    }
+    localStorage.setItem(key, JSON.stringify(latestGuestMessage));
   }
 
   async function select(id) {
     state.selectedId = id;
     state.selectedGuestId = null;
+    state.detail = null;
     state.actionError = null;
+    $('#replyStatus').textContent = '';
+    $('#replyStatus').classList.remove('text-error');
     renderList();
+    renderChat();
     await loadDetail();
   }
 
@@ -286,8 +371,42 @@
     state.selectedId = null;
     state.detail = null;
     state.actionError = null;
+    $('#replyStatus').textContent = '';
+    $('#replyStatus').classList.remove('text-error');
     renderList();
     renderChat();
+  }
+
+  async function sendStaffReply(event) {
+    event.preventDefault();
+    const conversation = state.detail;
+    const textarea = $('#replyText');
+    const status = $('#replyStatus');
+    const message = textarea.value.trim();
+    if (!message || !conversation || conversation.status !== 'open' || state.sending) return;
+
+    state.sending = true;
+    status.classList.remove('text-error');
+    status.textContent = 'Sending to WhatsApp…';
+    updateReplyComposer(conversation);
+    try {
+      const response = await fetch(SEND_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ number: conversation.guests.phone, message }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || 'HTTP ' + response.status);
+      textarea.value = '';
+      status.textContent = 'Message sent to WhatsApp.';
+      await loadDetail();
+    } catch (error) {
+      status.classList.add('text-error');
+      status.textContent = error.message || 'Could not send the message.';
+    } finally {
+      state.sending = false;
+      updateReplyComposer(state.detail);
+    }
   }
 
   async function deleteConversation(conversation, button) {
@@ -303,6 +422,25 @@
       await refresh();
     } catch (error) {
       state.actionError = error.message || 'Could not delete the conversation.';
+      renderChat();
+    }
+  }
+
+  async function deleteGuest(guest, button) {
+    const name = guest.name || guest.phone;
+    if (!window.confirm(`Permanently delete guest "${name}" from Supabase? Guests with conversation tickets cannot be deleted here.`)) return;
+    state.actionError = null;
+    button.disabled = true;
+    button.textContent = 'Deleting…';
+    try {
+      const response = await fetch(GUEST_API + '/' + encodeURIComponent(guest.id), { method: 'DELETE', cache: 'no-store' });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || 'HTTP ' + response.status);
+      state.guests = state.guests.filter((item) => item.id !== guest.id);
+      state.selectedGuestId = null;
+      await refresh();
+    } catch (error) {
+      state.actionError = error.message || 'Could not delete the guest.';
       renderChat();
     }
   }
@@ -323,6 +461,7 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     if (!$('#convList')) return;
+    $('#replyForm').addEventListener('submit', sendStaffReply);
     $('#convSearch').addEventListener('input', (e) => {
       state.query = e.target.value.trim().toLowerCase();
       renderList();

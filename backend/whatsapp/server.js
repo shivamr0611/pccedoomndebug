@@ -237,7 +237,8 @@ async function resolveSender(msg, chat) {
 
 client.on('message_create', async (msg) => {
   const isVoiceMessage = msg.hasMedia && ['audio', 'ptt'].includes(msg.type);
-  if (msg.isStatus || msg.from.endsWith('@g.us') || msg.to.endsWith('@g.us') || (!msg.body && !isVoiceMessage)) return;
+  const isNonDirectChat = (address) => /@(g\.us|newsletter|broadcast)$/i.test(String(address || ''));
+  if (msg.isStatus || isNonDirectChat(msg.from) || isNonDirectChat(msg.to) || (!msg.body && !isVoiceMessage)) return;
   if (msg.body.startsWith(BOT_MARK)) return;
   if (msg.fromMe && msg.to !== msg.from) return; // ignore messages we send to other people (e.g. the Message tab)
   if (msg.fromMe && recentBotTexts.has(norm(msg.body))) return; // our own reply echoing back
@@ -338,8 +339,6 @@ client.on('message_create', async (msg) => {
   }
 });
 
-client.initialize()
-
 const UI_ORIGINS = ['http://127.0.0.1:8081', 'http://localhost:8081'].concat(process.env.UI_ORIGIN ? [process.env.UI_ORIGIN] : []);
 
 const cors = {
@@ -390,8 +389,7 @@ function knowledgeItemInput(value, partial = false) {
   return Object.keys(item).length ? item : null;
 }
 
-http
-  .createServer(async (req, res) => {
+const apiServer = http.createServer(async (req, res) => {
     const urlPath = req.url.split('?')[0];
 
     if (urlPath === '/api/knowledge-base' || urlPath.startsWith('/api/knowledge-base/')) {
@@ -453,6 +451,38 @@ http
       }
     }
 
+    if (urlPath.startsWith('/api/guests/')) {
+      const origin = req.headers.origin;
+      const allowed = !origin || UI_ORIGINS.includes(origin);
+      const send = (code, obj) => {
+        res.writeHead(code, {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store',
+          ...(origin && allowed ? { 'Access-Control-Allow-Origin': origin, Vary: 'Origin' } : {}),
+        });
+        res.end(JSON.stringify(obj));
+      };
+      if (!allowed) return send(403, { error: 'origin not allowed' });
+      if (req.method === 'OPTIONS') {
+        res.writeHead(204, { 'Access-Control-Allow-Origin': origin, 'Access-Control-Allow-Methods': 'DELETE, OPTIONS', Vary: 'Origin' });
+        return res.end();
+      }
+      if (req.method !== 'DELETE') return send(405, { error: 'method not allowed' });
+      if (!dashboardStore) return send(503, { error: 'Supabase is not configured (SUPABASE_SERVICE_ROLE_KEY)' });
+      try {
+        const id = decodeURIComponent(urlPath.slice('/api/guests/'.length));
+        if (!UUID_RE.test(id)) return send(400, { error: 'invalid guest id' });
+        if (await dashboardStore.guestHasConversations(id)) {
+          return send(409, { error: 'Guests with conversations cannot be deleted here.' });
+        }
+        const deleted = await dashboardStore.deleteGuest(id);
+        return deleted ? send(200, { ok: true }) : send(404, { error: 'guest not found' });
+      } catch (e) {
+        console.error('Guest API error:', e.message);
+        return send(500, { error: e.message });
+      }
+    }
+
     // Dashboard API. Only the UI's own origin may call it (it returns private guest data).
     if (urlPath === '/api/conversations' || urlPath.startsWith('/api/conversations/')) {
       const origin = req.headers.origin;
@@ -509,5 +539,18 @@ http
         reply(res, 500, { error: e.message });
       }
     });
-  })
-  .listen(PORT, '127.0.0.1', () => console.log('WhatsApp API on http://127.0.0.1:' + PORT));
+});
+
+apiServer.on('error', (error) => {
+  if (error.code === 'EADDRINUSE') {
+    console.error('WhatsApp API is already running on http://127.0.0.1:' + PORT + '. Stop the existing instance before starting another.');
+  } else {
+    console.error('WhatsApp API failed to start:', error.message);
+  }
+  process.exitCode = 1;
+});
+
+apiServer.listen(PORT, '127.0.0.1', () => {
+  console.log('WhatsApp API on http://127.0.0.1:' + PORT);
+  client.initialize().catch((error) => console.error('WhatsApp client initialization failed:', error.message));
+});

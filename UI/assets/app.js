@@ -60,6 +60,18 @@
 
     const currentFolder = location.pathname.split('/').slice(-2, -1)[0];
     const currentPage = Object.keys(PAGES).find((page) => PAGES[page] === currentFolder);
+    const savedUnreadCount = localStorage.getItem('unread-conversation-count');
+    if (savedUnreadCount !== null) {
+      const unreadCount = Math.max(0, Number(savedUnreadCount) || 0);
+      const badge = $('aside a[data-path="conversations"] span.rounded-full');
+      if (badge) {
+        badge.textContent = String(unreadCount);
+        badge.hidden = unreadCount === 0;
+      }
+      const notification = $$('header .material-symbols-outlined').find((icon) => icon.textContent.trim() === 'notifications');
+      const dot = notification && notification.parentElement.querySelector('span.absolute');
+      if (dot) dot.hidden = unreadCount === 0;
+    }
     const activeClasses = ['bg-secondary', 'text-on-secondary', 'font-bold'];
     const inactiveClasses = [
       'text-primary-fixed-dim',

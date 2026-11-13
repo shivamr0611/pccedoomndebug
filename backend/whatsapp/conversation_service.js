@@ -301,18 +301,26 @@ function createSupabaseStore({ url, serviceRoleKey, fetchImpl = fetch }) {
       const [guests, convs, msgs] = await Promise.all([
         fetchAll('guests?select=*&order=created_at.desc,id.asc'),
         fetchAll('conversations?select=*,guests(*)&order=started_at.desc,id.asc'),
-        fetchAll('messages?select=conversation_id,sender,body,created_at&order=created_at.desc,id.asc'),
+        fetchAll('messages?select=id,conversation_id,sender,body,created_at&order=created_at.desc,id.desc'),
       ]);
       const last = new Map();
+      const lastGuest = new Map();
       const count = new Map();
       for (const m of msgs) {
         if (!last.has(m.conversation_id)) last.set(m.conversation_id, m); // rows arrive newest first
+        if (m.sender === 'guest' && !lastGuest.has(m.conversation_id)) lastGuest.set(m.conversation_id, m);
         count.set(m.conversation_id, (count.get(m.conversation_id) || 0) + 1);
       }
       const conversations = convs
         .map((c) => {
           const lm = last.get(c.id) || null;
-          return { ...c, last_message: lm, message_count: count.get(c.id) || 0, last_activity: lm ? lm.created_at : c.started_at };
+          return {
+            ...c,
+            last_message: lm,
+            last_guest_message: lastGuest.get(c.id) || null,
+            message_count: count.get(c.id) || 0,
+            last_activity: lm ? lm.created_at : c.started_at,
+          };
         })
         .sort((a, b) => new Date(b.last_activity) - new Date(a.last_activity));
       return { conversations, guests };
@@ -328,6 +336,10 @@ function createSupabaseStore({ url, serviceRoleKey, fetchImpl = fetch }) {
       const messages = await fetchAll('messages?select=*&order=created_at.asc,id.asc&conversation_id=eq.' + q(conv.id));
       return { ...conv, messages };
     },
+    guestHasConversations: async (guestId) =>
+      (await rest('GET', 'conversations?select=id&guest_id=eq.' + q(guestId) + '&limit=1')).length > 0,
+    deleteGuest: async (guestId) =>
+      (await rest('DELETE', 'guests?id=eq.' + q(guestId))).length > 0,
     deleteConversation: async (id) =>
       (await rest('DELETE', 'conversations?id=eq.' + q(id))).length > 0,
     findConversationById: async (id) => first(await rest('GET', 'conversations?select=*&limit=1&id=eq.' + q(id))),
