@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "error-container": "#ffdad6", "tertiary-fixed-dim": "#7dd0ff", "on-primary-fixed-variant": "#394761", "secondary-container": "#fd6e5c", "inverse-primary": "#b9c7e6", "tertiary": "#000000", "on-tertiary-container": "#008dc0", "surface": "#fbf8fb", "primary-fixed-dim": "#b9c7e6", "on-secondary-fixed": "#410000", "outline": "#75777e", "surface-container": "#efedf0", "on-tertiary-fixed-variant": "#004c69", "secondary-fixed": "#ffdad5", "surface-tint": "#515f7a", "on-surface-variant": "#44474d", "surface-container-highest": "#e4e2e4", "on-error": "#ffffff", "background": "#fbf8fb", "outline-variant": "#c5c6ce", "on-primary": "#ffffff", "on-error-container": "#93000a", "on-background": "#1b1b1d", "surface-container-lowest": "#ffffff", "surface-container-low": "#f5f3f5", "on-secondary-container": "#6d0102", "primary": "#000000", "tertiary-container": "#001e2c", "surface-container-high": "#eae7ea", "on-tertiary": "#ffffff", "inverse-on-surface": "#f2f0f2", "primary-fixed": "#d7e3ff", "on-secondary": "#ffffff", "on-primary-container": "#7684a1", "on-tertiary-fixed": "#001e2c", "surface-variant": "#e4e2e4", "on-surface": "#1b1b1d", "primary-container": "#0c1b33", "tertiary-fixed": "#c4e7ff", "secondary-fixed-dim": "#ffb4a9", "on-secondary-fixed-variant": "#8a1a12", "on-primary-fixed": "#0c1b33", "inverse-surface": "#303032", "surface-bright": "#fbf8fb", "secondary": "#ac3327", "error": "#ba1a1a", "surface-dim": "#dbd9dc" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-md": "1rem", "gutter": "1.5rem", "space-xs": "0.25rem", "space-sm": "0.5rem", "space-xl": "2rem", "margin": "2rem", "space-lg": "1.5rem", "space-xxl": "3rem" }, "fontFamily": { "label-sm": ["Inter"], "body-lg": ["Inter"], "label-md": ["Inter"], "headline-md": ["Inter"], "headline-lg": ["Inter"], "body-sm": ["Inter"], "headline-sm": ["Inter"], "body-md": ["Inter"], "headline-xl": ["Inter"] }, "fontSize": { "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "500" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }], "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "500" }], "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }], "headline-sm": ["16px", { "lineHeight": "24px", "fontWeight": "500" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "headline-xl": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }] } } } }</script><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/></head><body class="bg-[#F6F3F3] font-body text-on-surface"><aside class="fixed left-0 top-0 h-full w-[240px] bg-primary-container z-50 flex flex-col justify-between py-6"><div class="flex flex-col"><div class="px-6 mb-8 flex items-center gap-3"><img alt="Sunset Bay Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1j_jF9ff_6jXVnqNdvU5ltkA_QIkvWFi78OfLJGK9_v5-YAf13XXncOr3hzRwt0LHDEh1K1KAWPN68lYM2w2ZfnnQIh14pVKCElihl-cA49sBuTV8wgTcW7EYpVkVkDMSrQD886a4YkWbYWG4yoIChFEEMe2EaODmVkr22xUzQ8Ulfmhx5_HCtusI1JOh9DuxaLqIYcuDAPYbVBF2Zm3YGXOA9Nm0XMv1zwbZmg"/><div class="flex flex-col"><span class="text-headline-sm font-bold text-on-primary">Sunset Bay</span><span class="text-label-sm text-on-primary-container">Calangute, Goa</span></div></div><div class="px-4 mb-6"><div class="bg-primary p-3 rounded-xl flex items-center justify-between text-on-primary cursor-pointer"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-sm">apartment</span><span class="text-body-sm font-medium">Sunset Bay Resort</span></div><span class="material-symbols-outlined text-sm">unfold_more</span></div></div><nav class="flex-1 px-4 space-y-1" data-active-classes="bg-secondary text-on-secondary font-bold rounded-xl"><a aria-current="page" class="flex items-center justify-between px-4 py-3 transition-all bg-secondary text-on-secondary font-bold rounded-xl" data-path="dashboard" href="#"><span class="material-symbols-outlined mr-3">dashboard</span>Dashboard</a><a class="flex items-center justify-between px-4 py-3 rounded-xl text-primary-fixed-dim hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="conversations" href="#"><div class="flex items-center"><span class="material-symbols-outlined mr-3">chat</span>Conversations</div><span class="bg-secondary-container text-on-secondary-container text-label-sm px-2 py-0.5 rounded-full">7</span></a><a class="flex items-center px-4 py-3 rounded-xl text-primary-fixed-dim hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="tickets" href="#"><span class="material-symbols-outlined mr-3">confirmation_number</span>Tickets</a><a class="flex items-center px-4 py-3 rounded-xl text-primary-fixed-dim hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="guests" href="#"><span class="material-symbols-outlined mr-3">group</span>Guests</a><a class="flex items-center px-4 py-3 rounded-xl text-primary-fixed-dim hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="knowledge-base" href="#"><span class="material-symbols-outlined mr-3">menu_book</span>Knowledge Base</a><a class="flex items-center px-4 py-3 rounded-xl text-primary-fixed-dim hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="analytics" href="#"><span class="material-symbols-outlined mr-3">analytics</span>Analytics</a><a class="flex items-center px-4 py-3 rounded-xl text-primary-fixed-dim hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="triggers-and-alerts" href="#"><span class="material-symbols-outlined mr-3">bolt</span>Triggers &amp; Alerts</a><a class="flex items-center px-4 py-3 rounded-xl text-primary-fixed-dim hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="settings" href="#"><span class="material-symbols-outlined mr-3">settings</span>Settings</a></nav></div><div class="px-4 pt-4 border-t border-outline-variant/20"><div class="flex items-center gap-3 px-2"><img alt="Profile" class="w-9 h-9 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYuf5ThWCtj7pbiidRxX44c7_Zei1tdmHaXFscoH85EO_oX0TcvB5pJbqVTUvGeO5ZgbeYYgwB-jT9koZGXCkQNuY1MZIlXVEWmzl2-OJ5Q6KlTrY5jx15t9hhh2Oqb5E2zi16JJ6YM6kkNJ8JvdiqUeG4NKjnVPtSjijOsnLgYv0Reap--37RcVehblDBl9jYB8kD5nnt3clD1NvfIKdll89Qt_QhFzJlcb-faA"/><div class="flex flex-col overflow-hidden"><span class="text-body-sm font-medium text-on-primary truncate">Meera Prabhu</span><span class="text-label-sm text-on-primary-container truncate">Manager</span></div></div></div></aside><div class="pl-[240px]"><header class="fixed top-0 left-[240px] right-0 h-16 bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-gutter"><div class="flex items-center gap-4 text-on-surface-variant text-body-sm"><span class="hover:text-on-surface cursor-pointer">Home</span><span class="material-symbols-outlined text-xs">chevron_right</span><span class="text-on-surface font-medium">Dashboard</span></div><div class="flex items-center gap-4"><div class="flex items-center bg-surface-container px-3 py-1.5 rounded-lg border border-outline-variant/30 text-on-surface-variant"><span class="material-symbols-outlined text-sm mr-2">search</span><input class="bg-transparent border-none outline-none text-body-sm text-on-surface w-64" placeholder="Search guests, rooms, tickets..." type="text"/></div><div class="flex items-center gap-2 bg-surface-container px-3 py-1.5 rounded-lg border border-outline-variant/30 text-body-sm text-on-surface-variant cursor-pointer"><span class="material-symbols-outlined text-sm">language</span><span>EN</span></div><div class="flex items-center gap-2 bg-surface-container px-3 py-1.5 rounded-lg border border-outline-variant/30 text-body-sm text-on-surface"><span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span><span class="text-label-md font-medium">AI Online</span></div><div class="relative cursor-pointer"><span class="material-symbols-outlined text-on-surface-variant hover:text-on-surface">notifications</span><span class="absolute top-0 right-0 w-2 h-2 rounded-full bg-secondary"></span></div><img alt="Profile" class="w-8 h-8 rounded-full object-cover cursor-pointer" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYuf5ThWCtj7pbiidRxX44c7_Zei1tdmHaXFscoH85EO_oX0TcvB5pJbqVTUvGeO5ZgbeYYgwB-jT9koZGXCkQNuY1MZIlXVEWmzl2-OJ5Q6KlTrY5jx15t9hhh2Oqb5E2zi16JJ6YM6kkNJ8JvdiqUeG4NKjnVPtSjijOsnLgYv0Reap--37RcVehblDBl9jYB8kD5nnt3clD1NvfIKdll89Qt_QhFzJlcb-faA"/></div></header><main class="relative pt-16 bg-[#F6F3F3] min-h-screen p-gutter"><div class="flex flex-col w-full">
+<!-- Header / Intro banner with typography-driven layout -->
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-space-xxl gap-space-md">
+<div>
+<div class="flex items-center gap-2 mb-space-xs">
+<span class="text-label-sm font-label-md tracking-wider uppercase text-on-surface-variant">Configuration Suite</span>
+<span class="text-outline-variant">/</span>
+<span class="text-label-sm font-label-md tracking-wider uppercase text-secondary">Property Settings</span>
+</div>
+<h1 class="font-headline-xl text-on-surface">Resort &amp; System Configuration</h1>
+</div>
+<div class="flex items-center gap-space-sm">
+<button class="bg-surface-container hover:bg-surface-container-high text-on-surface text-body-md px-space-md py-space-sm rounded-lg transition-all shadow-sm">Discard Changes</button>
+<button class="bg-secondary hover:bg-secondary/90 text-on-secondary text-body-md font-medium px-space-lg py-space-sm rounded-lg transition-all shadow-md flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-sm">save</span>
+        Save Preferences
+      </button>
+</div>
+</div>
+<!-- Horizontal Navigation Tabs -->
+<div class="flex overflow-x-auto gap-space-sm mb-space-xl pb-space-xs no-scrollbar" id="settings-tabs">
+<button class="tab-btn px-space-lg py-space-md rounded-xl text-body-md font-medium transition-all bg-primary text-on-primary shadow-sm flex items-center gap-space-xs whitespace-nowrap" data-target="general" onclick="switchTab('general')">
+<span class="material-symbols-outlined text-sm">hotel</span>
+      General
+    </button>
+<button class="tab-btn px-space-lg py-space-md rounded-xl text-body-md font-medium transition-all bg-surface-container hover:bg-surface-container-high text-on-surface-variant flex items-center gap-space-xs whitespace-nowrap" data-target="languages" onclick="switchTab('languages')">
+<span class="material-symbols-outlined text-sm">translate</span>
+      Languages
+    </button>
+<button class="tab-btn px-space-lg py-space-md rounded-xl text-body-md font-medium transition-all bg-surface-container hover:bg-surface-container-high text-on-surface-variant flex items-center gap-space-xs whitespace-nowrap" data-target="channels" onclick="switchTab('channels')">
+<span class="material-symbols-outlined text-sm">hub</span>
+      Channels
+    </button>
+<button class="tab-btn px-space-lg py-space-md rounded-xl text-body-md font-medium transition-all bg-surface-container hover:bg-surface-container-high text-on-surface-variant flex items-center gap-space-xs whitespace-nowrap" data-target="payments" onclick="switchTab('payments')">
+<span class="material-symbols-outlined text-sm">payments</span>
+      Payments
+    </button>
+<button class="tab-btn px-space-lg py-space-md rounded-xl text-body-md font-medium transition-all bg-surface-container hover:bg-surface-container-high text-on-surface-variant flex items-center gap-space-xs whitespace-nowrap" data-target="team" onclick="switchTab('team')">
+<span class="material-symbols-outlined text-sm">group</span>
+      Team &amp; Roles
+    </button>
+<button class="tab-btn px-space-lg py-space-md rounded-xl text-body-md font-medium transition-all bg-surface-container hover:bg-surface-container-high text-on-surface-variant flex items-center gap-space-xs whitespace-nowrap" data-target="billing" onclick="switchTab('billing')">
+<span class="material-symbols-outlined text-sm">receipt_long</span>
+      Billing
+    </button>
+</div>
+<!-- Tab Contents -->
+<div class="w-full">
+<!-- 1. GENERAL TAB -->
+<div class="tab-content grid grid-cols-1 lg:grid-cols-3 gap-space-lg" id="tab-general">
+<div class="lg:col-span-2 bg-surface-container-lowest p-space-xl rounded-xl shadow-sm flex flex-col gap-space-lg">
+<div>
+<h2 class="font-headline-md text-on-surface mb-space-xs">Property Identification</h2>
+<p class="text-body-sm text-on-surface-variant">Update core details displayed on guest communications, invoices, and automated responses.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+<div class="flex flex-col gap-space-xs">
+<label class="text-label-md text-on-surface-variant font-medium">Hotel Name</label>
+<input class="bg-surface-container-low px-space-md py-space-sm rounded-lg text-body-md text-on-surface outline-none focus:ring-2 focus:ring-tertiary-fixed-dim transition-all" type="text" value="Sunset Bay Resort"/>
+</div>
+<div class="flex flex-col gap-space-xs">
+<label class="text-label-md text-on-surface-variant font-medium">Contact Email</label>
+<input class="bg-surface-container-low px-space-md py-space-sm rounded-lg text-body-md text-on-surface outline-none focus:ring-2 focus:ring-tertiary-fixed-dim transition-all" type="text" value="concierge@sunsetbaygoa.com"/>
+</div>
+</div>
+<div class="flex flex-col gap-space-xs">
+<label class="text-label-md text-on-surface-variant font-medium">Street Address</label>
+<input class="bg-surface-container-low px-space-md py-space-sm rounded-lg text-body-md text-on-surface outline-none focus:ring-2 focus:ring-tertiary-fixed-dim transition-all" type="text" value="Vaddo, Calangute Beach Road, Bardez"/>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">
+<div class="flex flex-col gap-space-xs">
+<label class="text-label-md text-on-surface-variant font-medium">City / Region</label>
+<input class="bg-surface-container-low px-space-md py-space-sm rounded-lg text-body-md text-on-surface outline-none" type="text" value="Goa"/>
+</div>
+<div class="flex flex-col gap-space-xs">
+<label class="text-label-md text-on-surface-variant font-medium">Postal Code</label>
+<input class="bg-surface-container-low px-space-md py-space-sm rounded-lg text-body-md text-on-surface outline-none" type="text" value="403516"/>
+</div>
+<div class="flex flex-col gap-space-xs">
+<label class="text-label-md text-on-surface-variant font-medium">Country</label>
+<input class="bg-surface-container-low px-space-md py-space-sm rounded-lg text-body-md text-on-surface outline-none" type="text" value="India"/>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md pt-space-md">
+<div class="flex flex-col gap-space-xs">
+<label class="text-label-md text-on-surface-variant font-medium">Timezone</label>
+<select class="bg-surface-container-low px-space-md py-space-sm rounded-lg text-body-md text-on-surface outline-none">
+<option>(GMT+05:30) Chennai, Kolkata, Mumbai, New Delhi</option>
+<option>(GMT+00:00) Universal Time Coordinated</option>
+</select>
+</div>
+<div class="flex flex-col gap-space-xs">
+<label class="text-label-md text-on-surface-variant font-medium">Business Hours</label>
+<input class="bg-surface-container-low px-space-md py-space-sm rounded-lg text-body-md text-on-surface outline-none" type="text" value="24/7 Front Desk Operations"/>
+</div>
+</div>
+</div>
+<!-- General Sidebar Widget -->
+<div class="flex flex-col gap-space-lg">
+<div class="bg-primary-container text-on-primary p-space-xl rounded-xl shadow-sm flex flex-col justify-between">
+<div>
+<div class="w-12 h-12 rounded-xl bg-surface/10 flex items-center justify-center mb-space-md">
+<span class="material-symbols-outlined text-tertiary-fixed-dim">verified</span>
+</div>
+<h3 class="font-headline-sm font-bold text-on-primary mb-space-xs">Verified Property</h3>
+<p class="text-body-sm text-on-primary-container mb-space-lg">Your resort is verified across major messaging networks and OTA channels.</p>
+</div>
+<div class="bg-surface/5 p-space-md rounded-lg flex items-center justify-between">
+<span class="text-body-sm text-on-primary">Property ID</span>
+<span class="text-body-sm font-mono text-tertiary-fixed-dim">SSB-GOA-8821</span>
+</div>
+</div>
+</div>
+</div>
+<!-- 2. LANGUAGES TAB -->
+<div class="tab-content hidden grid grid-cols-1 lg:grid-cols-3 gap-space-lg" id="tab-languages">
+<div class="lg:col-span-2 bg-surface-container-lowest p-space-xl rounded-xl shadow-sm flex flex-col gap-space-lg">
+<div>
+<h2 class="font-headline-md text-on-surface mb-space-xs">Supported AI &amp; Chat Languages</h2>
+<p class="text-body-sm text-on-surface-variant">Configure which languages your AI concierge uses to converse with guests in real-time.</p>
+</div>
+<div class="flex flex-col gap-space-md">
+<!-- Konkani -->
+<div class="flex items-center justify-between p-space-md bg-surface-container-low rounded-xl">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface font-bold text-body-sm">KOK</div>
+<div>
+<h4 class="font-headline-sm text-on-surface">Konkani (कोंकणी)</h4>
+<p class="text-body-sm text-on-surface-variant">Primary regional dialect for local guest support</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+<!-- English -->
+<div class="flex items-center justify-between p-space-md bg-surface-container-low rounded-xl">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface font-bold text-body-sm">ENG</div>
+<div>
+<h4 class="font-headline-sm text-on-surface">English</h4>
+<p class="text-body-sm text-on-surface-variant">Global default language for international guests</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+<!-- Hindi -->
+<div class="flex items-center justify-between p-space-md bg-surface-container-low rounded-xl">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface font-bold text-body-sm">HIN</div>
+<div>
+<h4 class="font-headline-sm text-on-surface">Hindi (हिन्दी)</h4>
+<p class="text-body-sm text-on-surface-variant">National language support for domestic travelers</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+<!-- Marathi -->
+<div class="flex items-center justify-between p-space-md bg-surface-container-low rounded-xl opacity-75">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface font-bold text-body-sm">MAR</div>
+<div>
+<div class="flex items-center gap-2">
+<h4 class="font-headline-sm text-on-surface">Marathi (मराठी)</h4>
+<span class="bg-surface-container-highest text-on-surface-variant text-label-sm px-2 py-0.5 rounded-full font-medium">Coming soon</span>
+</div>
+<p class="text-body-sm text-on-surface-variant">Regional dialect expansion for neighboring states</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-not-allowed">
+<input class="sr-only peer" disabled="" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest rounded-full cursor-not-allowed opacity-50"></div>
+</label>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-space-lg">
+<div class="bg-surface-container-lowest p-space-xl rounded-xl shadow-sm">
+<h3 class="font-headline-sm text-on-surface mb-space-xs">AI Translation Engine</h3>
+<p class="text-body-sm text-on-surface-variant mb-space-md">Powered by neural network routing optimized for hospitality terms, room amenities, and local Goa idioms.</p>
+<div class="flex items-center gap-space-xs text-secondary font-medium text-body-sm cursor-pointer">
+<span class="material-symbols-outlined text-sm">auto_fix_high</span>
+<span>Test Concierge Translation</span>
+</div>
+</div>
+</div>
+</div>
+<!-- 3. CHANNELS TAB -->
+<div class="tab-content hidden grid grid-cols-1 lg:grid-cols-2 gap-space-lg" id="tab-channels">
+<!-- WhatsApp Card -->
+<div class="bg-surface-container-lowest p-space-xl rounded-xl shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-space-md">
+<div class="flex items-center gap-space-md">
+<div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl">chat</span>
+</div>
+<div>
+<h3 class="font-headline-md text-on-surface">WhatsApp Business API</h3>
+<p class="text-body-sm text-on-surface-variant">+91 832 229 0000</p>
+</div>
+</div>
+<span class="bg-emerald-500/15 text-emerald-700 text-label-md px-space-md py-1 rounded-full font-medium flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              Connected
+            </span>
+</div>
+<p class="text-body-sm text-on-surface-variant mb-space-lg">Primary messaging channel used for guest pre-check-in, room service requests, and automated WhatsApp concierge flows.</p>
+</div>
+<div class="flex items-center justify-between pt-space-md border-t border-surface-container">
+<span class="text-label-md text-on-surface-variant">Quality Rating: High</span>
+<button class="bg-surface-container hover:bg-surface-container-high text-on-surface text-body-sm font-medium px-space-md py-space-sm rounded-lg transition-all">Configure Webhooks</button>
+</div>
+</div>
+<!-- Web Chat Widget Card -->
+<div class="bg-surface-container-lowest p-space-xl rounded-xl shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-space-md">
+<div class="flex items-center gap-space-md">
+<div class="w-12 h-12 rounded-xl bg-tertiary-fixed-dim/20 text-tertiary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl">code</span>
+</div>
+<div>
+<h3 class="font-headline-md text-on-surface">Web Chat Widget</h3>
+<p class="text-body-sm text-on-surface-variant">Embeddable HTML widget for resort website</p>
+</div>
+</div>
+<span class="bg-secondary-container text-on-secondary-container text-label-md px-space-md py-1 rounded-full font-medium">Active</span>
+</div>
+<!-- Color preview & snippet -->
+<div class="flex flex-col gap-space-sm mb-space-md">
+<label class="text-label-md text-on-surface-variant font-medium">Widget Embed Code</label>
+<div class="bg-primary-container text-on-primary-container p-space-md rounded-lg font-mono text-body-sm overflow-x-auto select-all">
+              &lt;script src="https://chat.sunsetbaygoa.com/widget.js" data-hotel="ssb-8821" async&gt;&lt;/script&gt;
+            </div>
+</div>
+<div class="flex items-center justify-between bg-surface-container-low p-space-md rounded-lg mb-space-md">
+<span class="text-body-sm text-on-surface font-medium">Widget Brand Accent Color</span>
+<div class="flex items-center gap-space-xs">
+<div class="w-6 h-6 rounded-full bg-secondary"></div>
+<span class="text-body-sm font-mono text-on-surface-variant">#AC3327</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-end gap-space-sm">
+<button class="bg-surface-container hover:bg-surface-container-high text-on-surface text-body-sm font-medium px-space-md py-space-sm rounded-lg transition-all">Preview Widget</button>
+<button class="bg-primary hover:bg-primary/90 text-on-primary text-body-sm font-medium px-space-md py-space-sm rounded-lg transition-all">Copy Snippet</button>
+</div>
+</div>
+</div>
+<!-- 4. PAYMENTS TAB -->
+<div class="tab-content hidden grid grid-cols-1 lg:grid-cols-3 gap-space-lg" id="tab-payments">
+<div class="lg:col-span-2 bg-surface-container-lowest p-space-xl rounded-xl shadow-sm flex flex-col gap-space-lg">
+<div class="flex items-center justify-between">
+<div>
+<h2 class="font-headline-md text-on-surface mb-space-xs">Payment Gateway &amp; Links</h2>
+<p class="text-body-sm text-on-surface-variant">Manage secure payment links for deposit collections, spa bookings, and bill settling.</p>
+</div>
+<span class="bg-surface-container-highest text-on-surface-variant text-label-sm px-3 py-1 rounded-full font-medium">Coming soon</span>
+</div>
+<!-- Disabled state mockup for payment links -->
+<div class="flex flex-col items-center justify-center p-space-xxl bg-surface-container-low rounded-xl border border-dashed border-outline-variant/30 text-center">
+<div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant mb-space-md">
+<span class="material-symbols-outlined text-3xl">credit_card</span>
+</div>
+<h3 class="font-headline-sm text-on-surface mb-space-xs">Automated Payment Links Integration</h3>
+<p class="text-body-sm text-on-surface-variant max-w-md mb-space-lg">Allow guests to pay invoices directly inside WhatsApp conversations securely via Razorpay &amp; Stripe integration.</p>
+<button class="bg-surface-container text-on-surface-variant text-body-md font-medium px-space-lg py-space-sm rounded-lg opacity-60 cursor-not-allowed" disabled="">Join Early Access Waitlist</button>
+</div>
+</div>
+<div class="flex flex-col gap-space-lg">
+<div class="bg-surface-container-lowest p-space-xl rounded-xl shadow-sm">
+<h3 class="font-headline-sm text-on-surface mb-space-xs">Current Settlement Mode</h3>
+<p class="text-body-sm text-on-surface-variant mb-space-md">Manual POS terminal settlements are active at the front desk desk.</p>
+<div class="flex items-center gap-space-xs text-on-surface-variant text-body-sm">
+<span class="material-symbols-outlined text-sm">info</span>
+<span>Contact finance manager to alter bank routing.</span>
+</div>
+</div>
+</div>
+</div>
+<!-- 5. TEAM AND ROLES TAB -->
+<div class="tab-content hidden flex flex-col gap-space-lg" id="tab-team">
+<div class="bg-surface-container-lowest p-space-xl rounded-xl shadow-sm flex flex-col gap-space-lg">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+<div>
+<h2 class="font-headline-md text-on-surface mb-space-xs">Staff &amp; Role Management</h2>
+<p class="text-body-sm text-on-surface-variant">Assign granular access rights to resort operators across departments.</p>
+</div>
+<button class="bg-secondary hover:bg-secondary/90 text-on-secondary text-body-md font-medium px-space-lg py-space-sm rounded-lg transition-all shadow-md flex items-center gap-space-xs self-start">
+<span class="material-symbols-outlined text-sm">person_add</span>
+            Invite Member
+          </button>
+</div>
+<!-- Staff Table -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-surface-container text-on-surface-variant text-label-md uppercase tracking-wider">
+<th class="py-space-md px-space-md">Staff Member</th>
+<th class="py-space-md px-space-md">Assigned Role</th>
+<th class="py-space-md px-space-md">Status</th>
+<th class="py-space-md px-space-md">Last Active</th>
+<th class="py-space-md px-space-md text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container text-body-md text-on-surface">
+<!-- Member 1 -->
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-space-md px-space-md flex items-center gap-space-md">
+<img class="w-9 h-9 rounded-full object-cover" data-alt="Professional portrait of Indian female resort manager with welcoming expression, warm lighting, wearing corporate attire." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTju4P-1t6AgIAhNIcKhX2XIIBV6a-5FbuPAb0eV3vUzDffkYvMyO5-bIxTeOmWfZws5pReZUgI4kAXMsndusor0YB20tkhS2wgmMgmwyHlnNgVl4rwgqi8W2ZwUI66CrS7Scx6VRGuX7sR9-OLLcO3kVTIA_9EmIyUOVEnXBD-3C_h3yL7EvLvInFLGTA1v0PibTofyxg4qm4s2icO00mghgvI2muupIBsv1Rrw"/>
+<div>
+<span class="font-medium block">Meera Prabhu</span>
+<span class="text-body-sm text-on-surface-variant">meera@sunsetbaygoa.com</span>
+</div>
+</td>
+<td class="py-space-md px-space-md">
+<select class="bg-surface-container px-space-sm py-1 rounded-lg text-body-sm text-on-surface outline-none cursor-pointer">
+<option selected="">Manager</option>
+<option>Front Desk</option>
+<option>Housekeeping</option>
+</select>
+</td>
+<td class="py-space-md px-space-md">
+<span class="inline-flex items-center gap-1.5 bg-emerald-500/10 text-emerald-700 text-label-sm px-2.5 py-0.5 rounded-full font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    Active
+                  </span>
+</td>
+<td class="py-space-md px-space-md text-on-surface-variant text-body-sm">Just now</td>
+<td class="py-space-md px-space-md text-right">
+<button class="text-on-surface-variant hover:text-on-surface p-1"><span class="material-symbols-outlined text-sm">more_vert</span></button>
+</td>
+</tr>
+<!-- Member 2 -->
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-space-md px-space-md flex items-center gap-space-md">
+<img class="w-9 h-9 rounded-full object-cover" data-alt="Friendly front desk receptionist smiling in uniform at luxury resort lobby." src="https://lh3.googleusercontent.com/aida-public/AB6AXuArLx-lNg8r0tzuR9jNwfwF-vuaYMQfwUhojpaLJLgJ1Uph0sHKWADKIlY95Wx3Wb4aGtQSkp6xUm6m5EEqjX6MCjMaqFGAaP6p61OLf-6Ex_nj9QlH-4LLdoASnvhY72FqlERPklDg2DkcyKwuS03Uk0Xp57YRwoizuaMhW2AUXc95RJxPMLaIi433gzF-3kwo2x4TS0nq_9k2aXDuitO2j0pbmjmqKeBLUE3ehw"/>
+<div>
+<span class="font-medium block">Rahul Naik</span>
+<span class="text-body-sm text-on-surface-variant">rahul.n@sunsetbaygoa.com</span>
+</div>
+</td>
+<td class="py-space-md px-space-md">
+<select class="bg-surface-container px-space-sm py-1 rounded-lg text-body-sm text-on-surface outline-none cursor-pointer">
+<option>Manager</option>
+<option selected="">Front Desk</option>
+<option>Housekeeping</option>
+</select>
+</td>
+<td class="py-space-md px-space-md">
+<span class="inline-flex items-center gap-1.5 bg-emerald-500/10 text-emerald-700 text-label-sm px-2.5 py-0.5 rounded-full font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    Active
+                  </span>
+</td>
+<td class="py-space-md px-space-md text-on-surface-variant text-body-sm">12 mins ago</td>
+<td class="py-space-md px-space-md text-right">
+<button class="text-on-surface-variant hover:text-on-surface p-1"><span class="material-symbols-outlined text-sm">more_vert</span></button>
+</td>
+</tr>
+<!-- Member 3 -->
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-space-md px-space-md flex items-center gap-space-md">
+<img class="w-9 h-9 rounded-full object-cover" data-alt="Portrait of resort housekeeping head supervisor standing in tropical corridor." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIw9L3LPvCD3h3I_uGGd5f6PwHB42M1Kgvbq-Hbm6e6vmp24zBNiGbgqU0T7Ii7vWLVLBIAGUaT-RtuN_UwWGoF5pHB9wz7n88Njf6W_36BJYJv3xCRQbdksm3LeEIh4CMTy1mdBC5CnVNPQBRSWEDVadP0HoMvZUuWtRqrhDtrYrdqwVpP6K3mrI_9HNVUqkEGUTBcW1VIV04wuzcCEHJKhtSQOb8yT57G840DA"/>
+<div>
+<span class="font-medium block">Anita Fernandes</span>
+<span class="text-body-sm text-on-surface-variant">anita@sunsetbaygoa.com</span>
+</div>
+</td>
+<td class="py-space-md px-space-md">
+<select class="bg-surface-container px-space-sm py-1 rounded-lg text-body-sm text-on-surface outline-none cursor-pointer">
+<option>Manager</option>
+<option>Front Desk</option>
+<option selected="">Housekeeping</option>
+</select>
+</td>
+<td class="py-space-md px-space-md">
+<span class="inline-flex items-center gap-1.5 bg-surface-container-highest text-on-surface-variant text-label-sm px-2.5 py-0.5 rounded-full font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+                    Away
+                  </span>
+</td>
+<td class="py-space-md px-space-md text-on-surface-variant text-body-sm">3 hours ago</td>
+<td class="py-space-md px-space-md text-right">
+<button class="text-on-surface-variant hover:text-on-surface p-1"><span class="material-symbols-outlined text-sm">more_vert</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- 6. BILLING TAB -->
+<div class="tab-content hidden grid grid-cols-1 lg:grid-cols-3 gap-space-lg" id="tab-billing">
+<!-- Current Plan Card -->
+<div class="lg:col-span-2 bg-primary-container text-on-primary p-space-xl rounded-xl shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-space-lg">
+<div>
+<span class="text-label-md text-on-primary-container uppercase tracking-wider font-medium">Subscription Plan</span>
+<h2 class="font-headline-xl text-on-primary mt-1">Enterprise Resort Tier</h2>
+</div>
+<span class="bg-secondary text-on-secondary text-label-md px-space-md py-1 rounded-full font-medium">Active</span>
+</div>
+<p class="text-body-md text-on-primary-container mb-space-xl">Billed annually for Sunset Bay Resort, Calangute Goa. Includes unlimited WhatsApp conversations and 24/7 priority AI concierge routing.</p>
+</div>
+<div class="flex items-center justify-between pt-space-lg border-t border-surface/10">
+<div>
+<span class="text-body-sm text-on-primary-container block">Next billing date</span>
+<span class="text-body-md font-medium text-on-primary">October 14, 2025</span>
+</div>
+<button class="bg-surface text-on-surface hover:bg-surface-bright text-body-md font-medium px-space-lg py-space-sm rounded-lg transition-all shadow-sm">Manage Subscription</button>
+</div>
+</div>
+<!-- Usage Meter Card -->
+<div class="bg-surface-container-lowest p-space-xl rounded-xl shadow-sm flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between mb-space-md">
+<h3 class="font-headline-sm text-on-surface">Monthly AI Usage</h3>
+<span class="text-label-md font-medium text-secondary">78% Used</span>
+</div>
+<p class="text-body-sm text-on-surface-variant mb-space-lg">Conversation tokens and automated ticket resolution quota for the current billing cycle.</p>
+<!-- Usage bar -->
+<div class="flex flex-col gap-space-xs mb-space-lg">
+<div class="flex justify-between text-body-sm text-on-surface font-medium">
+<span>7,840 / 10,000 Chats</span>
+<span>78%</span>
+</div>
+<div class="w-full h-3 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary rounded-full" style="width: 78%"></div>
+</div>
+</div>
+</div>
+<button class="w-full bg-surface-container hover:bg-surface-container-high text-on-surface text-body-sm font-medium py-space-sm rounded-lg transition-all">Buy Additional Quota</button>
+</div>
+</div>
+</div>
+<!-- Client-side Tab Switcher Script -->
+<script>
+    function switchTab(targetName) {
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(el => {
+        el.classList.add('hidden');
+      });
+      // Show target tab
+      document.getElementById('tab-' + targetName).classList.remove('hidden');
+
+      // Update button active state
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-primary', 'text-on-primary', 'shadow-sm');
+        btn.classList.add('bg-surface-container', 'text-on-surface-variant');
+      });
+
+      const activeBtn = document.querySelector(`[data-target="${targetName}"]`);
+      if (activeBtn) {
+        activeBtn.classList.remove('bg-surface-container', 'text-on-surface-variant');
+        activeBtn.classList.add('bg-primary', 'text-on-primary', 'shadow-sm');
+      }
+    }
+  </script>
+</div></main></div><script src="../assets/app.js"></script></body></html>
