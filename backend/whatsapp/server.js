@@ -256,7 +256,7 @@ async function resolveSender(msg, chat) {
   return { phone, name };
 }
 
-const BOOKING_INTENT_RE = /(?:^|[^\p{L}\p{N}])(?:book(?:ing)?(?:\s+(?:for|a|the|it|room|me))?|confirm\s+booking|booking\s+kar(?:na|o|do|at)?|room\s+book|बुकिंग|बुक|कमरा\s*चाहिए|रूम\s*चाहिए|खोली\s*(?:हवी|पाहिजे|जाय|बुक\s*करा|बुक\s*कर)|खोलीची\s*बुकिंग|आरक्षण|नक्की\s*करा|कन्फर्म\s*करा)(?:[^\p{L}\p{N}]|$)/iu;
+const BOOKING_INTENT_RE = /(?:^|[^\p{L}\p{N}])(?:book(?:ing)?(?:\s+(?:for|a|the|it|room|me))?|confirm\s+booking|booking\s*kar(?:na|o|do|at|a|chem|unk)?|room\s*book|room\s*chahiye|kamra\s*chahiye|kholi\s*(?:hawi|havi|pahije|jay|zay|zai|book\s*kara|book\s*kar)|kholichi\s*booking|बुकिंग|बुक|कमरा\s*चाहिए|रूम\s*चाहिए|खोली\s*(?:हवी|पाहिजे|जाय|बुक\s*करा|बुक\s*कर)|खोलीची\s*बुकिंग|आरक्षण|नक्की\s*करा|कन्फर्म\s*करा)(?:[^\p{L}\p{N}]|$)/iu;
 
 const REGIONAL_MONTHS = {
   // Hindi, Marathi & Konkani forms
