@@ -3,6 +3,7 @@ const test = require('node:test');
 const assert = require('node:assert');
 const {
   createConversationService,
+  createSupabaseStore,
   normalizePhone,
   parseCommand,
   CODE_RE,
@@ -176,17 +177,39 @@ test('guests are separate', async () => {
   assert.equal(store.s.conversations.length, 2);
 });
 
-test('AI failure returns the error reply but keeps the guest message', async () => {
+test('AI failure sends no canned reply but keeps the guest message', async () => {
   const { svc, store, phone } = setup({ aiReply: async () => { throw new Error('groq down'); } });
   await svc.handleIncomingMessage(phone, '/new');
-  assert.equal(await svc.handleIncomingMessage(phone, 'hello', 'm1'), REPLIES.error);
+  assert.equal(await svc.handleIncomingMessage(phone, 'hello', 'm1'), null);
   assert.deepEqual(store.s.messages.map((m) => m.sender), ['guest']);
 });
 
-test('database failure returns the error reply', async () => {
+test('database failure sends no canned reply', async () => {
   const { svc, store, phone } = setup();
   store.findGuest = async () => { throw new Error('supabase down'); };
-  assert.equal(await svc.handleIncomingMessage(phone, '/new'), REPLIES.error);
+  assert.equal(await svc.handleIncomingMessage(phone, '/new'), null);
+});
+
+test('Supabase store deletes a conversation by id and reports missing rows', async () => {
+  const id = '00000000-0000-4000-8000-000000000001';
+  const calls = [];
+  let rows = [{ id }];
+  const store = createSupabaseStore({
+    url: 'https://example.supabase.co',
+    serviceRoleKey: 'test-key',
+    fetchImpl: async (url, options) => {
+      calls.push({ url, options });
+      return { ok: true, status: 200, text: async () => JSON.stringify(rows) };
+    },
+  });
+
+  assert.equal(await store.deleteConversation(id), true);
+  assert.equal(calls[0].options.method, 'DELETE');
+  const url = new URL(calls[0].url);
+  assert.equal(url.pathname, '/rest/v1/conversations');
+  assert.equal(url.searchParams.get('id'), 'eq.' + id);
+  rows = [];
+  assert.equal(await store.deleteConversation(id), false);
 });
 
 test('staff message is stored only in an open conversation', async () => {

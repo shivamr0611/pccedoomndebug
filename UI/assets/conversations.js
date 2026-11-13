@@ -13,7 +13,7 @@
     return e;
   };
 
-  const state = { list: [], guests: [], filter: 'all', query: '', selectedId: null, selectedGuestId: null, detail: null, failed: false };
+  const state = { list: [], guests: [], filter: 'all', query: '', selectedId: null, selectedGuestId: null, detail: null, failed: false, actionError: null };
 
   const labelOf = (c) => c.code || String(c.id).slice(0, 8).toUpperCase();
   const nameOf = (c) => (c.guests && c.guests.name) || phoneOf(c);
@@ -230,7 +230,14 @@
     const idBox = el('div', 'bg-surface-container p-4 rounded-xl');
     idBox.append(el('span', 'text-[10px] text-outline block mb-1', 'Conversation ID'), el('code', 'text-body-md font-bold text-on-surface', d.code || d.id), el('div', 'text-[10px] text-outline break-all mt-1', d.id));
 
-    const cards = [card, sum, idBox, dataCard('Conversation record (conversations table)', d)];
+    const deleteButton = el('button', 'w-full rounded-lg border border-error px-4 py-2 text-sm font-semibold text-error hover:bg-error-container', 'Delete conversation');
+    deleteButton.type = 'button';
+    deleteButton.addEventListener('click', () => deleteConversation(d, deleteButton));
+    const actions = el('div', 'space-y-2');
+    actions.append(deleteButton);
+    if (state.actionError) actions.append(el('p', 'text-sm text-error', state.actionError));
+
+    const cards = [card, sum, idBox, dataCard('Conversation record (conversations table)', d), actions];
     if (d.guests) cards.push(dataCard('Guest record (guests table)', d.guests));
     panel.replaceChildren(...cards);
   }
@@ -249,8 +256,8 @@
   }
 
   /* ---------- data ---------- */
-  async function api(path) {
-    const r = await fetch(API + path, { cache: 'no-store' });
+  async function api(path, options = {}) {
+    const r = await fetch(API + path, { cache: 'no-store', ...options });
     const data = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(data.error || 'HTTP ' + r.status);
     return data;
@@ -269,6 +276,7 @@
   async function select(id) {
     state.selectedId = id;
     state.selectedGuestId = null;
+    state.actionError = null;
     renderList();
     await loadDetail();
   }
@@ -277,8 +285,26 @@
     state.selectedGuestId = id;
     state.selectedId = null;
     state.detail = null;
+    state.actionError = null;
     renderList();
     renderChat();
+  }
+
+  async function deleteConversation(conversation, button) {
+    if (!window.confirm(`Permanently delete conversation #${labelOf(conversation)} and all its messages from Supabase?`)) return;
+    state.actionError = null;
+    button.disabled = true;
+    button.textContent = 'Deleting…';
+    try {
+      await api('/' + encodeURIComponent(conversation.id), { method: 'DELETE' });
+      state.list = state.list.filter((item) => item.id !== conversation.id);
+      state.selectedId = null;
+      state.detail = null;
+      await refresh();
+    } catch (error) {
+      state.actionError = error.message || 'Could not delete the conversation.';
+      renderChat();
+    }
   }
 
   async function refresh() {

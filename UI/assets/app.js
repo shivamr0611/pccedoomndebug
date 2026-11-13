@@ -40,16 +40,23 @@
 
   function wireSidebar() {
     enablePageTransitions();
-    const profileLink = $('aside a[data-path="settings"]');
-    if (profileLink) {
-      profileLink.dataset.path = 'profile';
-      const icon = $('.material-symbols-outlined', profileLink);
-      if (icon) icon.textContent = 'person';
-      const label = Array.from(profileLink.childNodes).find(
-        (node) => node.nodeType === Node.TEXT_NODE && node.textContent.trim()
-      );
-      if (label) label.textContent = label.textContent.replace('Settings', 'Profile');
-    }
+    const settingsLink = $('aside a[data-path="settings"]');
+    if (settingsLink) settingsLink.remove();
+
+    $$('img[alt="Profile"]').forEach((image) => {
+      const existingLink = image.closest('a');
+      if (existingLink) {
+        existingLink.href = '../profile/code.html';
+        return;
+      }
+      const link = document.createElement('a');
+      link.href = '../profile/code.html';
+      link.className = 'inline-flex rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-secondary';
+      link.setAttribute('aria-label', 'Open profile');
+      image.classList.add('cursor-pointer');
+      image.replaceWith(link);
+      link.append(image);
+    });
 
     const currentFolder = location.pathname.split('/').slice(-2, -1)[0];
     const currentPage = Object.keys(PAGES).find((page) => PAGES[page] === currentFolder);

@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { answerFromKnowledge, retrieveKnowledge } = require('./knowledge_base');
+const { answerFromKnowledge, outOfContextReply, retrieveKnowledge } = require('./knowledge_base');
 const { createSupabaseStore } = require('./conversation_service');
 
 const items = [
@@ -31,6 +31,14 @@ test('knowledge answers use retrieved entries as context and return their source
   );
 
   assert.equal(request.body.model, 'qwen/qwen3.8-27b');
+  assert.match(request.body.messages[0].content, /only in the language and script used in the guest question/);
+  assert.match(request.body.messages[0].content, /Translate facts from the knowledge-base entries into the guest language/);
+  assert.match(request.body.messages[0].content, /Never use outside knowledge/);
+  assert.match(request.body.messages[0].content, /Hallucinating is not allowed/);
+  assert.match(request.body.messages[0].content, /answer it completely and directly without apologizing/);
+  assert.match(request.body.messages[0].content, /Return exactly one complete reply/);
+  assert.match(request.body.messages[0].content, /ask the guest to rephrase/);
+  assert.match(request.body.messages[0].content, /Do not repeat or translate the guest question as the reply/);
   assert.match(request.body.messages[1].content, /Peak rate ₹22,000 per night/);
   assert.equal(result.answer, 'The peak rate is ₹22,000 per night.');
   assert.deepEqual(result.sources.map((item) => item.id), ['1']);
@@ -45,6 +53,13 @@ test('no matching knowledge entry does not call the model', async () => {
   assert.equal(called, false);
 });
 
+test('out-of-context questions get a rephrase request in the guest language', () => {
+  assert.match(outOfContextReply('English'), /Sorry, I couldn't understand your question/);
+  assert.match(outOfContextReply('Hindi'), /मैं आपका सवाल समझ नहीं पाया/);
+  assert.match(outOfContextReply('Marathi'), /मला तुमचा प्रश्न समजला नाही/);
+  assert.equal(outOfContextReply('Other', 'Désolé, je ne comprends pas votre question.'), 'Désolé, je ne comprends pas votre question.');
+});
+
 test('translated query can retrieve an English entry while the original question stays in context', async () => {
   const breakfast = { id: '4', category: 'Dining', title: 'Breakfast hours', content: 'Breakfast is served from 7 to 10 AM.', enabled: true };
   let prompt;
@@ -54,11 +69,12 @@ test('translated query can retrieve an English entry while the original question
     'test-key',
     async (_url, options) => {
       prompt = JSON.parse(options.body).messages[1].content;
-      return { ok: true, json: async () => ({ choices: [{ message: { content: 'Breakfast is served from 7 to 10 AM.' } }] }) };
+      return { ok: true, json: async () => ({ choices: [{ message: { content: 'नाश्ता सुबह 7 से 10 बजे तक परोसा जाता है।' } }] }) };
     },
     'What time is breakfast served?'
   );
   assert.deepEqual(result.sources.map((item) => item.id), ['4']);
+  assert.equal(result.answer, 'नाश्ता सुबह 7 से 10 बजे तक परोसा जाता है।');
   assert.match(prompt, /नाश्ता कितने बजे मिलता है/);
 });
 

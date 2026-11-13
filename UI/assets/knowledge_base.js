@@ -31,7 +31,7 @@
   }
 
   function buildLayout(grid) {
-    grid.className = 'grid grid-cols-1 gap-6 items-start xl:grid-cols-[220px_minmax(0,1fr)_320px]';
+    grid.className = 'grid grid-cols-1 gap-6 items-start xl:grid-cols-[220px_minmax(0,1fr)]';
     grid.replaceChildren();
 
     const categories = el('aside', 'rounded-xl bg-surface-container-low p-3 shadow-sm');
@@ -49,22 +49,12 @@
       '</tr></thead><tbody id="kbRows" class="divide-y divide-surface-container-high/40"></tbody></table></div>' +
       '<p id="kbEmpty" class="hidden py-10 text-center text-sm text-on-surface-variant"></p>';
 
-    const test = el('section', 'rounded-xl bg-surface-container-low p-5 shadow-sm');
-    test.innerHTML =
-      '<div class="mb-3 flex items-center justify-between"><h3 class="font-semibold text-on-surface">Test retrieval</h3>' +
-      '<span class="rounded-full bg-surface-container-highest px-2 py-1 text-xs text-on-surface-variant">Live</span></div>' +
-      '<p class="mb-4 text-sm text-on-surface-variant">Ask a question to test the current enabled Supabase entries.</p>' +
-      '<form id="kbTestForm" class="space-y-3"><textarea id="kbTestQuery" required maxlength="2000" rows="3" placeholder="Ask a guest question…" class="w-full rounded-lg border border-outline-variant/50 bg-surface-container-lowest p-3 text-sm outline-none focus:border-secondary"></textarea>' +
-      '<button class="w-full rounded-lg bg-secondary px-4 py-2 text-sm font-semibold text-on-secondary" type="submit">Ask the assistant</button></form>' +
-      '<div id="kbTestResult" class="mt-4 space-y-3 text-sm" aria-live="polite"></div>';
-
-    grid.append(categories, main, test);
+    grid.append(categories, main);
     $('#kbAdd', main).addEventListener('click', () => editEntry());
     $('#kbSearch', main).addEventListener('input', (event) => {
       state.query = event.target.value.trim().toLocaleLowerCase();
       renderRows();
     });
-    $('#kbTestForm', test).addEventListener('submit', testQuestion);
     createEditor();
     return { categories, main };
   }
@@ -202,26 +192,6 @@
       await loadItems();
     } catch (error) {
       setStatus(error.message, true);
-    }
-  }
-
-  async function testQuestion(event) {
-    event.preventDefault();
-    const query = $('#kbTestQuery').value.trim();
-    if (!query) return;
-    const resultBox = $('#kbTestResult');
-    resultBox.replaceChildren(el('p', 'text-on-surface-variant', 'Checking current knowledge…'));
-    try {
-      const result = await request('/test', { method: 'POST', body: JSON.stringify({ query }) });
-      resultBox.replaceChildren(el('p', 'rounded-lg bg-surface-container-lowest p-3 text-on-surface', result.answer));
-      if (result.sources && result.sources.length) {
-        resultBox.append(el('p', 'text-xs font-semibold text-on-surface-variant', 'Sources:'));
-        for (const source of result.sources) {
-          resultBox.append(el('span', 'mr-1 inline-block rounded-md bg-[#c4e7ff] px-2 py-1 text-xs text-[#001e2c]', `${source.category}: ${source.title}`));
-        }
-      }
-    } catch (error) {
-      resultBox.replaceChildren(el('p', 'text-error', error.message));
     }
   }
 

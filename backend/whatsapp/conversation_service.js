@@ -8,7 +8,6 @@ const REPLIES = {
   alreadyOpen: 'You already have an open conversation. Type /close to end it first.',
   closed: 'Conversation closed. A new conversation is ready.',
   noneOpen: 'There is no open conversation to close.',
-  error: 'Sorry, something went wrong. Please try again.',
 };
 
 const UNIQUE_VIOLATION = '23505';
@@ -165,13 +164,13 @@ function createConversationService({ store, aiReply, summarize, logger = console
         reply = replyOverride === null ? await aiReply(text) : replyOverride;
       } catch (e) {
         logger.error('AI reply failed:', e.message);
-        return REPLIES.error;
+        return null;
       }
       await saveMessage(conversation.id, 'ai', reply);
       return reply;
     } catch (e) {
       logger.error('Conversation service error:', e.message);
-      return REPLIES.error;
+      return null;
     }
   }
 
@@ -329,6 +328,8 @@ function createSupabaseStore({ url, serviceRoleKey, fetchImpl = fetch }) {
       const messages = await fetchAll('messages?select=*&order=created_at.asc,id.asc&conversation_id=eq.' + q(conv.id));
       return { ...conv, messages };
     },
+    deleteConversation: async (id) =>
+      (await rest('DELETE', 'conversations?id=eq.' + q(id))).length > 0,
     findConversationById: async (id) => first(await rest('GET', 'conversations?select=*&limit=1&id=eq.' + q(id))),
     setSummary: (id, summary) => rest('PATCH', 'conversations?id=eq.' + q(id), { summary }),
     insertMessage: async (row) => first(await rest('POST', 'messages', row)),

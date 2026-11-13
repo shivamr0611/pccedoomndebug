@@ -18,7 +18,7 @@ eval(src.slice(start, end).replace(/^const /gm, 'var ').replace(/^async function
   ];
   for (const t of tests) {
     try {
-      console.log(JSON.stringify(t), '->\n' + (await translateWithEnglish(t)) + '\n');
+      console.log(JSON.stringify(t), '->', JSON.stringify(await detectAndTranslate(t)));
     } catch (e) {
       console.log(JSON.stringify(t), '-> ERROR', e.message);
     }
