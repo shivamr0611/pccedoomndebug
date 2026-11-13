@@ -7,10 +7,16 @@ try {
 if (!process.env.GROQ_API_KEY) console.warn('WARNING: GROQ_API_KEY is not set - auto-replies will fail');
 
 const http = require('http');
-const { createConversationService, createSupabaseStore, REPLIES, UUID_RE } = require('./conversation_service');
+const { createConversationService, createSupabaseStore, normalizePhone, REPLIES, UUID_RE } = require('./conversation_service');
 const qrcode = require('qrcode-terminal');
-const { Client, LocalAuth } = require('whatsapp-web.js');
+const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 const { SarvamAIClient } = require('sarvamai');
+const {
+  createPaymentQr,
+  createLocalizedPaymentReply,
+  isPaymentRelated,
+  isThumbsUp,
+} = require('./payment_intent');
 
 const PORT = 3001;
 const COUNTRY_CODE = '91'; // numbers without a country code are assumed to be Indian
@@ -121,11 +127,22 @@ const BOT_MARK = '\u200B';
 // account, and WhatsApp may strip the invisible marker, so we also match on the text itself.
 const recentBotTexts = new Map();
 const norm = (s) => s.replace(/\u200B/g, '').trim();
-async function sendBot(chat, text) {
+const pendingPayments = new Map();
+function rememberBotText(text) {
   recentBotTexts.set(norm(text), Date.now());
   for (const [t, at] of recentBotTexts) if (Date.now() - at > 60000) recentBotTexts.delete(t);
+}
+async function sendBot(chat, text) {
+  rememberBotText(text);
   console.log('-> reply to ' + chat + ': ' + text);
   await client.sendMessage(chat, BOT_MARK + text);
+}
+
+async function sendPaymentQr(chat, caption, orderId) {
+  const qr = await createPaymentQr(orderId);
+  const media = new MessageMedia('image/png', qr.toString('base64'), 'upi-payment-qr.png');
+  rememberBotText(caption);
+  await client.sendMessage(chat, media, { caption: BOT_MARK + caption });
 }
 
 let sarvamClient;
@@ -211,17 +228,47 @@ client.on('message_create', async (msg) => {
   try {
     const providerId = msg.id && msg.id._serialized;
     const sender = await resolveSender(msg, chat);
+    const senderKey = normalizePhone(sender.phone);
     console.log('   sender: ' + sender.phone + (sender.name ? ' (' + sender.name + ')' : ''));
     const translatedVoice = isVoiceMessage ? await translateVoiceToEnglish(msg) : null;
     const incomingText = isVoiceMessage ? '[Voice message]' : msg.body;
+    const pending = pendingPayments.get(senderKey);
+    const paymentText = isVoiceMessage ? translatedVoice : msg.body;
+    const awaitingQr = !isVoiceMessage && isThumbsUp(msg.body) && pending && pending.expiresAt > Date.now();
+    let replyOverride = translatedVoice;
+    let nextPendingPayment = null;
+    if (awaitingQr) {
+      replyOverride = pending.qrCaption;
+    } else if (isPaymentRelated(paymentText)) {
+      const paymentReply = await createLocalizedPaymentReply(paymentText, process.env.GROQ_API_KEY);
+      replyOverride = paymentReply.reply;
+      if (paymentReply.wantsPayment) {
+        nextPendingPayment = {
+          qrCaption: paymentReply.qrCaption,
+          orderId: 'PAY-' + require('crypto').randomBytes(4).toString('hex').toUpperCase(),
+          expiresAt: Date.now() + 10 * 60 * 1000,
+        };
+      }
+    } else if (pending && pending.expiresAt <= Date.now()) {
+      pendingPayments.delete(senderKey);
+    }
     const replyText = await conversations.handleIncomingMessage(
       sender.phone,
       incomingText,
       providerId,
       { name: sender.name },
-      translatedVoice
+      replyOverride
     );
-    if (replyText) await sendBot(chat, replyText);
+    if (replyText) {
+      if (awaitingQr) {
+        await sendPaymentQr(chat, replyText, pending.orderId);
+        pendingPayments.delete(senderKey);
+      } else {
+        await sendBot(chat, replyText);
+        if (nextPendingPayment) pendingPayments.set(senderKey, nextPendingPayment);
+        else if (!isPaymentRelated(paymentText)) pendingPayments.delete(senderKey);
+      }
+    }
   } catch (e) {
     console.error('Auto-reply failed:', e.message);
     if (isVoiceMessage) {

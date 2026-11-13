@@ -1,0 +1,35 @@
+[
+  {
+    "id": "DEMO-SAMPLE-001",
+    "orderId": "DEMO-ORDER-001",
+    "merchant": "Sunset Bay Demo",
+    "amount": 50,
+    "paymentMethod": "upi",
+    "status": "success",
+    "failureReason": null,
+    "createdAt": "2026-11-12T10:15:00.000Z",
+    "demo": true
+  },
+  {
+    "id": "DEMO-SAMPLE-002",
+    "orderId": "DEMO-ORDER-002",
+    "merchant": "Sunset Bay Demo",
+    "amount": 50,
+    "paymentMethod": "phonepe",
+    "status": "failed",
+    "failureReason": "Simulated failure selected for this demo.",
+    "createdAt": "2026-11-12T11:30:00.000Z",
+    "demo": true
+  },
+  {
+    "id": "DEMO-SAMPLE-003",
+    "orderId": "DEMO-ORDER-003",
+    "merchant": "Sunset Bay Demo",
+    "amount": 50,
+    "paymentMethod": "qr",
+    "status": "pending",
+    "failureReason": "This demo payment is pending; no payment was submitted.",
+    "createdAt": "2026-11-12T13:45:00.000Z",
+    "demo": true
+  }
+]
