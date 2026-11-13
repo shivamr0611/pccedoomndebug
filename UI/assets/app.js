@@ -10,13 +10,10 @@
   const PAGES = {
     dashboard: 'dashboard',
     conversations: 'conversations',
-    tickets: 'tickets',
     guests: 'guests',
     'knowledge-base': 'knowledge_base',
-    analytics: 'analytics',
     'triggers-and-alerts': 'triggers_alerts',
     settings: 'settings',
-    message: 'message',
   };
 
   /* Makes a row of buttons/links behave as tabs: exactly one active at a time. */
@@ -43,25 +40,12 @@
 
   function wireSidebar() {
     enablePageTransitions();
-    const sideNav = $('aside nav');
-    if (sideNav && !$('a[data-path="message"]', sideNav)) {
-      const link = $('a[data-path="settings"]', sideNav).cloneNode(true);
-      link.dataset.path = 'message';
-      link.lastChild.textContent = 'Message';
-      $('.material-symbols-outlined', link).textContent = 'send';
-      sideNav.appendChild(link);
-    }
-    if (location.pathname.includes('/message/')) {
-      const cur = $('aside a[data-path="dashboard"]');
-      const me = $('aside a[data-path="message"]');
-      const activeCls = cur.className;
-      cur.className = $('aside a[data-path="settings"]').className;
-      cur.removeAttribute('aria-current');
-      me.className = activeCls;
-    }
     $$('aside a[data-path]').forEach((a) => {
       const folder = PAGES[a.dataset.path];
-      if (!folder) return;
+      if (!folder) {
+        a.remove();
+        return;
+      }
       a.href = '../' + folder + '/code.html';
       const pre = document.createElement('link');
       pre.rel = 'prefetch';
@@ -78,6 +62,7 @@
 
   /* Conversations: status filter tabs + search + row selection */
   function initConversations() {
+    if (document.body.dataset.liveConversations) return; // rendered from Supabase by conversations.js
     const search = $('input[placeholder^="Search conversations"]');
     if (!search) return;
     const list = $('.space-y-2.overflow-y-auto');
