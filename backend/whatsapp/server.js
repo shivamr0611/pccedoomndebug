@@ -257,10 +257,17 @@ async function resolveSender(msg, chat) {
   return { phone, name };
 }
 
-const BOOKING_INTENT_RE = /\b(?:book(?:ing)?(?:\s+(?:for|a|the|it|room|me))?|confirm\s+booking|booking\s+kar(?:na|o|do)?|room\s+book)\b/i;
+const BOOKING_INTENT_RE = /\b(?:book(?:ing)?(?:\s+(?:for|a|the|it|room|me))?|confirm\s+booking|booking\s+kar(?:na|o|do)?|room\s+book|बुकिंग|बुक|कमरा\s+चाहिए|रूम\s+चाहिए|खोली\s+हवी|खोली\s+पाहिजे)\b/i;
+
+const HINDI_MONTHS = {
+  जनवरी: '01', फ़रवरी: '02', फरवरी: '02', मार्च: '03', अप्रैल: '04', अप्रेल: '04',
+  मई: '05', जून: '06', जुलाई: '07', अगस्त: '08', सितंबर: '09', सितम्बर: '09',
+  अक्टूबर: '10', नवम्बर: '11', नवंबर: '11', दिसंबर: '12', दिसम्बर: '12'
+};
 
 function extractDateFromText(text) {
-  const m = String(text || '').match(/(\d{1,2})\s+(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s*(?:(\d{2,4}))?/i);
+  const raw = String(text || '').replace(/[०-९]/g, (d) => String('०१२३४५६७८९'.indexOf(d)));
+  const m = raw.match(/(\d{1,2})\s+(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s*(?:(\d{2,4}))?/i);
   if (m) {
     const months = { jan: '01', feb: '02', mar: '03', apr: '04', may: '05', jun: '06', jul: '07', aug: '08', sep: '09', oct: '10', nov: '11', dec: '12' };
     const month = months[m[2].toLowerCase().slice(0, 3)];
@@ -268,7 +275,14 @@ function extractDateFromText(text) {
     let year = m[3] ? (m[3].length === 2 ? '20' + m[3] : m[3]) : '2026';
     return year + '-' + month + '-' + day;
   }
-  const iso = String(text || '').match(/\b(\d{4}-\d{2}-\d{2})\b/);
+  const mHindi = raw.match(/(\d{1,2})\s+(जनवरी|फ़रवरी|फरवरी|मार्च|अप्रैल|अप्रेल|मई|जून|जुलाई|अगस्त|सितंबर|सितम्बर|अक्टूबर|नवम्बर|नवंबर|दिसंबर|दिसम्बर)\s*(?:(\d{2,4}))?/i);
+  if (mHindi) {
+    const month = HINDI_MONTHS[mHindi[2]];
+    const day = mHindi[1].padStart(2, '0');
+    let year = mHindi[3] ? (mHindi[3].length === 2 ? '20' + mHindi[3] : mHindi[3]) : '2026';
+    return year + '-' + month + '-' + day;
+  }
+  const iso = raw.match(/\b(\d{4}-\d{2}-\d{2})\b/);
   return iso ? iso[1] : null;
 }
 

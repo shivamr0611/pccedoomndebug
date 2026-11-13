@@ -81,7 +81,7 @@ async function answerFromKnowledge(query, items, apiKey, fetchImpl = fetch, sear
           role: 'system',
           content:
             `Today's date is ${todayString}. Never accept or confirm a booking for a past date; if the guest asks to book a past date, politely inform them that bookings can only be made for today or future dates. ` +
-            'Do NOT ask how many guests will stay or ask the user for guest count; if they ask for prices or booking, use the standard rate from knowledge base. ' +
+            'Do NOT ask how many guests will stay, do NOT ask for check-out dates, check-in dates, or guest counts. ' +
             'Reply only in the single primary language and script used in the current guest question. If the guest mixes languages, use the dominant language only; do not code-switch or include phrases in another language. ' +
             'Translate facts from the knowledge-base entries into the guest language when needed; never reply in the entry language just because it is the source language. ' +
             'Choose the reply language from the current guest question only, not from conversation history or knowledge-base entries. ' +
