@@ -41,7 +41,8 @@ function parseCommand(text) {
 /**
  * @param {object} deps
  * @param {object} deps.store      data access, see createSupabaseStore / the in-memory store in the tests
- * @param {(text: string) => Promise<string>} deps.aiReply   the existing AI reply pipeline
+ * @param {(text: string, history: {sender: string, body: string}[]) => Promise<string>} deps.aiReply
+ *        the existing AI reply pipeline
  * @param {(messages: {sender: string, body: string}[]) => Promise<string>} deps.summarize
  *        builds an admin-only summary when a conversation is closed
  */
@@ -153,6 +154,9 @@ function createConversationService({ store, aiReply, summarize, logger = console
 
       const conversation = (await getOpenConversation(guest.id)) || (await startConversation(guest.id)).conversation;
 
+      const history = store.listRecentMessages
+        ? await store.listRecentMessages(conversation.id, 12)
+        : (await store.listMessages(conversation.id)).slice(-12);
       const saved = await saveMessage(conversation.id, 'guest', text, providerMessageId);
       if (!saved) {
         logger.log('[conversation] duplicate message ' + providerMessageId + ' ignored');
@@ -161,7 +165,9 @@ function createConversationService({ store, aiReply, summarize, logger = console
 
       let reply;
       try {
-        reply = replyOverride === null ? await aiReply(text) : replyOverride;
+        reply = replyOverride === null
+          ? await aiReply(text, history.map(({ sender, body }) => ({ sender, body })))
+          : replyOverride;
       } catch (e) {
         logger.error('AI reply failed:', e.message);
         return null;
@@ -220,14 +226,14 @@ function createSupabaseStore({ url, serviceRoleKey, fetchImpl = fetch }) {
   if (!url || !serviceRoleKey) throw new Error('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set');
   const base = url.replace(/\/$/, '') + '/rest/v1/';
 
-  async function rest(method, pathAndQuery, body) {
+  async function rest(method, pathAndQuery, body, prefer = 'return=representation') {
     const res = await fetchImpl(base + pathAndQuery, {
       method,
       headers: {
         apikey: serviceRoleKey,
         Authorization: 'Bearer ' + serviceRoleKey,
         'Content-Type': 'application/json',
-        Prefer: 'return=representation',
+        Prefer: prefer,
       },
       body: body === undefined ? undefined : JSON.stringify(body),
       signal: AbortSignal.timeout(15000),
@@ -360,6 +366,35 @@ function createSupabaseStore({ url, serviceRoleKey, fetchImpl = fetch }) {
       (await rest('DELETE', 'knowledge_base_items?id=eq.' + q(id))).length > 0,
     listMessages: (conversationId) =>
       rest('GET', 'messages?select=sender,body,created_at&order=created_at.asc&conversation_id=eq.' + q(conversationId)),
+    listRecentMessages: async (conversationId, limit = 12) => {
+      const rows = await rest(
+        'GET',
+        'messages?select=sender,body,created_at&order=created_at.desc,id.desc&limit=' +
+          Math.max(1, Math.min(20, Math.trunc(Number(limit)) || 12)) +
+          '&conversation_id=eq.' + q(conversationId)
+      );
+      return rows.reverse();
+    },
+    listRoomBookings: (startDate, endDate) =>
+      rest(
+        'GET',
+        'room_bookings?select=booking_date,room_number&and=(booking_date.gte.' +
+          q(startDate) + ',booking_date.lt.' + q(endDate) + ')' +
+          '&order=booking_date.asc,room_number.asc'
+      ),
+    setRoomBooking: async (bookingDate, roomNumber, occupied) => {
+      const filter =
+        'booking_date=eq.' + q(bookingDate) + '&room_number=eq.' + q(roomNumber);
+      if (!occupied) return (await rest('DELETE', 'room_bookings?' + filter)).length > 0;
+      return first(
+        await rest(
+          'POST',
+          'room_bookings?on_conflict=booking_date,room_number',
+          { booking_date: bookingDate, room_number: roomNumber },
+          'resolution=merge-duplicates,return=representation'
+        )
+      );
+    },
     listOpenConversations: () => rest('GET', 'conversations?select=*&status=eq.open'),
     lastMessageAt: async (conversationId) => {
       const row = first(

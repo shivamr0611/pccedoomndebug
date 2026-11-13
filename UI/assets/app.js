@@ -89,6 +89,7 @@
       a.href = '../' + folder + '/code.html';
       a.classList.remove(...activeClasses, ...inactiveClasses, ...legacyClasses);
       a.classList.add('rounded-xl');
+      if (a.dataset.path === 'dashboard') a.classList.remove('justify-between');
       if (a.dataset.path === currentPage) {
         a.classList.add(...activeClasses);
         a.setAttribute('aria-current', 'page');

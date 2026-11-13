@@ -84,6 +84,9 @@ test('payment reply uses Groq Qwen with JSON mode and accepts the expected respo
   assert.equal(request.reasoning_effort, 'none');
   assert.equal(reply.wantsPayment, true);
   assert.equal(reply.amount, 275.5);
+  assert.match(request.messages[0].content, /reply only in that language/);
+  assert.match(request.messages[0].content, /Do not code-switch/);
+  assert.match(request.messages[0].content, /same single language for the reply and QR caption/);
   assert.match(reply.qrCaption, /shivamsrevankar@oksbi/);
   assert.match(reply.qrCaption, /₹275\.5/);
   assert.match(reply.qrCaption, /cannot verify payment/);
@@ -116,4 +119,37 @@ test('payment reply asks for an amount instead of assuming a default', async () 
   );
   assert.equal(reply.amount, null);
   assert.equal(reply.qrCaption, null);
+});
+
+test('post-QR thumbs-up confirms the guest report without claiming payment is verified', async () => {
+  let prompt;
+  const reply = await createLocalizedPaymentReply(
+    '👍',
+    'test-key',
+    async (_url, options) => {
+      prompt = JSON.parse(options.body).messages[0].content;
+      return {
+        ok: true,
+        json: async () => ({
+          choices: [{
+            message: {
+              content: JSON.stringify({
+                language: 'English',
+                wants_payment: true,
+                reply: 'We received your confirmation. Payment is pending staff verification.',
+                qr_caption: 'Verify the payment details.',
+              }),
+            },
+          }],
+        }),
+      };
+    },
+    { amount: 275.5, language: 'English', confirmationReceived: true }
+  );
+
+  assert.match(prompt, /reporting that they sent payment/);
+  assert.match(prompt, /not verified and remains pending/);
+  assert.match(prompt, /do not claim it is complete/);
+  assert.equal(reply.reply, 'We received your confirmation. Payment is pending staff verification.');
+  assert.equal(reply.wantsPayment, false);
 });

@@ -15,7 +15,7 @@ Open the local URL printed by Vite (normally `http://localhost:5173`). The UPI Q
 
 ## WhatsApp payment flow
 
-With the existing WhatsApp backend configured, payment questions get a reply in the user's language. If they ask to pay, the bot explains the recipient and amount and asks for 👍 before sending a payable QR. The QR prompts a real UPI transfer; the bot cannot verify it.
+With the existing WhatsApp backend configured, payment questions get a reply in the user's language. If they ask to pay, the bot explains the recipient and amount and asks for 👍 before sending a payable QR. A further 👍 is recorded as the guest reporting that they paid; the bot says the transfer is pending staff verification and does not mark it as verified. The QR prompts a real UPI transfer; the bot cannot verify it.
 
 Configure `backend/whatsapp/.env` locally (ignored by Git) with the existing `GROQ_API_KEY` and Supabase settings, then run:
 
@@ -23,11 +23,11 @@ Configure `backend/whatsapp/.env` locally (ignored by Git) with the existing `GR
 npm run dev:whatsapp
 ```
 
-Pair the WhatsApp Web client using its terminal QR. For voice translation, set a newly rotated `SARVAM_API_KEY` locally. Never share API keys in chat.
+Pair the WhatsApp Web client using its terminal QR. For voice messages, the backend transcribes the original language and sends the transcript through the same language-aware reply flow, so replies stay in the guest's language. Set a newly rotated `SARVAM_API_KEY` locally. Never share API keys in chat.
 
-## Dynamic knowledge base
+## Supabase setup
 
-Apply `supabase/migrations/20261113020000_knowledge_base_items.sql` to the configured Supabase project. Then serve the admin UI and start the WhatsApp backend:
+Apply `supabase/migrations/20261113020000_knowledge_base_items.sql` and `supabase/migrations/20261113030000_room_bookings.sql` to the configured Supabase project. Room occupancy is stored per room and date; no booking rows means all rooms are unoccupied. Then serve the admin UI and start the WhatsApp backend:
 
 ```sh
 cd UI && python3 -m http.server 8081

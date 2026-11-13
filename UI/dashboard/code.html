@@ -95,49 +95,6 @@
 </div>
 <!-- Row 2: Charts -->
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
-<!-- Line Chart (8 cols) -->
-<div class="lg:col-span-8 bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col justify-between">
-<div class="flex items-center justify-between mb-space-md">
-<div>
-<h3 class="text-headline-sm font-bold text-primary-container">Conversations per day</h3>
-<p class="text-body-sm text-on-surface-variant">Performance overview for the last 14 days</p>
-</div>
-<div class="flex items-center bg-surface-container p-1 rounded-lg">
-<button class="px-3 py-1 text-label-md font-medium text-on-surface-variant hover:text-on-surface rounded">7D</button>
-<button class="px-3 py-1 text-label-md font-medium bg-surface-container-lowest text-primary shadow-sm rounded">14D</button>
-<button class="px-3 py-1 text-label-md font-medium text-on-surface-variant hover:text-on-surface rounded">30D</button>
-</div>
-</div>
-<!-- Chart Area -->
-<div class="relative h-64 w-full flex items-end pt-space-xl">
-<!-- Grid lines -->
-<div class="absolute inset-0 flex flex-col justify-between pointer-events-none">
-<div class="w-full h-[1px] bg-outline-variant/15"></div>
-<div class="w-full h-[1px] bg-outline-variant/15"></div>
-<div class="w-full h-[1px] bg-outline-variant/15"></div>
-<div class="w-full h-[1px] bg-outline-variant/15"></div>
-<div class="w-full h-[1px] bg-outline-variant/15"></div>
-</div>
-<!-- SVG Line Curves -->
-<svg class="absolute inset-0 w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 100 100">
-<!-- AI resolved (#0c1b33) -->
-<path d="M 0 70 Q 15 50, 30 55 T 60 30 T 90 20 L 100 15" fill="none" stroke="#0c1b33" stroke-width="2.5" vector-effect="non-scaling-stroke"></path>
-<!-- Handed to staff (#ac3327) -->
-<path d="M 0 85 Q 15 80, 30 75 T 60 60 T 90 50 L 100 45" fill="none" stroke="#ac3327" stroke-width="2.5" vector-effect="non-scaling-stroke"></path>
-</svg>
-</div>
-<!-- Legend -->
-<div class="flex items-center gap-space-lg mt-space-md pt-space-md border-t border-outline-variant/10">
-<div class="flex items-center gap-space-xs">
-<span class="w-3 h-3 rounded-full bg-primary-container"></span>
-<span class="text-body-sm font-medium text-on-surface">AI resolved</span>
-</div>
-<div class="flex items-center gap-space-xs">
-<span class="w-3 h-3 rounded-full bg-secondary"></span>
-<span class="text-body-sm font-medium text-on-surface">Handed to staff</span>
-</div>
-</div>
-</div>
 <!-- Donut Chart (4 cols) -->
 <div class="lg:col-span-4 bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col justify-between">
 <div>
@@ -397,60 +354,7 @@
 </div>
 </div>
 <!-- Primary Analytics Grid -->
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter mb-8">
-<!-- Reply Time Trend -->
-<div class="bg-surface-container-low p-6 rounded-xl shadow-sm lg:col-span-2 flex flex-col justify-between">
-<div class="flex items-center justify-between mb-6">
-<div>
-<h3 class="font-headline-md text-on-surface">Average Reply Time Trend</h3>
-<p class="font-body-sm text-on-surface-variant">Measured in seconds from guest prompt to agent/AI response</p>
-</div>
-<div class="flex items-center gap-2">
-<span class="inline-block w-3 h-3 bg-secondary rounded-full"></span>
-<span class="font-label-sm text-on-surface-variant">AI Bot</span>
-<span class="inline-block w-3 h-3 bg-primary-container rounded-full ml-2"></span>
-<span class="font-label-sm text-on-surface-variant">Human Staff</span>
-</div>
-</div>
-<!-- Chart Mockup SVG -->
-<div class="w-full h-64 flex items-end gap-3 pt-6 relative">
-<div class="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-20">
-<div class="w-full border-b border-outline"></div>
-<div class="w-full border-b border-outline"></div>
-<div class="w-full border-b border-outline"></div>
-<div class="w-full border-b border-outline"></div>
-</div>
-<!-- Bar groups -->
-<div class="flex-1 flex flex-col items-center gap-1 z-10">
-<div class="w-full flex items-end justify-center gap-1 h-48">
-<div class="w-1/2 bg-secondary rounded-t h-[40%] transition-all hover:opacity-80 cursor-pointer" title="AI: 12s"></div>
-<div class="w-1/2 bg-primary-container rounded-t h-[80%] transition-all hover:opacity-80 cursor-pointer" title="Human: 140s"></div>
-</div>
-<span class="font-label-sm text-on-surface-variant">Week 1</span>
-</div>
-<div class="flex-1 flex flex-col items-center gap-1 z-10">
-<div class="w-full flex items-end justify-center gap-1 h-48">
-<div class="w-1/2 bg-secondary rounded-t h-[35%] transition-all hover:opacity-80 cursor-pointer" title="AI: 10s"></div>
-<div class="w-1/2 bg-primary-container rounded-t h-[70%] transition-all hover:opacity-80 cursor-pointer" title="Human: 120s"></div>
-</div>
-<span class="font-label-sm text-on-surface-variant">Week 2</span>
-</div>
-<div class="flex-1 flex flex-col items-center gap-1 z-10">
-<div class="w-full flex items-end justify-center gap-1 h-48">
-<div class="w-1/2 bg-secondary rounded-t h-[25%] transition-all hover:opacity-80 cursor-pointer" title="AI: 8s"></div>
-<div class="w-1/2 bg-primary-container rounded-t h-[60%] transition-all hover:opacity-80 cursor-pointer" title="Human: 95s"></div>
-</div>
-<span class="font-label-sm text-on-surface-variant">Week 3</span>
-</div>
-<div class="flex-1 flex flex-col items-center gap-1 z-10">
-<div class="w-full flex items-end justify-center gap-1 h-48">
-<div class="w-1/2 bg-secondary rounded-t h-[20%] transition-all hover:opacity-80 cursor-pointer" title="AI: 6s"></div>
-<div class="w-1/2 bg-primary-container rounded-t h-[45%] transition-all hover:opacity-80 cursor-pointer" title="Human: 75s"></div>
-</div>
-<span class="font-label-sm text-on-surface-variant">Week 4</span>
-</div>
-</div>
-</div>
+<div class="grid grid-cols-1 gap-gutter mb-8">
 <!-- AI Resolution Rate -->
 <div class="bg-surface-container-low p-6 rounded-xl shadow-sm flex flex-col justify-between">
 <div>
@@ -478,97 +382,6 @@
 </div>
 <!-- Secondary Metrics Grid -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter mb-8">
-<!-- After-Hours Enquiries Heatmap -->
-<div class="bg-surface-container-low p-6 rounded-xl shadow-sm flex flex-col justify-between">
-<div>
-<h3 class="font-headline-md text-on-surface mb-1">After-Hours Enquiries</h3>
-<p class="font-body-sm text-on-surface-variant">Hourly distribution (10 PM - 6 AM)</p>
-</div>
-<!-- Heatmap Grid in Fresh Sky / Tertiary Fixed Dim Tints -->
-<div class="grid grid-cols-4 gap-2 my-6">
-<div class="bg-primary-fixed p-3 rounded-lg flex flex-col items-center justify-center text-on-tertiary-fixed">
-<span class="font-label-sm opacity-70">22:00</span>
-<span class="font-headline-sm font-bold">42</span>
-</div>
-<div class="bg-primary-fixed-dim p-3 rounded-lg flex flex-col items-center justify-center text-on-tertiary-fixed">
-<span class="font-label-sm opacity-70">23:00</span>
-<span class="font-headline-sm font-bold">58</span>
-</div>
-<div class="bg-primary-container p-3 rounded-lg flex flex-col items-center justify-center text-on-primary">
-<span class="font-label-sm opacity-70">00:00</span>
-<span class="font-headline-sm font-bold">74</span>
-</div>
-<div class="bg-tertiary-container p-3 rounded-lg flex flex-col items-center justify-center text-on-tertiary">
-<span class="font-label-sm opacity-70">01:00</span>
-<span class="font-headline-sm font-bold">89</span>
-</div>
-<div class="bg-primary-container p-3 rounded-lg flex flex-col items-center justify-center text-on-primary">
-<span class="font-label-sm opacity-70">02:00</span>
-<span class="font-headline-sm font-bold">65</span>
-</div>
-<div class="bg-primary-fixed-dim p-3 rounded-lg flex flex-col items-center justify-center text-on-tertiary-fixed">
-<span class="font-label-sm opacity-70">03:00</span>
-<span class="font-headline-sm font-bold">40</span>
-</div>
-<div class="bg-primary-fixed p-3 rounded-lg flex flex-col items-center justify-center text-on-tertiary-fixed">
-<span class="font-label-sm opacity-70">04:00</span>
-<span class="font-label-sm opacity-70 font-bold">21</span>
-</div>
-<div class="bg-surface-container p-3 rounded-lg flex flex-col items-center justify-center text-on-surface-variant">
-<span class="font-label-sm opacity-70">05:00</span>
-<span class="font-label-sm opacity-70 font-bold">9</span>
-</div>
-</div>
-<span class="font-body-sm text-on-surface-variant text-center">Peak volume observed between midnight and 2 AM.</span>
-</div>
-<!-- Top Query Types -->
-<div class="bg-surface-container-low p-6 rounded-xl shadow-sm flex flex-col justify-between">
-<div>
-<h3 class="font-headline-md text-on-surface mb-1">Top Query Types</h3>
-<p class="font-body-sm text-on-surface-variant">Most frequent guest topics this month</p>
-</div>
-<div class="space-y-4 my-6">
-<div>
-<div class="flex justify-between text-body-sm mb-1">
-<span class="text-on-surface font-medium">Pool &amp; Beach Timings</span>
-<span class="text-on-surface-variant">34%</span>
-</div>
-<div class="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
-<div class="bg-secondary h-full rounded-full" style="width: 34%"></div>
-</div>
-</div>
-<div>
-<div class="flex justify-between text-body-sm mb-1">
-<span class="text-on-surface font-medium">Airport Transfers</span>
-<span class="text-on-surface-variant">26%</span>
-</div>
-<div class="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
-<div class="bg-primary-container h-full rounded-full" style="width: 26%"></div>
-</div>
-</div>
-<div>
-<div class="flex justify-between text-body-sm mb-1">
-<span class="text-on-surface font-medium">Early Check-in / Luggage</span>
-<span class="text-on-surface-variant">22%</span>
-</div>
-<div class="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
-<div class="bg-tertiary-fixed-dim h-full rounded-full" style="width: 22%"></div>
-</div>
-</div>
-<div>
-<div class="flex justify-between text-body-sm mb-1">
-<span class="text-on-surface font-medium">In-Room Dining Menu</span>
-<span class="text-on-surface-variant">18%</span>
-</div>
-<div class="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden">
-<div class="bg-outline-variant h-full rounded-full" style="width: 18%"></div>
-</div>
-</div>
-</div>
-<a class="font-label-md text-secondary font-medium cursor-pointer hover:underline flex items-center gap-1">
-        View all 24 categories <span class="material-symbols-outlined text-sm">arrow_forward</span>
-</a>
-</div>
 <!-- Language Mix Over Time -->
 <div class="bg-surface-container-low p-6 rounded-xl shadow-sm flex flex-col justify-between">
 <div>
@@ -609,7 +422,7 @@
 </div>
 </div>
 <!-- Bottom Section: Tickets by Category & Busiest Days -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter">
+<div class="grid grid-cols-1 gap-gutter">
 <!-- Tickets by Category -->
 <div class="bg-surface-container-low p-6 rounded-xl shadow-sm">
 <div class="flex items-center justify-between mb-6">
@@ -665,67 +478,6 @@
 <span class="font-label-sm text-emerald-600">+8.4% vs prev</span>
 </div>
 </div>
-</div>
-</div>
-<!-- Busiest Days of the Week -->
-<div class="bg-surface-container-low p-6 rounded-xl shadow-sm flex flex-col justify-between">
-<div>
-<div class="flex items-center justify-between mb-6">
-<div>
-<h3 class="font-headline-md text-on-surface">Busiest Days of the Week</h3>
-<p class="font-body-sm text-on-surface-variant">Guest query volume trends across weekly cycles</p>
-</div>
-<span class="material-symbols-outlined text-on-surface-variant cursor-pointer">more_vert</span>
-</div>
-</div>
-<!-- Weekly Distribution Chart -->
-<div class="grid grid-cols-7 gap-3 items-end h-48 py-4">
-<div class="flex flex-col items-center gap-2 h-full justify-end">
-<div class="w-full bg-surface-container-highest rounded-t relative flex items-end justify-center h-[60%]">
-<div class="w-full bg-primary-container rounded-t h-[70%]"></div>
-</div>
-<span class="font-label-sm text-on-surface-variant">Mon</span>
-</div>
-<div class="flex flex-col items-center gap-2 h-full justify-end">
-<div class="w-full bg-surface-container-highest rounded-t relative flex items-end justify-center h-[60%]">
-<div class="w-full bg-primary-container rounded-t h-[55%]"></div>
-</div>
-<span class="font-label-sm text-on-surface-variant">Tue</span>
-</div>
-<div class="flex flex-col items-center gap-2 h-full justify-end">
-<div class="w-full bg-surface-container-highest rounded-t relative flex items-end justify-center h-[60%]">
-<div class="w-full bg-primary-container rounded-t h-[65%]"></div>
-</div>
-<span class="font-label-sm text-on-surface-variant">Wed</span>
-</div>
-<div class="flex flex-col items-center gap-2 h-full justify-end">
-<div class="w-full bg-surface-container-highest rounded-t relative flex items-end justify-center h-[60%]">
-<div class="w-full bg-primary-container rounded-t h-[75%]"></div>
-</div>
-<span class="font-label-sm text-on-surface-variant">Thu</span>
-</div>
-<div class="flex flex-col items-center gap-2 h-full justify-end">
-<div class="w-full bg-surface-container-highest rounded-t relative flex items-end justify-center h-[60%]">
-<div class="w-full bg-secondary rounded-t h-[95%]"></div>
-</div>
-<span class="font-label-sm text-on-surface font-bold">Fri</span>
-</div>
-<div class="flex flex-col items-center gap-2 h-full justify-end">
-<div class="w-full bg-surface-container-highest rounded-t relative flex items-end justify-center h-[60%]">
-<div class="w-full bg-secondary rounded-t h-[100%]"></div>
-</div>
-<span class="font-label-sm text-on-surface font-bold">Sat</span>
-</div>
-<div class="flex flex-col items-center gap-2 h-full justify-end">
-<div class="w-full bg-surface-container-highest rounded-t relative flex items-end justify-center h-[60%]">
-<div class="w-full bg-secondary rounded-t h-[85%]"></div>
-</div>
-<span class="font-label-sm text-on-surface font-bold">Sun</span>
-</div>
-</div>
-<div class="pt-4 border-t border-outline-variant/10 flex items-center justify-between text-body-sm text-on-surface-variant">
-<span>Peak Traffic: Friday &amp; Saturday evenings</span>
-<span class="font-medium text-on-surface">+35% vs weekdays</span>
 </div>
 </div>
 </div>

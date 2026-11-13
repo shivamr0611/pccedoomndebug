@@ -8,6 +8,7 @@
   const POLL_MS = 5000;
 
   const $ = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
   const el = (tag, cls, txt) => {
     const e = document.createElement(tag);
     if (cls) e.className = cls;
@@ -97,7 +98,7 @@
   function renderList() {
     const box = $('#convList');
     box.replaceChildren();
-    for (const key of ['all', 'open', 'closed']) {
+    for (const key of ['all', 'open']) {
       const n = key === 'all' ? state.list.length : state.list.filter((c) => c.status === key).length;
       const span = $('[data-count="' + key + '"]');
       if (span) span.textContent = state.list.length || !state.failed ? '(' + n + ')' : '';

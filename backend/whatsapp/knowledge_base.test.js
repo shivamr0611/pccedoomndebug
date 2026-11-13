@@ -31,7 +31,9 @@ test('knowledge answers use retrieved entries as context and return their source
   );
 
   assert.equal(request.body.model, 'qwen/qwen3.8-27b');
-  assert.match(request.body.messages[0].content, /only in the language and script used in the guest question/);
+  assert.match(request.body.messages[0].content, /single primary language and script used in the current guest question/);
+  assert.match(request.body.messages[0].content, /do not code-switch/);
+  assert.match(request.body.messages[0].content, /not from conversation history/);
   assert.match(request.body.messages[0].content, /Translate facts from the knowledge-base entries into the guest language/);
   assert.match(request.body.messages[0].content, /Never use outside knowledge/);
   assert.match(request.body.messages[0].content, /Hallucinating is not allowed/);
@@ -42,6 +44,29 @@ test('knowledge answers use retrieved entries as context and return their source
   assert.match(request.body.messages[1].content, /Peak rate ₹22,000 per night/);
   assert.equal(result.answer, 'The peak rate is ₹22,000 per night.');
   assert.deepEqual(result.sources.map((item) => item.id), ['1']);
+});
+
+test('follow-up questions use prior conversation context for retrieval and answering', async () => {
+  const history = [
+    { sender: 'guest', body: 'Can children stay in the Executive Suite?' },
+    { sender: 'ai', body: 'The Executive Suite allows up to 3 adults.' },
+  ];
+  let prompt;
+  const result = await answerFromKnowledge(
+    'What about the maximum?',
+    items,
+    'test-key',
+    async (_url, options) => {
+      prompt = JSON.parse(options.body).messages[1].content;
+      return { ok: true, json: async () => ({ choices: [{ message: { content: 'The Executive Suite allows up to 3 adults.' } }] }) };
+    },
+    'What about the maximum? Executive Suite children maximum 3 adults',
+    history
+  );
+
+  assert.deepEqual(result.sources.map((item) => item.id), ['1']);
+  assert.match(prompt, /Can children stay in the Executive Suite/);
+  assert.match(prompt, /What about the maximum/);
 });
 
 test('no matching knowledge entry does not call the model', async () => {

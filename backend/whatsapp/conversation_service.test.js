@@ -58,6 +58,8 @@ function memoryStore() {
       return m;
     },
     listMessages: async (cid) => s.messages.filter((m) => m.conversation_id === cid),
+    listRecentMessages: async (cid, limit = 12) =>
+      s.messages.filter((m) => m.conversation_id === cid).slice(-limit),
     listOpenConversations: async () => s.conversations.filter((c) => c.status === 'open'),
     lastMessageAt: async (cid) => {
       const ms = s.messages.filter((m) => m.conversation_id === cid);
@@ -91,16 +93,42 @@ test('a guest message automatically starts a conversation', async () => {
   assert.deepEqual(store.s.messages.map((m) => m.sender), ['guest', 'ai']);
 });
 
-test('a pretranslated voice message is returned and logged without calling the text translator', async () => {
-  let aiCalls = 0;
-  const { svc, store, phone } = setup({ aiReply: async () => { aiCalls++; return 'unexpected'; } });
-  const reply = await svc.handleIncomingMessage(phone, '[Voice message]', 'voice-1', {}, 'Please send fresh towels.');
+test('AI reply receives prior conversation messages without the current guest message', async () => {
+  let received;
+  const { store, svc, phone } = setup({
+    aiReply: async (text, history) => {
+      received = { text, history };
+      return 'AI:' + text;
+    },
+  });
 
-  assert.equal(reply, 'Please send fresh towels.');
-  assert.equal(aiCalls, 0);
+  await svc.handleIncomingMessage(phone, 'What time is breakfast?', 'm1');
+  await svc.handleIncomingMessage(phone, 'and checkout?', 'm2');
+
+  assert.equal(received.text, 'and checkout?');
+  assert.deepEqual(received.history, [
+    { sender: 'guest', body: 'What time is breakfast?' },
+    { sender: 'ai', body: 'AI:What time is breakfast?' },
+  ]);
+  assert.equal(store.s.messages.at(-1).body, 'AI:and checkout?');
+});
+
+test('a voice transcription is sent through the normal language-aware reply pipeline', async () => {
+  let receivedText;
+  const { svc, store, phone } = setup({
+    aiReply: async (text) => {
+      receivedText = text;
+      return 'कृपया ताजे तौलिए भेजें।';
+    },
+  });
+  const transcript = 'कृपया ताजे तौलिए भेजें।';
+  const reply = await svc.handleIncomingMessage(phone, transcript, 'voice-1');
+
+  assert.equal(receivedText, transcript);
+  assert.equal(reply, 'कृपया ताजे तौलिए भेजें।');
   assert.deepEqual(store.s.messages.map((message) => [message.sender, message.body]), [
-    ['guest', '[Voice message]'],
-    ['ai', 'Please send fresh towels.'],
+    ['guest', transcript],
+    ['ai', 'कृपया ताजे तौलिए भेजें।'],
   ]);
 });
 
