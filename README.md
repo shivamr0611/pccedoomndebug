@@ -25,6 +25,18 @@ npm run dev:whatsapp
 
 Pair the WhatsApp Web client using its terminal QR. For voice translation, set a newly rotated `SARVAM_API_KEY` locally. Never share API keys in chat.
 
+## Dynamic knowledge base
+
+Apply `supabase/migrations/20261113020000_knowledge_base_items.sql` to the configured Supabase project. Then serve the admin UI and start the WhatsApp backend:
+
+```sh
+cd UI && python3 -m http.server 8081
+# In another terminal, from the project root:
+npm run dev:whatsapp
+```
+
+Open `http://127.0.0.1:8081/knowledge_base/code.html`. Add, edit, disable, or delete entries there; the data is persisted in Supabase and enabled entries are fetched for each WhatsApp message. Use **Test retrieval** to preview the current entries. The old sample room, policy, and FAQ values were removed rather than treated as verified property information.
+
 ## Checks
 
 ```sh

@@ -80,7 +80,10 @@ async function detectAndTranslate(text) {
 
 // Reply = the same message, plus its detected language and English translation.
 async function translateWithEnglish(text) {
-  const { language, english } = await detectAndTranslate(text);
+  return formatTranslation(text, await detectAndTranslate(text));
+}
+
+function formatTranslation(text, { language, english }) {
   if (language === 'English') return text + '\n\n🌐 English';
   return text + '\n\n🌐 ' + language + ' → English:\n' + english;
 }
@@ -178,6 +181,10 @@ async function answerGuestMessage(text) {
     const items = await dashboardStore.listKnowledgeBaseItems();
     const grounded = await answerFromKnowledge(text, items, process.env.GROQ_API_KEY);
     if (grounded) return grounded.answer;
+    const translation = await detectAndTranslate(text);
+    const translatedMatch = await answerFromKnowledge(text, items, process.env.GROQ_API_KEY, fetch, translation.english);
+    if (translatedMatch) return translatedMatch.answer;
+    return formatTranslation(text, translation);
   }
   return translateWithEnglish(text);
 }
@@ -380,12 +387,18 @@ http
           return send(201, await dashboardStore.insertKnowledgeBaseItem(item));
         }
         if (urlPath === '/api/knowledge-base/test' && req.method === 'POST') {
-          const { query } = await readJsonBody(req);
+          const body = await readJsonBody(req);
+          const query = body && body.query;
           if (typeof query !== 'string' || !query.trim() || query.length > 2000) {
             return send(400, { error: 'query must be between 1 and 2000 characters.' });
           }
           const items = await dashboardStore.listKnowledgeBaseItems();
-          const result = await answerFromKnowledge(query.trim(), items, process.env.GROQ_API_KEY);
+          const question = query.trim();
+          let result = await answerFromKnowledge(question, items, process.env.GROQ_API_KEY);
+          if (!result && items.length) {
+            const translation = await detectAndTranslate(question);
+            result = await answerFromKnowledge(question, items, process.env.GROQ_API_KEY, fetch, translation.english);
+          }
           return send(200, result || {
             answer: 'No enabled knowledge-base entries matched that question.',
             sources: [],
@@ -394,7 +407,7 @@ http
 
         const itemPath = urlPath.match(/^\/api\/knowledge-base\/([^/]+)$/);
         if (itemPath) {
-          const id = decodeURIComponent(itemPath[1]);
+          const id = itemPath[1];
           if (!UUID_RE.test(id)) return send(400, { error: 'invalid knowledge item id' });
           if (req.method === 'PATCH') {
             const item = knowledgeItemInput(await readJsonBody(req), true);

@@ -13,7 +13,7 @@
     guests: 'guests',
     'knowledge-base': 'knowledge_base',
     'triggers-and-alerts': 'triggers_alerts',
-    settings: 'settings',
+    profile: 'profile',
   };
 
   /* Makes a row of buttons/links behave as tabs: exactly one active at a time. */
@@ -40,6 +40,27 @@
 
   function wireSidebar() {
     enablePageTransitions();
+    const profileLink = $('aside a[data-path="settings"]');
+    if (profileLink) {
+      profileLink.dataset.path = 'profile';
+      const icon = $('.material-symbols-outlined', profileLink);
+      if (icon) icon.textContent = 'person';
+      const label = Array.from(profileLink.childNodes).find(
+        (node) => node.nodeType === Node.TEXT_NODE && node.textContent.trim()
+      );
+      if (label) label.textContent = label.textContent.replace('Settings', 'Profile');
+    }
+
+    const currentFolder = location.pathname.split('/').slice(-2, -1)[0];
+    const currentPage = Object.keys(PAGES).find((page) => PAGES[page] === currentFolder);
+    const activeClasses = ['bg-secondary', 'text-on-secondary', 'font-bold'];
+    const inactiveClasses = [
+      'text-primary-fixed-dim',
+      'hover:bg-surface-container-high',
+      'hover:text-on-surface',
+    ];
+    const legacyClasses = ['bg-[#ac3327]', 'text-white', 'font-semibold', 'text-slate-200', 'hover:bg-white/10'];
+
     $$('aside a[data-path]').forEach((a) => {
       const folder = PAGES[a.dataset.path];
       if (!folder) {
@@ -47,11 +68,26 @@
         return;
       }
       a.href = '../' + folder + '/code.html';
+      a.classList.remove(...activeClasses, ...inactiveClasses, ...legacyClasses);
+      a.classList.add('rounded-xl');
+      if (a.dataset.path === currentPage) {
+        a.classList.add(...activeClasses);
+        a.setAttribute('aria-current', 'page');
+      } else {
+        a.classList.add(...inactiveClasses);
+        a.removeAttribute('aria-current');
+      }
       const pre = document.createElement('link');
       pre.rel = 'prefetch';
       pre.href = a.href;
       document.head.appendChild(pre);
     });
+
+    if (currentPage === 'profile') {
+      const heading = $('main h1');
+      if (heading) heading.textContent = 'Profile';
+      document.title = 'Profile';
+    }
   }
 
   /* Dashboard: 7D / 14D / 30D period switch */
@@ -109,102 +145,6 @@
     );
   }
 
-  /* Knowledge base: vertical tabs swap the data table */
-  const KB_STATUS = {
-    Immediate: 'bg-emerald-500/10 text-emerald-700',
-    Limited: 'bg-amber-500/10 text-amber-700',
-    'Sold Out': 'bg-error/10 text-error',
-  };
-  const KB = {
-    'Rooms and Rates': {
-      title: 'Rooms and Rates Data',
-      desc: 'Manage base rates, peak pricing, and availability details used by the AI assistant.',
-      cols: ['Room Type', 'Base Rate', 'Peak Rate', 'Cap.', 'Availability'],
-      rows: [
-        ['Deluxe Sea View', '₹8,500', '₹14,000', '2 Adults', 'Immediate'],
-        ['Executive Suite', '₹14,000', '₹22,000', '3 Adults', 'Limited'],
-        ['Standard Cottage', '₹5,500', '₹9,500', '2 Adults', 'Immediate'],
-        ['Beach Villa Pool', '₹24,000', '₹38,000', '4 Adults', 'Sold Out'],
-      ],
-    },
-    Amenities: {
-      title: 'Amenities Data',
-      desc: 'Facilities, timings and prices the AI can share with guests.',
-      cols: ['Amenity', 'Timings', 'Location', 'Cost', 'Availability'],
-      rows: [
-        ['Infinity Pool', '6 AM - 10 PM', 'Level 2', 'Free', 'Immediate'],
-        ['Spa & Wellness', '9 AM - 8 PM', 'Wing B', 'From ₹2,500', 'Limited'],
-        ['Beach Shack', '8 AM - 11 PM', 'Beachfront', 'A la carte', 'Immediate'],
-        ['Fitness Centre', '24x7', 'Level 1', 'Free', 'Immediate'],
-      ],
-    },
-    Policies: {
-      title: 'Policies Data',
-      desc: 'Check-in, cancellation and stay policies the AI quotes to guests.',
-      cols: ['Policy', 'Details', 'Applies To', 'Updated', 'Availability'],
-      rows: [
-        ['Check-in', '2 PM, early on request', 'All guests', 'Jan 2024', 'Immediate'],
-        ['Check-out', '11 AM, late until 2 PM with fee', 'All guests', 'Jan 2024', 'Immediate'],
-        ['Cancellation', 'Free until 72h before arrival', 'All bookings', 'Feb 2024', 'Immediate'],
-        ['Extra bed', '₹1,500 per night', 'Rooms only', 'Mar 2024', 'Limited'],
-      ],
-    },
-    'Nearby Places': {
-      title: 'Nearby Places Data',
-      desc: 'Points of interest and distances for concierge answers.',
-      cols: ['Place', 'Type', 'Distance', 'Open Hours', 'Availability'],
-      rows: [
-        ['Calangute Beach', 'Beach', '0.2 km', '24x7', 'Immediate'],
-        ['Fort Aguada', 'Heritage', '7 km', '9 AM - 5:30 PM', 'Immediate'],
-        ['Baga Night Market', 'Market', '3 km', '6 PM - 11 PM', 'Limited'],
-        ['Dabolim Airport', 'Transport', '42 km', '24x7', 'Immediate'],
-      ],
-    },
-    FAQs: {
-      title: 'FAQs Data',
-      desc: 'Common guest questions with approved answers.',
-      cols: ['Question', 'Answer', 'Category', 'Language', 'Availability'],
-      rows: [
-        ['Is breakfast included?', 'Yes, for all room types', 'Dining', 'EN', 'Immediate'],
-        ['Is there Wi-Fi?', 'Free high-speed Wi-Fi throughout', 'Services', 'EN', 'Immediate'],
-        ['Do you offer airport pickup?', 'Yes, ₹1,800 each way', 'Transport', 'EN', 'Limited'],
-        ['Parking available?', 'Free for in-house guests', 'Services', 'EN', 'Immediate'],
-      ],
-    },
-  };
-
-  function initKnowledgeBase() {
-    const table = $('table');
-    const grid = $('.grid.grid-cols-12');
-    if (!table || !grid) return;
-    const tabsCol = grid.children[0];
-    const main = grid.children[1];
-    const tabs = $$('a', tabsCol);
-    const names = tabs.map((a) => text(a).replace(/\d+$/, '').trim());
-
-    function render(name) {
-      const d = KB[name];
-      if (!d) return;
-      $('h2', main).textContent = d.title;
-      $('h2 + p', main).textContent = d.desc;
-      $('thead tr', table).innerHTML = d.cols.map((c) => '<th class="p-3">' + c + '</th>').join('') + '<th class="p-3 text-right">Actions</th>';
-      $('tbody', table).innerHTML = d.rows
-        .map((r) => {
-          const cells = r.slice(0, -1).map((v, i) => '<td class="p-3' + (i === 0 ? ' font-medium' : '') + '">' + v + '</td>').join('');
-          const status = '<td class="p-3"><span class="px-2 py-0.5 rounded-full ' + KB_STATUS[r[r.length - 1]] + '">' + r[r.length - 1] + '</span></td>';
-          return '<tr class="hover:bg-surface-container-low/50 transition-colors">' + cells + status +
-            '<td class="p-3 text-right"><div class="flex items-center justify-end gap-1">' +
-            '<button class="p-1.5 rounded hover:bg-surface-container-high text-on-surface-variant"><span class="material-symbols-outlined text-sm">edit</span></button>' +
-            '<button class="p-1.5 rounded hover:bg-surface-container-high text-on-surface-variant"><span class="material-symbols-outlined text-sm">delete</span></button>' +
-            '</div></td></tr>';
-        })
-        .join('');
-    }
-
-    tabGroup(tabs, 0, (i) => render(names[i]));
-    render(names[0]);
-  }
-
   /* Tickets: Kanban / List view toggle */
   function initTickets() {
     const cards = $$('[onclick="openSlideOver()"]');
@@ -232,7 +172,6 @@
     wireSidebar();
     initDashboard();
     initConversations();
-    initKnowledgeBase();
     initTickets();
   });
 })();

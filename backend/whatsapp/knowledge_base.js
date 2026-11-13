@@ -1,6 +1,6 @@
 const STOP_WORDS = new Set([
   'a', 'an', 'and', 'are', 'can', 'do', 'does', 'for', 'how', 'i', 'in', 'is',
-  'it', 'me', 'my', 'of', 'on', 'or', 'our', 'please', 'the', 'to', 'we', 'what',
+  'it', 'me', 'my', 'of', 'on', 'or', 'our', 'please', 'the', 'time', 'to', 'we', 'what',
   'when', 'where', 'which', 'who', 'with', 'you', 'your',
   'है', 'हैं', 'का', 'की', 'के', 'को', 'में', 'क्या', 'कब', 'कहाँ', 'और', 'मुझे',
   'आहे', 'आहेत', 'काय', 'कधी', 'कुठे', 'मला', 'मध्ये', 'आणि',
@@ -40,8 +40,8 @@ function retrieveKnowledge(items, query, limit = 5) {
     .map(({ item }) => item);
 }
 
-async function answerFromKnowledge(query, items, apiKey, fetchImpl = fetch) {
-  const sources = retrieveKnowledge(items, query);
+async function answerFromKnowledge(query, items, apiKey, fetchImpl = fetch, searchQuery = query) {
+  const sources = retrieveKnowledge(items, searchQuery);
   if (!sources.length) return null;
   if (!apiKey) throw new Error('GROQ_API_KEY is not set');
 

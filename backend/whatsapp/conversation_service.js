@@ -217,12 +217,12 @@ function createConversationService({ store, aiReply, summarize, logger = console
 }
 
 /** Supabase (PostgREST) data access using the service role key. Server-side only. */
-function createSupabaseStore({ url, serviceRoleKey }) {
+function createSupabaseStore({ url, serviceRoleKey, fetchImpl = fetch }) {
   if (!url || !serviceRoleKey) throw new Error('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set');
   const base = url.replace(/\/$/, '') + '/rest/v1/';
 
   async function rest(method, pathAndQuery, body) {
-    const res = await fetch(base + pathAndQuery, {
+    const res = await fetchImpl(base + pathAndQuery, {
       method,
       headers: {
         apikey: serviceRoleKey,
