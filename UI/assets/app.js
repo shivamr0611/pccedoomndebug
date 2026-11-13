@@ -34,7 +34,7 @@
   }
 
   function wireSidebar() {
-    $$('nav a[data-path]').forEach((a) => {
+    $$('aside a[data-path]').forEach((a) => {
       const folder = PAGES[a.dataset.path];
       if (folder) a.href = '../' + folder + '/code.html';
     });
