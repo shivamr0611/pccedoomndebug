@@ -39,7 +39,7 @@ test('UPI QR targets the configured payee and fixed ₹50 amount', async () => {
   assert.equal(qr.subarray(0, 8).toString('hex'), '89504e470d0a1a0a');
 });
 
-test('payment reply uses Groq Llama with JSON mode and accepts the expected response', async () => {
+test('payment reply uses Groq Qwen with JSON mode and accepts the expected response', async () => {
   let request;
   const reply = await createLocalizedPaymentReply(
     'I want to make the payment for the room.',
@@ -64,9 +64,10 @@ test('payment reply uses Groq Llama with JSON mode and accepts the expected resp
     }
   );
 
-  assert.equal(request.model, 'llama-3.3-70b-versatile');
+  assert.equal(request.model, 'qwen/qwen3.8-27b');
   assert.deepEqual(request.response_format, { type: 'json_object' });
   assert.equal(request.max_completion_tokens, 600);
+  assert.equal(request.reasoning_effort, 'none');
   assert.equal(reply.wantsPayment, true);
   assert.match(reply.qrCaption, /shivamsrevankar@oksbi/);
   assert.match(reply.qrCaption, /cannot verify payment/);

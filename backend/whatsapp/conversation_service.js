@@ -332,6 +332,19 @@ function createSupabaseStore({ url, serviceRoleKey }) {
     findConversationById: async (id) => first(await rest('GET', 'conversations?select=*&limit=1&id=eq.' + q(id))),
     setSummary: (id, summary) => rest('PATCH', 'conversations?id=eq.' + q(id), { summary }),
     insertMessage: async (row) => first(await rest('POST', 'messages', row)),
+    listKnowledgeBaseItems: () =>
+      fetchAll('knowledge_base_items?select=*&order=category.asc,title.asc'),
+    insertKnowledgeBaseItem: async (item) =>
+      first(await rest('POST', 'knowledge_base_items', item)),
+    updateKnowledgeBaseItem: async (id, item) =>
+      first(
+        await rest('PATCH', 'knowledge_base_items?id=eq.' + q(id), {
+          ...item,
+          updated_at: new Date().toISOString(),
+        })
+      ),
+    deleteKnowledgeBaseItem: async (id) =>
+      (await rest('DELETE', 'knowledge_base_items?id=eq.' + q(id))).length > 0,
     listMessages: (conversationId) =>
       rest('GET', 'messages?select=sender,body,created_at&order=created_at.asc&conversation_id=eq.' + q(conversationId)),
     listOpenConversations: () => rest('GET', 'conversations?select=*&status=eq.open'),

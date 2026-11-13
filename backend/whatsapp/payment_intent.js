@@ -31,9 +31,10 @@ async function createLocalizedPaymentReply(text, apiKey, fetchImpl = fetch) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + apiKey },
     body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
+      model: 'qwen/qwen3.8-27b',
       temperature: 0.1,
       max_completion_tokens: 600,
+      reasoning_effort: 'none',
       response_format: { type: 'json_object' },
       messages: [
         {
