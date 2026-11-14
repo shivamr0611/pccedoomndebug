@@ -4,6 +4,7 @@ const STOP_WORDS = new Set([
   'when', 'where', 'which', 'who', 'with', 'you', 'your',
   'है', 'हैं', 'का', 'की', 'के', 'को', 'में', 'क्या', 'कब', 'कहाँ', 'और', 'मुझे',
   'आहे', 'आहेत', 'काय', 'कधी', 'कुठे', 'मला', 'मध्ये', 'आणि',
+  'आसा', 'आसात', 'किते', 'कन्ना', 'खंय', 'म्हाका', 'आनी', 'जाय', 'कर', 'वूय',
 ]);
 
 function outOfContextReply(language, localizedReply = '') {
@@ -11,8 +12,10 @@ function outOfContextReply(language, localizedReply = '') {
     English: "Sorry, I couldn't understand your question. Please rephrase it.",
     Hindi: 'माफ़ कीजिए, मैं आपका सवाल समझ नहीं पाया। कृपया इसे दूसरे शब्दों में पूछें।',
     Marathi: 'माफ करा, मला तुमचा प्रश्न समजला नाही. कृपया तो पुन्हा वेगळ्या शब्दांत विचारा.',
+    Konkani: 'माफ करा, म्हाका तुमचो प्रश्न समजुंक ना. उपकार करून तो दुसऱ्या उतरांनी विचारात.',
     'Hindi + English': "Sorry, मैं आपका सवाल समझ नहीं पाया। Please rephrase it.",
     'Marathi + English': "Sorry, मला तुमचा प्रश्न समजला नाही. Please rephrase it.",
+    'Konkani + English': "Sorry, म्हाका तुमचो प्रश्न समजुंक ना. Please rephrase it.",
     'Hindi + Marathi': 'माफ़ कीजिए, मैं आपका सवाल समझ नहीं पाया। कृपया तो पुन्हा वेगळ्या शब्दांत विचारा।',
   };
   return replies[language] || localizedReply || replies.English;
@@ -157,6 +160,7 @@ async function answerFromKnowledge(query, items, apiKey, fetchImpl = fetch, sear
           content:
             `Today's date is ${todayString}. Never accept or confirm a booking for a past date; if the guest asks to book a past date, politely inform them that bookings can only be made for today or future dates. ` +
             languageInstruction +
+            'Do NOT ask for a guest count or checkout date. Use the standard rate from the knowledge base for booking or price questions. ' +
             'Translate facts from the knowledge-base entries into the guest language when needed; never reply in the entry language just because it is the source language. ' +
             'Choose the reply language from the current guest question only, not from conversation history or knowledge-base entries. ' +
             'Use only the supplied knowledge-base entries as your source of truth. ' +

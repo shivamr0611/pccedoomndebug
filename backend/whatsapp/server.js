@@ -170,10 +170,16 @@ async function sendBot(chat, text) {
 }
 
 async function sendPaymentQr(chat, caption, orderId, amount) {
-  const qr = await createPaymentQr(orderId, amount);
-  const media = new MessageMedia('image/png', qr.toString('base64'), 'upi-payment-qr.png');
-  rememberBotText(caption);
-  await client.sendMessage(chat, media, { caption: BOT_MARK + caption });
+  try {
+    const qr = await createPaymentQr(orderId, amount);
+    const media = new MessageMedia('image/png', qr.toString('base64'), 'upi-payment-qr.png');
+    rememberBotText(caption);
+    console.log('-> sending payment QR image (' + qr.length + ' bytes) to ' + chat);
+    await client.sendMessage(chat, media, { caption: BOT_MARK + caption });
+  } catch (err) {
+    console.error('Failed to send QR media:', err.stack || err.message || err);
+    await client.sendMessage(chat, BOT_MARK + caption);
+  }
 }
 
 let sarvamClient;
@@ -284,10 +290,27 @@ async function resolveSender(msg, chat) {
   return { phone, name };
 }
 
-const BOOKING_INTENT_RE = /\b(?:book(?:ing)?(?:\s+(?:for|a|the|it|room|me))?|confirm\s+booking|booking\s+kar(?:na|o|do)?|room\s+book)\b/i;
+const BOOKING_INTENT_RE = /(?:^|[^\p{L}\p{N}])(?:book(?:ing)?(?:\s+(?:for|a|the|it|room|me))?|confirm\s+booking|booking\s*kar(?:na|o|do|at|a|chem|unk)?|room\s*book|room\s*chahiye|kamra\s*chahiye|kholi\s*(?:hawi|havi|pahije|jay|zay|zai|book\s*kara|book\s*kar)|kholichi\s*booking|बुकिंग|बुक|कमरा\s*चाहिए|रूम\s*चाहिए|खोली\s*(?:हवी|पाहिजे|जाय|बुक\s*करा|बुक\s*कर)|खोलीची\s*बुकिंग|आरक्षण|नक्की\s*करा|कन्फर्म\s*करा)(?:[^\p{L}\p{N}]|$)/iu;
+
+const REGIONAL_MONTHS = {
+  // Hindi, Marathi & Konkani forms
+  जनवरी: '01', जाने: '01', जानेवारी: '01',
+  फ़रवरी: '02', फरवरी: '02', फेब्रु: '02', फेब्रुवारी: '02', फेब्रुआरी: '02',
+  मार्च: '03',
+  अप्रैल: '04', अप्रेल: '04', एप्रिल: '04',
+  मई: '05', मे: '05',
+  जून: '06',
+  जुलाई: '07', जुलै: '07',
+  अगस्त: '08', ऑगस्ट: '08',
+  सितंबर: '09', सितम्बर: '09', सप्टेंबर: '09',
+  अक्टूबर: '10', ऑक्टोबर: '10',
+  नवम्बर: '11', नवंबर: '11', नोव्हेंबर: '11', नोव्हेंबर: '11',
+  दिसंबर: '12', दिसम्बर: '12', डिसेंबर: '12'
+};
 
 function extractDateFromText(text) {
-  const m = String(text || '').match(/(\d{1,2})\s+(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s*(?:(\d{2,4}))?/i);
+  const raw = String(text || '').replace(/[०-९]/g, (d) => String('०१२३४५६७८९'.indexOf(d)));
+  const m = raw.match(/(\d{1,2})\s+(Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s*(?:(\d{2,4}))?/i);
   if (m) {
     const months = { jan: '01', feb: '02', mar: '03', apr: '04', may: '05', jun: '06', jul: '07', aug: '08', sep: '09', oct: '10', nov: '11', dec: '12' };
     const month = months[m[2].toLowerCase().slice(0, 3)];
@@ -295,7 +318,14 @@ function extractDateFromText(text) {
     let year = m[3] ? (m[3].length === 2 ? '20' + m[3] : m[3]) : '2026';
     return year + '-' + month + '-' + day;
   }
-  const iso = String(text || '').match(/\b(\d{4}-\d{2}-\d{2})\b/);
+  const mRegional = raw.match(/(\d{1,2})\s+(जनवरी|जानेवारी|फ़रवरी|फरवरी|फेब्रुवारी|फेब्रुआरी|मार्च|अप्रैल|अप्रेल|एप्रिल|मई|मे|जून|जुलाई|जुलै|अगस्त|ऑगस्ट|सितंबर|सितम्बर|सप्टेंबर|अक्टूबर|ऑक्टोबर|नवम्बर|नवंबर|नोव्हेंबर|दिसंबर|दिसम्बर|डिसेंबर)\s*(?:(\d{2,4}))?/i);
+  if (mRegional) {
+    const month = REGIONAL_MONTHS[mRegional[2]];
+    const day = mRegional[1].padStart(2, '0');
+    let year = mRegional[3] ? (mRegional[3].length === 2 ? '20' + mRegional[3] : mRegional[3]) : '2026';
+    return year + '-' + month + '-' + day;
+  }
+  const iso = raw.match(/\b(\d{4}-\d{2}-\d{2})\b/);
   return iso ? iso[1] : null;
 }
 
